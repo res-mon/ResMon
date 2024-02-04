@@ -1,3 +1,11 @@
+# Work in progress, everything is subject to change.
+This project is early development, but if you want to contribute - 
+*idk why anyone would but thanks* - feel free to create issues.
+
+Please do **not** use it in production.
+
+---
+
 Requirements:
  - [Go](https://go.dev/dl/)
  - [Elm](https://guide.elm-lang.org/install/elm.html)
