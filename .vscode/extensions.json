@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "streetsidesoftware.code-spell-checker",
+        "streetsidesoftware.code-spell-checker-german",
+        "eamodio.gitlens",
+        "golang.go",
+        "supertsy5.line-length-checker-vscode",
+        "elmtooling.elm-ls-vscode",
+        "syler.sass-indented",
+        "ms-azuretools.vscode-docker",
+        "github.vscode-github-actions"
+    ]
+}
