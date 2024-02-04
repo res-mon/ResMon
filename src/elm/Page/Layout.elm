@@ -11,7 +11,8 @@ import List exposing (map)
 import Model.Shared exposing (AlertLevel(..), SharedModel, removeAlert)
 import Tailwind.Classes exposing (shadow_lg)
 import Tailwind.Theme exposing (base_100)
-import Tailwind.Utilities exposing (bg_color, font_bold, globalStyles, p_16, text_3xl, text_xl)
+import Tailwind.Utilities exposing (bg_color, duration_500, font_bold, font_mono, globalStyles, grid, h_screen, p_16, place_items_center, text_3xl, text_7xl, text_xl)
+import Time
 
 
 
@@ -60,9 +61,29 @@ view shared model _ body =
                 [ css
                     [ p_16
                     , bg_color base_100
+                    , grid
+                    , h_screen
+                    , place_items_center
                     ]
                 ]
-                (map fromUnstyled body.body)
+                (div [ css [ text_7xl, font_mono ] ]
+                    [ D.countdown []
+                        []
+                        [ duration_500 ]
+                        (Maybe.map2 Time.toHour shared.timeZone shared.time |> Maybe.withDefault 0)
+                    , text ":"
+                    , D.countdown []
+                        []
+                        [ duration_500 ]
+                        (Maybe.map2 Time.toMinute shared.timeZone shared.time |> Maybe.withDefault 0)
+                    , text ":"
+                    , D.countdown []
+                        []
+                        [ duration_500 ]
+                        (Maybe.map2 Time.toSecond shared.timeZone shared.time |> Maybe.withDefault 0)
+                    ]
+                    :: map fromUnstyled body.body
+                )
     in
     { title = body.title ++ " - Archive Guardian"
     , body =

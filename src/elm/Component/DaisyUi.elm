@@ -1,7 +1,7 @@
-module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DropdownModifier(..), InputModifier(..), MenuItemModifier(..), MenuModifier(..), ToastModifier(..), alert, alertStyle, btn, btnStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, toast, toastStyle)
+module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DropdownModifier(..), InputModifier(..), MenuItemModifier(..), MenuModifier(..), ToastModifier(..), alert, alertStyle, btn, btnStyle, countdown, countdownStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, toast, toastStyle)
 
-import Css exposing (Style)
-import Html.Styled exposing (Attribute, Html, div, li, ul)
+import Css exposing (Style, before, important)
+import Html.Styled exposing (Attribute, Html, div, li, span, ul)
 import Html.Styled.Attributes exposing (attribute, classList, css)
 import Svg.Styled exposing (style)
 import Tailwind.Classes as C
@@ -785,3 +785,57 @@ type InputModifier
     | InputMd -- Medium (default) size for input
     | InputSm -- Small size for input
     | InputXs -- Extra small size for input
+
+
+
+-- COUNTDOWN
+
+
+{-| Countdown gives you a transition effect of changing numbers.
+Value must be a number between 0 and 99.
+
+<https://daisyui.com/components/countdown/>
+
+-}
+countdownStyle : ( List Style, List String )
+countdownStyle =
+    C.countdown
+
+
+{-| Countdown gives you a transition effect of changing numbers.
+Value must be a number between 0 and 99.
+
+<https://daisyui.com/components/countdown/>
+
+-}
+countdown :
+    List ( List Style, List String )
+    -> List (Attribute msg)
+    -> List Style
+    -> Int
+    -> Html msg
+countdown classes attributes valueStyle value =
+    let
+        lastTwoDigits =
+            abs value
+                |> modBy 100
+    in
+    mergeUnmodifiedElement countdownStyle
+        span
+        classes
+        attributes
+        [ span
+            [ attribute "style"
+                ([ "--value:"
+                 , String.fromInt lastTwoDigits
+                 , ";"
+                 ]
+                    |> String.concat
+                )
+            , css
+                [ before
+                    (List.map important valueStyle)
+                ]
+            ]
+            []
+        ]
