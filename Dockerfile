@@ -11,8 +11,6 @@ RUN apt-get update && apt-get install -y gcc libc6-dev
 ENV CGO_ENABLED=1
 RUN go build -tags netgo -ldflags '-extldflags "-static"' -o res-mon
 
-
-
 FROM debian:bullseye-slim
 
 RUN apt-get update && apt-get install -y ca-certificates wget && rm -rf /var/lib/apt/lists/*
@@ -21,6 +19,7 @@ RUN groupadd -r appuser && useradd -r -g appuser -d /app appuser
 WORKDIR /app
 COPY --from=builder /app/res-mon .
 RUN chown appuser:appuser res-mon && chmod 500 res-mon
+RUN mkdir /app/data && chown appuser:appuser /app/data && chmod 500 /app/data
 
 EXPOSE 8321
 USER appuser
