@@ -56,7 +56,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: .
-        file: ./Dockerfile
+        file: ./docker/Release.Dockerfile
         push: true
         tags: yertools/res-mon:latest
         labels: yertools/res-mon
