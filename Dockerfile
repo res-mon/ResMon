@@ -20,6 +20,7 @@ WORKDIR /app
 COPY --from=builder /app/res-mon .
 RUN chown appuser:appuser res-mon && chmod 500 res-mon
 RUN mkdir /app/data && chown appuser:appuser /app/data && chmod 500 /app/data
+RUN touch /app/data/database.db chown appuser:appuser /app/data/database.db && chmod 500 /app/data/database.db
 
 EXPOSE 8321
 USER appuser
