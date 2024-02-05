@@ -38,6 +38,6 @@ jobs:
         tags: yertools/res-mon-docs:latest
         labels: yertools/res-mon-docs
         builder: ${{ steps.buildx.outputs.name }}
-        platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
+        platforms: linux/amd64
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
