@@ -28,18 +28,11 @@ RUN chown appuser:appuser res-mon && chmod 500 res-mon
 
 
 
-FROM base as temp
+FROM base as final
 
 WORKDIR /app
 COPY --from=builder /app/res-mon .
 RUN chown appuser:appuser res-mon && chmod 500 res-mon
-
-
-
-FROM base as final
-
-WORKDIR /app
-COPY --from=temp /app/res-mon .
 
 EXPOSE 8321
 USER appuser
