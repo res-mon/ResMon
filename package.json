@@ -30,8 +30,6 @@
         "css-loader": "^6.8.1",
         "css-minimizer-webpack-plugin": "^5.0.1",
         "daisyui": "^4.6.0",
-        "elm": "^0.19.1-6",
-        "elm-doc-preview": "^5.0.5",
         "elm-format": "^0.8.7",
         "elm-reloader": "^1.0.0",
         "elm-review": "^2.10.3",
