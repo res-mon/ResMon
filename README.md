@@ -5,7 +5,8 @@ _idk why anyone would but thanks_ - feel free to create issues.
 
 Please do **not** use it in production.
 
-The latest version is running at [ResMon.de](https://resmon.de).
+The latest version is running at [ResMon.de](https://resmon.de).  
+Code documentation can be found here: [Docs.ResMon.de](https://docs.resmon.de).
 
 ---
 
