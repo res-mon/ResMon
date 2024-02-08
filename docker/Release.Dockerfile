@@ -20,7 +20,7 @@ RUN mkdir /app && groupadd -r appuser && useradd -r -g appuser -d /app appuser
 
 
 RUN chown appuser:appuser /app && chmod 500 /app
-RUN mkdir /app/data && chown appuser:appuser /app/data && chmod 600 /app/data
+RUN mkdir /app/data && chown appuser:appuser /app/data && chmod 500 /app/data
 RUN touch /app/data/database.db && chown appuser:appuser /app/data/database.db && chmod 600 /app/data/database.db
 
 WORKDIR /app
