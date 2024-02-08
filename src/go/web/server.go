@@ -128,7 +128,7 @@ func (s *server) Run(ctx, killCtx context.Context, shutdown func()) error {
 
 	if s.devMode {
 		go (func() {
-			err := openURL("http://localhost:8123/")
+			err := openURL("http://localhost:8321/")
 			if err != nil {
 				errChan <- err
 			}
