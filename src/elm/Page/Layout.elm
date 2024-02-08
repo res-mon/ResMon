@@ -82,7 +82,7 @@ view shared model _ body =
                     :: map fromUnstyled body.body
                 )
     in
-    { title = body.title ++ " - Archive Guardian"
+    { title = body.title ++ " - ResMon"
     , body =
         global globalStyles
             :: alerts model.toMsg shared.alerts
