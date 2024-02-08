@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y ca-certificates wget && rm -rf /var/lib
 RUN mkdir /app && groupadd -r appuser && useradd -r -g appuser -d /app appuser
 
 
-RUN chown appuser:appuser /app && chmod 400 /app
+RUN chown appuser:appuser /app && chmod 500 /app
 RUN mkdir /app/data && chown appuser:appuser /app/data && chmod 400 /app/data
 RUN touch /app/data/database.db && chown appuser:appuser /app/data/database.db && chmod 600 /app/data/database.db
 
