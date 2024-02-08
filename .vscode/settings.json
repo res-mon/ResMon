@@ -1,0 +1,10 @@
+{
+    "editor.formatOnSave": true,
+    "files.eol": "\n",
+    "sortLines.filterBlankLines": true,
+    "line-length-checker.blacklist": [
+        "*.md",
+        "node_modules/**"
+    ],
+    "cSpell.language": "en,de"
+}

@@ -8,6 +8,7 @@
         "elmtooling.elm-ls-vscode",
         "syler.sass-indented",
         "ms-azuretools.vscode-docker",
-        "github.vscode-github-actions"
+        "github.vscode-github-actions",
+        "esbenp.prettier-vscode"
     ]
 }

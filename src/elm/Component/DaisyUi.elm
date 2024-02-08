@@ -1,8 +1,8 @@
-module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DropdownModifier(..), InputModifier(..), MenuItemModifier(..), MenuModifier(..), ToastModifier(..), alert, alertStyle, btn, btnStyle, countdown, countdownStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, toast, toastStyle)
+module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DropdownModifier(..), ExtendedStyle, InputModifier(..), MenuItemModifier(..), MenuModifier(..), ToastModifier(..), alert, alertStyle, attribute, attributes, btn, btnStyle, class, classes, countdown, countdownStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, modifier, modifiers, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, toast, toastStyle)
 
 import Css exposing (Style, before, important)
 import Html.Styled exposing (Attribute, Html, div, li, span, ul)
-import Html.Styled.Attributes exposing (attribute, classList, css)
+import Html.Styled.Attributes as Attr
 import Svg.Styled exposing (style)
 import Tailwind.Classes as C
 
@@ -18,30 +18,34 @@ merge :
     -> List modifier
     -> List (Attribute msg)
     -> List (Attribute msg)
-merge modifier daisyStyles daisyClasses modifiers attributes =
+merge modifierFunc daisyStyles daisyClasses modifierList attributeList =
     let
         ( modifierAttributes, modifierClasses ) =
-            List.map modifier modifiers
+            List.map modifierFunc modifierList
                 |> List.unzip
 
-        class : Attribute msg
-        class =
+        classList : Attribute msg
+        classList =
             daisyClasses
                 :: modifierClasses
                 |> List.concat
                 |> List.map (\x -> ( x, True ))
-                |> classList
+                |> Attr.classList
 
         style : Attribute msg
         style =
             daisyStyles
                 :: modifierAttributes
                 |> List.concat
-                |> css
+                |> Attr.css
     in
     style
-        :: class
-        :: attributes
+        :: classList
+        :: attributeList
+
+
+
+-- OK
 
 
 mergeModifiedStyles :
@@ -49,44 +53,53 @@ mergeModifiedStyles :
     -> List ( List Style, List String )
     -> List modifier
     -> ( List Style, List String )
-mergeModifiedStyles modifier classes modifiers =
-    classes
-        ++ List.map modifier modifiers
+mergeModifiedStyles modifierFunc classList modifierList =
+    classList
+        ++ List.map modifierFunc modifierList
         |> unzip
 
 
 mergeElement :
     (List modifier -> ( List Style, List String ))
     -> (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List modifier
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg modifier)
     -> List (Html msg)
     -> Html msg
-mergeElement modifiedStyle element classes modifiers attributes children =
+mergeElement modifierMapFunc element stylings children =
     let
-        ( styles, classNames ) =
-            classes ++ [ modifiedStyle modifiers ] |> unzip
+        classList : List ( List Style, List String )
+        classList =
+            List.concatMap .classes stylings
 
-        class : List ( String, Bool )
-        class =
+        attributeList : List (Attribute msg)
+        attributeList =
+            List.concatMap .attributes stylings
+
+        modifierList : List modifier
+        modifierList =
+            List.concatMap .modifiers stylings
+
+        ( styles, classNames ) =
+            classList ++ [ modifierMapFunc modifierList ] |> unzip
+
+        activeClasses : List ( String, Bool )
+        activeClasses =
             classNames
                 |> List.map (\name -> ( name, True ))
     in
     element
-        (css styles :: classList class :: attributes)
+        (Attr.css styles :: Attr.classList activeClasses :: attributeList)
         children
 
 
 mergeUnmodifiedElement :
     ( List Style, List String )
     -> (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg modifier)
     -> List (Html msg)
     -> Html msg
-mergeUnmodifiedElement style element classes =
-    mergeElement (\_ -> style) element classes []
+mergeUnmodifiedElement style element styling =
+    mergeElement (\_ -> ( [], [] )) element (class style :: styling)
 
 
 mergeUnmodified :
@@ -110,17 +123,76 @@ mergeStyles :
     List ( List Style, List String )
     -> List (Attribute msg)
     -> List (Attribute msg)
-mergeStyles classes =
-    mergeUnmodifiedTuple (classes |> unzip)
+mergeStyles classList =
+    mergeUnmodifiedTuple (classList |> unzip)
 
 
 unzip : List ( List a, List b ) -> ( List a, List b )
 unzip list =
     let
-        ( styles, classes ) =
+        ( styles, classList ) =
             List.unzip list
     in
-    ( List.concat styles, List.concat classes )
+    ( List.concat styles, List.concat classList )
+
+
+
+-- EXTENDED-STYLE
+
+
+type alias ExtendedStyle msg modifier =
+    { classes : List ( List Style, List String )
+    , attributes : List (Attribute msg)
+    , modifiers : List modifier
+    }
+
+
+class : ( List Style, List String ) -> ExtendedStyle msg modifier
+class ( styles, classNames ) =
+    { classes = [ ( styles, classNames ) ]
+    , attributes = []
+    , modifiers = []
+    }
+
+
+classes : List ( List Style, List String ) -> ExtendedStyle msg modifier
+classes classList =
+    { classes = classList
+    , attributes = []
+    , modifiers = []
+    }
+
+
+attribute : Attribute msg -> ExtendedStyle msg modifier
+attribute attr =
+    { classes = []
+    , attributes = [ attr ]
+    , modifiers = []
+    }
+
+
+attributes : List (Attribute msg) -> ExtendedStyle msg modifier
+attributes attributeList =
+    { classes = []
+    , attributes = attributeList
+    , modifiers = []
+    }
+
+
+modifier : modifier -> ExtendedStyle msg modifier
+modifier mod =
+    { classes = []
+    , attributes = []
+    , modifiers = [ mod ]
+    }
+
+
+modifiers : List modifier -> ExtendedStyle msg modifier
+modifiers modList =
+    { classes = []
+    , attributes = []
+    , modifiers = modList
+    }
 
 
 
@@ -154,8 +226,8 @@ type BtnModifier
 
 
 btnModifier : BtnModifier -> ( List Style, List String )
-btnModifier modifier =
-    case modifier of
+btnModifier mod =
+    case mod of
         BtnNeutral ->
             C.btn_neutral
 
@@ -247,13 +319,11 @@ Button.
 -}
 btn :
     (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List BtnModifier
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg BtnModifier)
     -> List (Html msg)
     -> Html msg
-btn =
-    mergeElement btnStyle
+btn element styling children =
+    mergeElement btnStyle element styling children
 
 
 
@@ -271,8 +341,8 @@ type DropdownModifier
 
 
 dropdownModifier : DropdownModifier -> ( List Style, List String )
-dropdownModifier modifier =
-    case modifier of
+dropdownModifier mod =
+    case mod of
         DropdownEnd ->
             C.dropdown_end
 
@@ -316,27 +386,26 @@ Container element.
 -}
 dropdown :
     (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List DropdownModifier
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg DropdownModifier)
     -> List (Html msg)
     -> (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg ())
     -> List (Html msg)
     -> Html msg
-dropdown element dropdownClasses modifiers dropdownAttributes dropdownOpener contentElement contentClasses contentAttributes content =
+dropdown element styling openerContent contentElement contentStyling content =
     let
         inner : Html msg
         inner =
-            mergeUnmodifiedElement dropdownContentStyle contentElement contentClasses contentAttributes content
+            mergeUnmodifiedElement
+                dropdownContentStyle
+                contentElement
+                contentStyling
+                content
     in
     mergeElement dropdownStyle
         element
-        dropdownClasses
-        modifiers
-        dropdownAttributes
-        (dropdownOpener ++ [ inner ])
+        styling
+        (openerContent ++ [ inner ])
 
 
 {-| Dropdown container for content.
@@ -358,12 +427,15 @@ Use inside of `dropdown` component.
 -}
 dropdownContent :
     (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg ())
     -> List (Html msg)
     -> Html msg
-dropdownContent =
-    mergeUnmodifiedElement dropdownContentStyle
+dropdownContent element styling content =
+    mergeUnmodifiedElement
+        dropdownContentStyle
+        element
+        styling
+        content
 
 
 
@@ -389,12 +461,15 @@ Container element.
 -}
 navbar :
     (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg ())
     -> List (Html msg)
     -> Html msg
-navbar =
-    mergeUnmodifiedElement navbarStyle
+navbar element styling content =
+    mergeUnmodifiedElement
+        navbarStyle
+        element
+        styling
+        content
 
 
 {-| Child element, fills 50% of width to be on start.
@@ -416,12 +491,14 @@ Use inside of `navbar` component.
 -}
 navbarStart :
     (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg ())
     -> List (Html msg)
     -> Html msg
-navbarStart =
+navbarStart element styling content =
     mergeUnmodifiedElement navbarStartStyle
+        element
+        styling
+        content
 
 
 {-| Child element, fills remaining space to be on center.
@@ -443,12 +520,14 @@ Use inside of `navbar` component.
 -}
 navbarCenter :
     (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg ())
     -> List (Html msg)
     -> Html msg
-navbarCenter =
+navbarCenter element styling content =
     mergeUnmodifiedElement navbarCenterStyle
+        element
+        styling
+        content
 
 
 {-| Child element, fills 50% of width to be on end.
@@ -470,12 +549,14 @@ Use inside of `navbar` component.
 -}
 navbarEnd :
     (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg ())
     -> List (Html msg)
     -> Html msg
-navbarEnd =
+navbarEnd element styling content =
     mergeUnmodifiedElement navbarEndStyle
+        element
+        styling
+        content
 
 
 
@@ -498,8 +579,8 @@ type MenuItemModifier
 
 
 menuModifier : MenuModifier -> ( List Style, List String )
-menuModifier modifier =
-    case modifier of
+menuModifier mod =
+    case mod of
         MenuXs ->
             C.menu_xs
 
@@ -520,8 +601,8 @@ menuModifier modifier =
 
 
 menuItemModifier : MenuItemModifier -> ( List Style, List String )
-menuItemModifier modifier =
-    case modifier of
+menuItemModifier mod =
+    case mod of
         MenuDisabled ->
             C.disabled
 
@@ -552,13 +633,11 @@ Container <ul> element.
 
 -}
 menu :
-    List ( List Style, List String )
-    -> List MenuModifier
-    -> List (Attribute msg)
+    List (ExtendedStyle msg MenuModifier)
     -> List (Html msg)
     -> Html msg
-menu =
-    mergeElement menuStyle ul
+menu styling content =
+    mergeElement menuStyle ul styling content
 
 
 {-| Specifies the title of menu.
@@ -580,12 +659,14 @@ Use inside of `menu` component.
 -}
 menuTitle :
     (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg ())
     -> List (Html msg)
     -> Html msg
-menuTitle =
+menuTitle element styling content =
     mergeUnmodifiedElement menuTitleStyle
+        element
+        styling
+        content
 
 
 {-| Item of menu. (`<li>`)
@@ -608,13 +689,11 @@ Use inside of `menu` component.
 
 -}
 menuItem :
-    List ( List Style, List String )
-    -> List MenuItemModifier
-    -> List (Attribute msg)
+    List (ExtendedStyle msg MenuItemModifier)
     -> List (Html msg)
     -> Html msg
-menuItem =
-    mergeElement menuItemStyle li
+menuItem styling content =
+    mergeElement menuItemStyle li styling content
 
 
 
@@ -638,12 +717,14 @@ stackStyle =
 -}
 stack :
     (List (Attribute msg) -> List (Html msg) -> Html msg)
-    -> List ( List Style, List String )
-    -> List (Attribute msg)
+    -> List (ExtendedStyle msg ())
     -> List (Html msg)
     -> Html msg
-stack =
+stack element styling content =
     mergeUnmodifiedElement stackStyle
+        element
+        styling
+        content
 
 
 
@@ -660,8 +741,8 @@ type ToastModifier
 
 
 toastModifier : ToastModifier -> ( List Style, List String )
-toastModifier modifier =
-    case modifier of
+toastModifier mod =
+    case mod of
         ToastStart ->
             ( [], [ "toast-start" ] )
 
@@ -699,13 +780,11 @@ toastStyle =
 
 -}
 toast :
-    List ( List Style, List String )
-    -> List ToastModifier
-    -> List (Attribute msg)
+    List (ExtendedStyle msg ToastModifier)
     -> List (Html msg)
     -> Html msg
-toast =
-    mergeElement toastStyle div
+toast styling content =
+    mergeElement toastStyle div styling content
 
 
 
@@ -720,8 +799,8 @@ type AlertModifier
 
 
 alertModifier : AlertModifier -> ( List Style, List String )
-alertModifier modifier =
-    case modifier of
+alertModifier mod =
+    case mod of
         AlertInfo ->
             unzip [ C.alert_info ]
 
@@ -753,18 +832,18 @@ alertStyle =
 
 -}
 alert :
-    List ( List Style, List String )
-    -> List AlertModifier
-    -> List (Attribute msg)
+    List (ExtendedStyle msg AlertModifier)
     -> List (Html msg)
     -> Html msg
-alert classes modifiers attributes =
+alert styling content =
     mergeElement
         alertStyle
         div
-        classes
-        modifiers
-        (attribute "role" "alert" :: attributes)
+        (attribute
+            (Attr.attribute "role" "alert")
+            :: styling
+        )
+        content
 
 
 
@@ -809,12 +888,11 @@ Value must be a number between 0 and 99.
 
 -}
 countdown :
-    List ( List Style, List String )
-    -> List (Attribute msg)
+    List (ExtendedStyle msg ())
     -> List Style
     -> Int
     -> Html msg
-countdown classes attributes valueStyle value =
+countdown styling valueStyle value =
     let
         lastTwoDigits =
             abs value
@@ -822,17 +900,16 @@ countdown classes attributes valueStyle value =
     in
     mergeUnmodifiedElement countdownStyle
         span
-        classes
-        attributes
+        styling
         [ span
-            [ attribute "style"
+            [ Attr.attribute "style"
                 ([ "--value:"
                  , String.fromInt lastTwoDigits
                  , ";"
                  ]
                     |> String.concat
                 )
-            , css
+            , Attr.css
                 [ before
                     (List.map important valueStyle)
                 ]
