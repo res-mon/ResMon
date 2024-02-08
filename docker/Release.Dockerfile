@@ -19,9 +19,9 @@ RUN apt-get update && apt-get install -y ca-certificates wget && rm -rf /var/lib
 RUN mkdir /app && groupadd -r appuser && useradd -r -g appuser -d /app appuser
 
 
-RUN chown -R appuser:appuser /app && chmod -R 400 /app
-#RUN mkdir /app/data && chown -R appuser:appuser /app/data && chmod -R 400 /app/data
-#RUN touch /app/data/database.db && chown appuser:appuser /app/data/database.db && chmod 600 /app/data/database.db
+RUN chown -R appuser:appuser /app && chmod -R 700 /app
+RUN mkdir /app/data && chown -R appuser:appuser /app/data && chmod -R 700 /app/data
+RUN touch /app/data/database.db && chown appuser:appuser /app/data/database.db && chmod 700 /app/data/database.db
 
 WORKDIR /app
 COPY --from=builder /app/res-mon .
