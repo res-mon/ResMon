@@ -68,17 +68,14 @@ view shared model _ body =
                 ]
                 (div [ css [ text_7xl, font_mono ] ]
                     [ D.countdown []
-                        []
                         [ duration_500 ]
                         (Maybe.map2 Time.toHour shared.timeZone shared.time |> Maybe.withDefault 0)
                     , text ":"
                     , D.countdown []
-                        []
                         [ duration_500 ]
                         (Maybe.map2 Time.toMinute shared.timeZone shared.time |> Maybe.withDefault 0)
                     , text ":"
                     , D.countdown []
-                        []
                         [ duration_500 ]
                         (Maybe.map2 Time.toSecond shared.timeZone shared.time |> Maybe.withDefault 0)
                     ]
@@ -96,9 +93,8 @@ view shared model _ body =
 
 alerts : (Msg msg -> msg) -> List (Model.Shared.Alert msg) -> Html msg
 alerts toMsg items =
-    D.toast []
-        [ D.ToastTop, D.ToastEnd ]
-        []
+    D.toast
+        [ D.modifiers [ D.ToastTop, D.ToastEnd ] ]
         (map (alert toMsg) items)
 
 
@@ -137,18 +133,15 @@ alert toMsg item =
                     , [ D.BtnError ]
                     )
     in
-    D.alert [ shadow_lg ]
-        alertModifier
-        []
+    D.alert [ D.modifiers alertModifier, D.class shadow_lg ]
         [ ico [ text_3xl ]
         , div []
             [ h3 [ css [ font_bold, text_xl ] ] item.title
             , div [] item.message
             ]
         , D.btn button
-            []
-            btnModifier
-            [ onClick (RemoveAlert item.number |> toMsg)
+            [ D.modifiers btnModifier
+            , D.attribute <| onClick (RemoveAlert item.number |> toMsg)
             ]
             [ text "Löschen"
             ]
