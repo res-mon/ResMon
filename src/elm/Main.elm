@@ -189,7 +189,7 @@ view model =
         ( minimal, page ) =
             case model.shared.route of
                 Loading ->
-                    ( True, { title = "", body = [] } )
+                    ( True, { title = "Loading", body = [] } )
 
                 NotFound ->
                     ( model.shared.user == Nothing
@@ -197,7 +197,7 @@ view model =
                     )
 
                 WorkClock ->
-                    ( False, { title = "", body = [] } )
+                    ( False, { title = "Stempeluhr", body = [] } )
     in
     layout minimal page
 
