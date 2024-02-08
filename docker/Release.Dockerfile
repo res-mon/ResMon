@@ -31,4 +31,4 @@ EXPOSE 8321
 USER appuser
 
 CMD ["./res-mon"]
-HEALTHCHECK --interval=1m --timeout=15s --start-period=30s --retries=5 CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:8123/ || exit 1
+HEALTHCHECK --interval=1m --timeout=15s --start-period=30s --retries=5 CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:8321/ || exit 1

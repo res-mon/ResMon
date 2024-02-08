@@ -69,8 +69,8 @@ func main() {
 	}
 	defer db.Close()
 
-	fmt.Println("starting web server at http://127.0.0.1:8123/ ...")
-	svr := web.NewServer(8123, "webroot", webroot, devMode)
+	fmt.Println("starting web server at http://127.0.0.1:8321/ ...")
+	svr := web.NewServer(8321, "webroot", webroot, devMode)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
