@@ -1,9 +1,17 @@
 module Extension.Time exposing (fixVariation, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString)
 
+{-| This module provides utility functions for working with Time.
+
+@docs fixVariation, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString
+
+-}
+
 import Basics.Extra exposing (safeDivide, safeModBy)
 import Time
 
 
+{-| Converts a given time to a date string.
+-}
 toDateString : Time.Zone -> Time.Posix -> String
 toDateString zone posix =
     let
@@ -29,6 +37,8 @@ toDateString zone posix =
         ]
 
 
+{-| Converts a month to an integer.
+-}
 monthToInt : Time.Month -> Int
 monthToInt month =
     case month of
@@ -69,6 +79,8 @@ monthToInt month =
             12
 
 
+{-| Converts a month to a string.
+-}
 monthToString : Time.Month -> String
 monthToString month =
     case month of
@@ -109,6 +121,8 @@ monthToString month =
             "Dezember"
 
 
+{-| Adjusts the time by a given variation.
+-}
 fixVariation : Time.Posix -> Maybe Time.Posix -> Int -> Time.Posix
 fixVariation now lastTime interval =
     if interval == 0 then
@@ -149,6 +163,8 @@ fixVariation now lastTime interval =
                 now
 
 
+{-| Groups a list of times by a given unit.
+-}
 groupBy : (Float -> Int) -> Int -> Time.Posix -> Time.Posix
 groupBy grouping intervalMillis posix =
     let
@@ -167,11 +183,15 @@ groupBy grouping intervalMillis posix =
     Time.millisToPosix roundedMillis
 
 
+{-| Rounds a given time to the nearest unit.
+-}
 roundTo : Int -> Time.Posix -> Time.Posix
 roundTo intervalMillis posix =
     groupBy round intervalMillis posix
 
 
+{-| Rounds down a given time to the nearest unit.
+-}
 floorTo : Int -> Time.Posix -> Time.Posix
 floorTo intervalMillis posix =
     groupBy floor intervalMillis posix

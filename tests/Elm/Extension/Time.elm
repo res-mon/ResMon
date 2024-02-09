@@ -1,5 +1,11 @@
 module Elm.Extension.Time exposing (all)
 
+{-| This module contains tests for the `Extension.Time` mmodule.
+
+@docs all
+
+-}
+
 import Expect
 import Extension.Time exposing (fixVariation, floorTo)
 import Fuzz
@@ -20,6 +26,8 @@ posixFuzzer =
 -- TEST
 
 
+{-| Tests all exposed functions in the `Extension.Time` module.
+-}
 all : Test
 all =
     describe "Expansion.Time Tests"
