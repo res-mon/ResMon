@@ -1,6 +1,8 @@
 module Model.Shared exposing (Alert, AlertLevel(..), Internal, Msg(..), Route(..), SharedModel, addTextAlert, init, removeAlert, subscriptions, update)
 
+import Browser exposing (UrlRequest(..))
 import Browser.Navigation exposing (Key, replaceUrl)
+import Extension.Time exposing (fixVariation, floorTo)
 import Html.Styled exposing (Html, text)
 import Json.Decode as D exposing (Value)
 import LocalStorage as LS
@@ -42,6 +44,7 @@ type alias Internal msg =
     { toMsg : Msg msg -> msg
     , updateRoute : msg
     , startUrl : Url
+    , exactTime : Maybe Time.Posix
     , alertCount : Int
     }
 
@@ -92,6 +95,7 @@ init toMsg updateRoute route url key localStorage =
                 { toMsg = toMsg
                 , updateRoute = updateRoute
                 , startUrl = url
+                , exactTime = Nothing
                 , alertCount = 0
                 }
             }
@@ -101,8 +105,19 @@ init toMsg updateRoute route url key localStorage =
             Task.perform
                 (\zone -> toMsg (GotTimeZone zone))
                 Time.here
+
+        curentTimeCmd : Cmd msg
+        curentTimeCmd =
+            Time.now
+                |> Task.perform
+                    (\time -> toMsg (Tick time))
     in
-    ( model, Cmd.batch [ lsCmd, timeZoneCmd ] )
+    ( model, Cmd.batch [ lsCmd, timeZoneCmd, curentTimeCmd ] )
+
+
+clockInterval : Int
+clockInterval =
+    5000
 
 
 
@@ -160,7 +175,28 @@ update msg model =
             ( { model | timeZone = Just zone }, Cmd.none )
 
         Tick time ->
-            ( { model | time = Just time }, Cmd.none )
+            let
+                floorTime : Time.Posix
+                floorTime =
+                    fixVariation time model.internal.exactTime clockInterval
+
+                flooredTime : Time.Posix
+                flooredTime =
+                    floorTo clockInterval floorTime
+
+                internal : Internal msg
+                internal =
+                    model.internal
+            in
+            ( { model
+                | time = Just flooredTime
+                , internal =
+                    { internal
+                        | exactTime = Just time
+                    }
+              }
+            , Cmd.none
+            )
 
 
 
@@ -223,4 +259,4 @@ removeAlert model number =
 
 subscriptions : SharedModel msg -> Sub msg
 subscriptions model =
-    Time.every 1000 (model.internal.toMsg << Tick)
+    Time.every (toFloat clockInterval) (model.internal.toMsg << Tick)
