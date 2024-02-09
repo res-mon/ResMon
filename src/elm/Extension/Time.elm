@@ -1,4 +1,4 @@
-module Extension.Time exposing (monthToInt, monthToString, toDateString)
+module Extension.Time exposing (fixVariation, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString)
 
 import Time
 
@@ -106,3 +106,72 @@ monthToString month =
 
         Time.Dec ->
             "Dezember"
+
+
+fixVariation : Time.Posix -> Maybe Time.Posix -> Int -> Time.Posix
+fixVariation now lastTime interval =
+    if interval == 0 then
+        now
+
+    else
+        case lastTime of
+            Just last ->
+                let
+                    currentMillis : Int
+                    currentMillis =
+                        Time.posixToMillis now
+
+                    lastMillis : Int
+                    lastMillis =
+                        Time.posixToMillis last
+
+                    delta : Int
+                    delta =
+                        currentMillis - lastMillis
+
+                    variationCompensation : Int
+                    variationCompensation =
+                        (modBy interval delta |> toFloat)
+                            / 2
+                            |> floor
+
+                    millis : Int
+                    millis =
+                        currentMillis + variationCompensation
+                in
+                Time.millisToPosix millis
+
+            Nothing ->
+                now
+
+
+groupBy : (Float -> Int) -> Int -> Time.Posix -> Time.Posix
+groupBy grouping intervalMillis posix =
+    let
+        millis : Float
+        millis =
+            Time.posixToMillis posix
+                |> toFloat
+
+        roundedMillis : Int
+        roundedMillis =
+            toFloat intervalMillis
+                |> (/) millis
+                |> grouping
+                |> (*) intervalMillis
+
+        roundedPosix : Time.Posix
+        roundedPosix =
+            Time.millisToPosix roundedMillis
+    in
+    roundedPosix
+
+
+roundTo : Int -> Time.Posix -> Time.Posix
+roundTo intervalMillis posix =
+    groupBy round intervalMillis posix
+
+
+floorTo : Int -> Time.Posix -> Time.Posix
+floorTo intervalMillis posix =
+    groupBy floor intervalMillis posix
