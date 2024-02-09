@@ -116,7 +116,7 @@ init toMsg updateRoute route url key localStorage =
 
 clockInterval : Int
 clockInterval =
-    5000
+    1000
 
 
 
