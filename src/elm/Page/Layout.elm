@@ -11,7 +11,21 @@ import List exposing (map)
 import Model.Shared exposing (AlertLevel(..), SharedModel, removeAlert)
 import Tailwind.Classes exposing (shadow_lg)
 import Tailwind.Theme exposing (base_100)
-import Tailwind.Utilities exposing (bg_color, duration_500, font_bold, font_mono, globalStyles, grid, h_screen, p_16, place_items_center, text_3xl, text_7xl, text_xl)
+import Tailwind.Utilities
+    exposing
+        ( bg_color
+        , duration_500
+        , font_bold
+        , font_mono
+        , globalStyles
+        , grid
+        , h_screen
+        , p_16
+        , place_items_center
+        , text_3xl
+        , text_7xl
+        , text_xl
+        )
 import Time
 
 

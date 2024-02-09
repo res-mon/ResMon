@@ -37,7 +37,7 @@ type alias Model =
 
 
 init : () -> Url -> Key -> ( Model, Cmd Msg )
-init _ url key =
+init () url key =
     let
         ( initialRoute, initialRouteCmd ) =
             Routing.init ()

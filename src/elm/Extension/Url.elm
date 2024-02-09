@@ -152,13 +152,13 @@ appendQueryDict dict url =
         currentQuery : Dict String (Maybe String)
         currentQuery =
             queryDict url
-                |> Dict.map (\_ value -> Just value)
+                |> Dict.map (\_ -> Just)
 
         query : Dict String String
         query =
             Dict.union dict currentQuery
                 |> Dict.filter (\_ value -> value /= Nothing)
-                |> Dict.map (\_ value -> withDefault "" value)
+                |> Dict.map (\_ -> withDefault "")
     in
     setQueryDict query url
 

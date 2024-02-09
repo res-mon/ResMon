@@ -1,5 +1,6 @@
 module Extension.Time exposing (fixVariation, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString)
 
+import Basics.Extra exposing (safeDivide, safeModBy)
 import Time
 
 
@@ -121,23 +122,26 @@ fixVariation now lastTime interval =
                     currentMillis =
                         Time.posixToMillis now
 
-                    lastMillis : Int
-                    lastMillis =
-                        Time.posixToMillis last
-
                     delta : Int
                     delta =
                         currentMillis - lastMillis
 
-                    variationCompensation : Int
-                    variationCompensation =
-                        (modBy interval delta |> toFloat)
-                            / 2
-                            |> floor
+                    lastMillis : Int
+                    lastMillis =
+                        Time.posixToMillis last
 
                     millis : Int
                     millis =
                         currentMillis + variationCompensation
+
+                    variationCompensation : Int
+                    variationCompensation =
+                        (safeModBy interval delta
+                            |> Maybe.withDefault 0
+                            |> toFloat
+                        )
+                            / 2
+                            |> floor
                 in
                 Time.millisToPosix millis
 
@@ -155,16 +159,12 @@ groupBy grouping intervalMillis posix =
 
         roundedMillis : Int
         roundedMillis =
-            toFloat intervalMillis
-                |> (/) millis
+            safeDivide millis (toFloat intervalMillis)
+                |> Maybe.withDefault 0
                 |> grouping
                 |> (*) intervalMillis
-
-        roundedPosix : Time.Posix
-        roundedPosix =
-            Time.millisToPosix roundedMillis
     in
-    roundedPosix
+    Time.millisToPosix roundedMillis
 
 
 roundTo : Int -> Time.Posix -> Time.Posix

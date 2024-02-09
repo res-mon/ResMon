@@ -1,6 +1,5 @@
 module Model.Shared exposing (Alert, AlertLevel(..), Internal, Msg(..), Route(..), SharedModel, addTextAlert, init, removeAlert, subscriptions, update)
 
-import Browser exposing (UrlRequest(..))
 import Browser.Navigation exposing (Key, replaceUrl)
 import Extension.Time exposing (fixVariation, floorTo)
 import Html.Styled exposing (Html, text)
@@ -75,6 +74,12 @@ init :
     -> ( SharedModel msg, Cmd msg )
 init toMsg updateRoute route url key localStorage =
     let
+        curentTimeCmd : Cmd msg
+        curentTimeCmd =
+            Time.now
+                |> Task.perform
+                    (\time -> toMsg (Tick time))
+
         lsCmd : Cmd msg
         lsCmd =
             LS.getMsg (\res -> toMsg (UserLoaded res))
@@ -105,12 +110,6 @@ init toMsg updateRoute route url key localStorage =
             Task.perform
                 (\zone -> toMsg (GotTimeZone zone))
                 Time.here
-
-        curentTimeCmd : Cmd msg
-        curentTimeCmd =
-            Time.now
-                |> Task.perform
-                    (\time -> toMsg (Tick time))
     in
     ( model, Cmd.batch [ lsCmd, timeZoneCmd, curentTimeCmd ] )
 
@@ -152,7 +151,7 @@ update msg model =
                                 updateRoute : Cmd msg
                                 updateRoute =
                                     Task.perform
-                                        (always model.internal.updateRoute)
+                                        (\_ -> model.internal.updateRoute)
                                         (Task.succeed ())
                             in
                             ( { model | user = Just user }

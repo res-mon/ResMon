@@ -7,7 +7,21 @@ import Html.Styled.Attributes exposing (css, type_, value)
 import Html.Styled.Events exposing (onBlur, onFocus, onInput)
 import Maybe exposing (withDefault)
 import Tailwind.Theme exposing (black, gray_200, gray_700, rose_600)
-import Tailwind.Utilities exposing (block, border_0, border_b_2, border_color, font_semibold, mb_2, mt_0, mt_2, px_0_dot_5, ring_0, text_color, w_full)
+import Tailwind.Utilities
+    exposing
+        ( block
+        , border_0
+        , border_b_2
+        , border_color
+        , font_semibold
+        , mb_2
+        , mt_0
+        , mt_2
+        , px_0_dot_5
+        , ring_0
+        , text_color
+        , w_full
+        )
 
 
 
@@ -162,7 +176,7 @@ input inputType model id labelText onInputMsg currentValue errors attributes ele
                 ]
                 [ text labelText ]
             , Html.Styled.input
-                ([ css
+                (css
                     [ mt_0
                     , block
                     , w_full
@@ -175,13 +189,12 @@ input inputType model id labelText onInputMsg currentValue errors attributes ele
                         , border_color black
                         ]
                     ]
-                 , type_ inputType
-                 , value currentValue
-                 , onFocus (model.toMsg (FocusChanged id True))
-                 , onBlur (model.toMsg (FocusChanged id False))
-                 , onInput onInputMsg
-                 ]
-                    ++ attributes
+                    :: type_ inputType
+                    :: value currentValue
+                    :: onFocus (model.toMsg (FocusChanged id True))
+                    :: onBlur (model.toMsg (FocusChanged id False))
+                    :: onInput onInputMsg
+                    :: attributes
                 )
                 []
             , renderedErrors

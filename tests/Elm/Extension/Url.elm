@@ -100,12 +100,12 @@ filterEmptyDict dict =
             value /= Nothing
         )
         dict
-        |> Dict.map (\_ value -> Maybe.withDefault "" value)
+        |> Dict.map (\_ -> Maybe.withDefault "")
 
 
 makeDictOptional : Dict String String -> Dict String (Maybe String)
 makeDictOptional dict =
-    Dict.map (\_ value -> Just value) dict
+    Dict.map (\_ -> Just) dict
 
 
 removeDictKeys :
@@ -114,9 +114,7 @@ removeDictKeys :
     -> Dict String b
 removeDictKeys keys dict =
     List.foldl
-        (\key acc ->
-            Dict.remove key acc
-        )
+        Dict.remove
         dict
         (Dict.keys keys)
 
@@ -148,14 +146,14 @@ routePartsTests : Test
 routePartsTests =
     describe "routeParts"
         [ test "Empty path returns empty list" <|
-            \_ ->
+            \() ->
                 Expect.equal
                     (Just [])
                 <|
                     Maybe.map routeParts <|
                         Url.fromString "http://example.com"
         , test "Path with segments returns correct list" <|
-            \_ ->
+            \() ->
                 Expect.equal
                     (Just [ "foo", "bar" ])
                 <|
@@ -210,7 +208,7 @@ queryDictTests : Test
 queryDictTests =
     describe "queryDict"
         [ test "Converts query string to dictionary" <|
-            \_ ->
+            \() ->
                 Expect.equal
                     (Just <|
                         Dict.fromList [ ( "foo", "bar" ), ( "baz", "qux" ) ]
@@ -219,14 +217,14 @@ queryDictTests =
                     Maybe.map queryDict <|
                         Url.fromString "http://example.com?foo=bar&baz=qux"
         , test "Decodes percent-encoded keys and values" <|
-            \_ ->
+            \() ->
                 Expect.equal
                     (Just <| Dict.fromList [ ( "foo ", "bar%" ) ])
                 <|
                     Maybe.map queryDict <|
                         Url.fromString "http://example.com?foo%20=bar%25"
         , test "Handles empty query string" <|
-            \_ ->
+            \() ->
                 Expect.equal
                     (Just <| Dict.empty)
                 <|
@@ -266,7 +264,7 @@ queryDictTests =
                     queryParameters =
                         queryString
                             |> String.split "&"
-                            |> List.map (\param -> String.split "=" param)
+                            |> List.map (String.split "=")
 
                     urlString : String
                     urlString =
@@ -280,7 +278,7 @@ setQueryDictTests : Test
 setQueryDictTests =
     describe "setQueryDict"
         [ test "Sets query parameters from a dictionary" <|
-            \_ ->
+            \() ->
                 Expect.equal
                     (Just "http://example.com/?baz=qux&foo=bar")
                 <|
@@ -291,7 +289,7 @@ setQueryDictTests =
                     <|
                         Url.fromString "http://example.com"
         , test "Replaces existing query parameters" <|
-            \_ ->
+            \() ->
                 Expect.equal
                     (Just "http://example.com/?new=value")
                 <|
@@ -308,7 +306,7 @@ appendQueryDictTests : Test
 appendQueryDictTests =
     describe "appendQueryDict"
         [ test "Appends and replaces query parameters" <|
-            \_ ->
+            \() ->
                 Expect.equal
                     (Just "http://example.com/?baz=qux&foo=new&new=value")
                 <|
@@ -319,7 +317,7 @@ appendQueryDictTests =
                     <|
                         Url.fromString "http://example.com?foo=bar&baz=qux"
         , test "Removes query parameter if value is Nothing" <|
-            \_ ->
+            \() ->
                 Expect.equal
                     (Just "http://example.com/?baz=qux")
                 <|
@@ -336,7 +334,7 @@ removeQueryParametersTests : Test
 removeQueryParametersTests =
     describe "removeQueryParameters"
         [ test "Removes specified query parameters" <|
-            \_ ->
+            \() ->
                 Expect.equal
                     (Just "http://example.com/?baz=qux")
                 <|
@@ -347,7 +345,7 @@ removeQueryParametersTests =
                     <|
                         Url.fromString "http://example.com?foo=bar&baz=qux"
         , test "Leaves URL unchanged if parameter not present" <|
-            \_ ->
+            \() ->
                 Expect.equal
                     (Just "http://example.com/?foo=bar")
                 <|

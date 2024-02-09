@@ -108,16 +108,16 @@ set model key value =
 
 getCmd : GetCmdCallback msg -> Model msg -> String -> Cmd msg
 getCmd callback model key =
-    let
-        cmd : Cmd msg
-        cmd =
-            LS.send (getCmdPort Process LS.moduleName model)
-                (LS.get key)
-                model.funnel.storage
-    in
     Task.perform
-        (always
-            (model.toMsg (ActionMsg (Get key callback cmd)))
+        (\_ ->
+            let
+                cmd : Cmd msg
+                cmd =
+                    LS.send (getCmdPort Process LS.moduleName model)
+                        (LS.get key)
+                        model.funnel.storage
+            in
+            model.toMsg (ActionMsg (Get key callback cmd))
         )
         (Task.succeed ())
 
@@ -127,7 +127,7 @@ getMsg callback =
     getCmd
         (\res ->
             Task.perform
-                (always (callback res))
+                (\_ -> callback res)
                 (Task.succeed ())
         )
 

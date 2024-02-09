@@ -20,10 +20,6 @@ merge :
     -> List (Attribute msg)
 merge modifierFunc daisyStyles daisyClasses modifierList attributeList =
     let
-        ( modifierAttributes, modifierClasses ) =
-            List.map modifierFunc modifierList
-                |> List.unzip
-
         classList : Attribute msg
         classList =
             daisyClasses
@@ -31,6 +27,10 @@ merge modifierFunc daisyStyles daisyClasses modifierList attributeList =
                 |> List.concat
                 |> List.map (\x -> ( x, True ))
                 |> Attr.classList
+
+        ( modifierAttributes, modifierClasses ) =
+            List.map modifierFunc modifierList
+                |> List.unzip
 
         style : Attribute msg
         style =
@@ -67,25 +67,25 @@ mergeElement :
     -> Html msg
 mergeElement modifierMapFunc element stylings children =
     let
-        classList : List ( List Style, List String )
-        classList =
-            List.concatMap .classes stylings
+        activeClasses : List ( String, Bool )
+        activeClasses =
+            classNames
+                |> List.map (\name -> ( name, True ))
 
         attributeList : List (Attribute msg)
         attributeList =
             List.concatMap .attributes stylings
 
-        modifierList : List modifier
-        modifierList =
-            List.concatMap .modifiers stylings
+        classList : List ( List Style, List String )
+        classList =
+            List.concatMap .classes stylings
 
         ( styles, classNames ) =
             classList ++ [ modifierMapFunc modifierList ] |> unzip
 
-        activeClasses : List ( String, Bool )
-        activeClasses =
-            classNames
-                |> List.map (\name -> ( name, True ))
+        modifierList : List modifier
+        modifierList =
+            List.concatMap .modifiers stylings
     in
     element
         (Attr.css styles :: Attr.classList activeClasses :: attributeList)
@@ -894,6 +894,7 @@ countdown :
     -> Html msg
 countdown styling valueStyle value =
     let
+        lastTwoDigits : Int
         lastTwoDigits =
             abs value
                 |> modBy 100
