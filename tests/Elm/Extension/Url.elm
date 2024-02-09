@@ -90,7 +90,7 @@ queryDictActionsFuzzer =
 
 
 
--- UTILITIES
+-- UTILITY
 
 
 filterEmptyDict : Dict String (Maybe String) -> Dict String String
@@ -127,7 +127,7 @@ stringReplaceAll replacements input =
 
 
 
--- TESTS
+-- TEST
 
 
 {-| Tests all exposed functions in the `Extension.Url` module.
@@ -150,19 +150,17 @@ routePartsTests =
         [ test "Empty path returns empty list" <|
             \_ ->
                 Expect.equal
-                    (Maybe.map routeParts <|
-                        Url.fromString "http://example.com"
-                    )
+                    (Just [])
                 <|
-                    Just []
+                    Maybe.map routeParts <|
+                        Url.fromString "http://example.com"
         , test "Path with segments returns correct list" <|
             \_ ->
                 Expect.equal
-                    (Maybe.map routeParts <|
-                        Url.fromString "http://example.com/foo/bar"
-                    )
+                    (Just [ "foo", "bar" ])
                 <|
-                    Just [ "foo", "bar" ]
+                    Maybe.map routeParts <|
+                        Url.fromString "http://example.com/foo/bar"
         , fuzz pathListFuzzer "Fuzz test for routeParts" <|
             \parts ->
                 let
@@ -214,26 +212,26 @@ queryDictTests =
         [ test "Converts query string to dictionary" <|
             \_ ->
                 Expect.equal
-                    (Maybe.map queryDict <|
-                        Url.fromString "http://example.com?foo=bar&baz=qux"
-                    )
                     (Just <|
                         Dict.fromList [ ( "foo", "bar" ), ( "baz", "qux" ) ]
                     )
+                <|
+                    Maybe.map queryDict <|
+                        Url.fromString "http://example.com?foo=bar&baz=qux"
         , test "Decodes percent-encoded keys and values" <|
             \_ ->
                 Expect.equal
-                    (Maybe.map queryDict <|
-                        Url.fromString "http://example.com?foo%20=bar%25"
-                    )
                     (Just <| Dict.fromList [ ( "foo ", "bar%" ) ])
+                <|
+                    Maybe.map queryDict <|
+                        Url.fromString "http://example.com?foo%20=bar%25"
         , test "Handles empty query string" <|
             \_ ->
                 Expect.equal
-                    (Maybe.map queryDict <|
-                        Url.fromString "http://example.com"
-                    )
                     (Just <| Dict.empty)
+                <|
+                    Maybe.map queryDict <|
+                        Url.fromString "http://example.com"
         , fuzz queryStringFuzzer "queryDict Fuzz test" <|
             \queryString ->
                 let
@@ -284,25 +282,25 @@ setQueryDictTests =
         [ test "Sets query parameters from a dictionary" <|
             \_ ->
                 Expect.equal
-                    (Maybe.map
+                    (Just "http://example.com/?baz=qux&foo=bar")
+                <|
+                    Maybe.map
                         (Url.toString
                             << setQueryDict (Dict.fromList [ ( "foo", "bar" ), ( "baz", "qux" ) ])
                         )
-                     <|
+                    <|
                         Url.fromString "http://example.com"
-                    )
-                    (Just "http://example.com/?baz=qux&foo=bar")
         , test "Replaces existing query parameters" <|
             \_ ->
                 Expect.equal
-                    (Maybe.map
+                    (Just "http://example.com/?new=value")
+                <|
+                    Maybe.map
                         (Url.toString
                             << setQueryDict (Dict.fromList [ ( "new", "value" ) ])
                         )
-                     <|
+                    <|
                         Url.fromString "http://example.com?foo=bar"
-                    )
-                    (Just "http://example.com/?new=value")
         ]
 
 
@@ -312,25 +310,25 @@ appendQueryDictTests =
         [ test "Appends and replaces query parameters" <|
             \_ ->
                 Expect.equal
-                    (Maybe.map
+                    (Just "http://example.com/?baz=qux&foo=new&new=value")
+                <|
+                    Maybe.map
                         (Url.toString
                             << appendQueryDict (Dict.fromList [ ( "foo", Just "new" ), ( "new", Just "value" ) ])
                         )
-                     <|
+                    <|
                         Url.fromString "http://example.com?foo=bar&baz=qux"
-                    )
-                    (Just "http://example.com/?baz=qux&foo=new&new=value")
         , test "Removes query parameter if value is Nothing" <|
             \_ ->
                 Expect.equal
-                    (Maybe.map
+                    (Just "http://example.com/?baz=qux")
+                <|
+                    Maybe.map
                         (Url.toString
                             << appendQueryDict (Dict.fromList [ ( "foo", Nothing ) ])
                         )
-                     <|
+                    <|
                         Url.fromString "http://example.com?foo=bar&baz=qux"
-                    )
-                    (Just "http://example.com/?baz=qux")
         ]
 
 
@@ -340,25 +338,25 @@ removeQueryParametersTests =
         [ test "Removes specified query parameters" <|
             \_ ->
                 Expect.equal
-                    (Maybe.map
+                    (Just "http://example.com/?baz=qux")
+                <|
+                    Maybe.map
                         (Url.toString
                             << removeQueryParameters [ "foo" ]
                         )
-                     <|
+                    <|
                         Url.fromString "http://example.com?foo=bar&baz=qux"
-                    )
-                    (Just "http://example.com/?baz=qux")
         , test "Leaves URL unchanged if parameter not present" <|
             \_ ->
                 Expect.equal
-                    (Maybe.map
+                    (Just "http://example.com/?foo=bar")
+                <|
+                    Maybe.map
                         (Url.toString
                             << removeQueryParameters [ "notThere" ]
                         )
-                     <|
+                    <|
                         Url.fromString "http://example.com?foo=bar"
-                    )
-                    (Just "http://example.com/?foo=bar")
         ]
 
 
