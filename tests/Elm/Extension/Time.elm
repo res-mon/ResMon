@@ -7,7 +7,7 @@ module Elm.Extension.Time exposing (all)
 -}
 
 import Expect
-import Extension.Time exposing (fixVariation, floorTo)
+import Extension.Time exposing (fixVariationFloored, floorTo)
 import Fuzz
 import Test exposing (Test, describe, fuzz, test)
 import Time
@@ -37,36 +37,44 @@ all =
 
 fixVariationTests : Test
 fixVariationTests =
-    describe "fixVariation"
+    describe "fixVariationFloored"
         [ fuzz posixFuzzer "without last time" <|
             \now ->
                 let
                     interval : Int
                     interval =
-                        5000
+                        1000
                 in
                 Expect.equal
-                    now
+                    (floorTo interval now)
                 <|
-                    fixVariation now Nothing interval
+                    fixVariationFloored now Nothing interval
         , test "test variation fix" <|
             \() ->
                 let
                     expectations : List ( Int, Int, Int )
                     expectations =
-                        [ ( 100000, 100000, 100000 )
-                        , ( 105000, 100000, 105000 )
-                        , ( 110000, 105000, 110000 )
-                        , ( 114999, 110000, 115000 )
-                        , ( 120000, 114999, 120000 )
-                        , ( 125000, 120000, 125000 )
-                        , ( 129999, 125000, 130000 )
-                        , ( 135000, 129999, 135000 )
+                        [ ( 1172, 0, 1000 )
+                        , ( 2537, 1172, 2000 )
+                        , ( 3676, 2537, 3000 )
+                        , ( 4755, 3676, 4000 )
+                        , ( 5839, 4755, 5000 )
+                        , ( 6347, 5839, 6000 )
+                        , ( 7395, 6347, 7000 )
+                        , ( 8783, 7395, 8000 )
+                        , ( 9756, 8783, 9000 )
+                        , ( 10664, 9756, 10000 )
+                        , ( 11755, 10664, 11000 )
+                        , ( 12723, 11755, 12000 )
+                        , ( 13634, 12723, 13000 )
+                        , ( 14882, 13634, 14000 )
+                        , ( 15730, 14882, 15000 )
+                        , ( 16627, 15730, 16000 )
                         ]
 
                     interval : Int
                     interval =
-                        5000
+                        1000
                 in
                 Expect.all
                     (List.map
@@ -74,13 +82,10 @@ fixVariationTests =
                             Expect.equal
                                 (Time.millisToPosix expected)
                             <|
-                                floorTo
+                                fixVariationFloored
+                                    (Time.millisToPosix now)
+                                    (Just (Time.millisToPosix last))
                                     interval
-                                    (fixVariation
-                                        (Time.millisToPosix now)
-                                        (Just (Time.millisToPosix last))
-                                        interval
-                                    )
                         )
                         expectations
                     )

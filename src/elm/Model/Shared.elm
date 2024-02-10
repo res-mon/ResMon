@@ -1,7 +1,7 @@
 port module Model.Shared exposing (Alert, AlertLevel(..), Internal, Msg(..), Route(..), SharedModel, addTextAlert, init, removeAlert, setDarkModeMessage, subscriptions, update)
 
 import Browser.Navigation exposing (Key, replaceUrl)
-import Extension.Time exposing (fixVariation, floorTo)
+import Extension.Time exposing (fixVariationFloored)
 import Html.Styled exposing (Html, text)
 import Json.Decode as D exposing (Value)
 import Json.Encode
@@ -180,13 +180,9 @@ update msg model =
 
         Tick time ->
             let
-                floorTime : Time.Posix
-                floorTime =
-                    fixVariation time model.internal.exactTime clockInterval
-
                 flooredTime : Time.Posix
                 flooredTime =
-                    floorTo clockInterval floorTime
+                    fixVariationFloored time model.internal.exactTime clockInterval
 
                 internal : Internal msg
                 internal =

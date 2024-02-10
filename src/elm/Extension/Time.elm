@@ -1,12 +1,12 @@
-module Extension.Time exposing (fixVariation, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString)
+module Extension.Time exposing (fixVariationFloored, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString)
 
 {-| This module provides utility functions for working with Time.
 
-@docs fixVariation, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString
+@docs fixVariationFloored, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString
 
 -}
 
-import Basics.Extra exposing (safeDivide, safeModBy)
+import Basics.Extra exposing (safeDivide)
 import Time
 
 
@@ -123,10 +123,10 @@ monthToString month =
 
 {-| Adjusts the time by a given variation.
 -}
-fixVariation : Time.Posix -> Maybe Time.Posix -> Int -> Time.Posix
-fixVariation now lastTime interval =
+fixVariationFloored : Time.Posix -> Maybe Time.Posix -> Int -> Time.Posix
+fixVariationFloored now lastTime interval =
     if interval == 0 then
-        now
+        floorTo interval now
 
     else
         case lastTime of
@@ -140,27 +140,30 @@ fixVariation now lastTime interval =
                     delta =
                         currentMillis - lastMillis
 
+                    intervals : Int
+                    intervals =
+                        safeDivide (toFloat delta)
+                            (toFloat interval)
+                            |> Maybe.withDefault 0
+                            |> round
+
                     lastMillis : Int
                     lastMillis =
                         Time.posixToMillis last
 
                     millis : Int
                     millis =
-                        currentMillis + variationCompensation
+                        if intervals == 0 then
+                            currentMillis + (interval // 2)
 
-                    variationCompensation : Int
-                    variationCompensation =
-                        (safeModBy interval delta
-                            |> Maybe.withDefault 0
-                            |> toFloat
-                        )
-                            / 2
-                            |> floor
+                        else
+                            lastMillis + interval * intervals
                 in
                 Time.millisToPosix millis
+                    |> floorTo interval
 
             Nothing ->
-                now
+                floorTo interval now
 
 
 {-| Groups a list of times by a given unit.
