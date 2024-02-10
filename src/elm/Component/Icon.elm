@@ -1,4 +1,4 @@
-module Component.Icon exposing (bell, brightnessAltHigh, checkCircle, checkCircleFill, circleFill, columnsGap, exclamationCircleFill, exclamationTriangle, exclamationTriangleFill, fileEarmarkPdf, ico, infoCircle, infoCircleFill, list, moon, moonFill, palette, search, sun, sunFill, xCircle, xLg)
+module Component.Icon exposing (bell, brightnessAltHigh, checkCircle, checkCircleFill, circleFill, columnsGap, exclamationCircleFill, exclamationTriangle, exclamationTriangleFill, fileEarmarkPdf, ico, infoCircle, infoCircleFill, list, moon, moonFill, palette, search, sun, sunFill, threeDots, xCircle, xLg)
 
 import Css exposing (Style)
 import Html.Styled exposing (Html, i)
@@ -33,6 +33,11 @@ moon =
 sunFill : List Style -> Html msg
 sunFill =
     ico "sun-fill"
+
+
+threeDots : List Style -> Html msg
+threeDots =
+    ico "three-dots"
 
 
 moonFill : List Style -> Html msg

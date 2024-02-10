@@ -1,10 +1,9 @@
-module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DropdownModifier(..), ExtendedStyle, InputModifier(..), MenuItemModifier(..), MenuModifier(..), SwapModifier(..), ToastModifier(..), alert, alertStyle, attribute, attributes, btn, btnStyle, class, classes, countdown, countdownStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, modifier, modifiers, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, swap, swapStyle, toast, toastStyle)
+module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DropdownModifier(..), ExtendedStyle, InputModifier(..), MenuItemModifier(..), MenuModifier(..), SwapModifier(..), ToastModifier(..), alert, alertStyle, attribute, attributes, btn, btnStyle, class, classes, countdown, countdownStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, modifier, modifiers, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, style, styles, swap, swapStyle, toast, toastStyle)
 
 import Css exposing (Style, before, important)
 import Html.Styled exposing (Attribute, Html, div, input, label, li, span, ul)
-import Html.Styled.Attributes as Attr exposing (checked)
+import Html.Styled.Attributes as Attr exposing (checked, tabindex)
 import Html.Styled.Events exposing (onCheck)
-import Svg.Styled exposing (style)
 import Tailwind.Classes as C
 
 
@@ -33,14 +32,14 @@ merge modifierFunc daisyStyles daisyClasses modifierList attributeList =
             List.map modifierFunc modifierList
                 |> List.unzip
 
-        style : Attribute msg
-        style =
+        styleAttribute : Attribute msg
+        styleAttribute =
             daisyStyles
                 :: modifierAttributes
                 |> List.concat
                 |> Attr.css
     in
-    style
+    styleAttribute
         :: classList
         :: attributeList
 
@@ -77,7 +76,7 @@ mergeElement modifierMapFunc element stylings children =
         classList =
             List.concatMap .classes stylings
 
-        ( styles, classNames ) =
+        ( styleList, classNames ) =
             classList ++ [ modifierMapFunc modifierList ] |> unzip
 
         modifierList : List modifier
@@ -85,7 +84,7 @@ mergeElement modifierMapFunc element stylings children =
             List.concatMap .modifiers stylings
     in
     element
-        (Attr.css styles :: Attr.classList activeClasses :: attributeList)
+        (Attr.css styleList :: Attr.classList activeClasses :: attributeList)
         children
 
 
@@ -95,8 +94,8 @@ mergeUnmodifiedElement :
     -> List (ExtendedStyle msg modifier)
     -> List (Html msg)
     -> Html msg
-mergeUnmodifiedElement style element styling =
-    mergeElement (\_ -> ( [], [] )) element (class style :: styling)
+mergeUnmodifiedElement styleTuple element styling =
+    mergeElement (\_ -> ( [], [] )) element (class styleTuple :: styling)
 
 
 mergeUnmodified :
@@ -127,10 +126,10 @@ mergeStyles classList =
 unzip : List ( List a, List b ) -> ( List a, List b )
 unzip list =
     let
-        ( styles, classList ) =
+        ( cssStyles, classList ) =
             List.unzip list
     in
-    ( List.concat styles, List.concat classList )
+    ( List.concat cssStyles, List.concat classList )
 
 
 
@@ -145,8 +144,8 @@ type alias ExtendedStyle msg modifier =
 
 
 class : ( List Style, List String ) -> ExtendedStyle msg modifier
-class ( styles, classNames ) =
-    { classes = [ ( styles, classNames ) ]
+class ( cssStyles, classNames ) =
+    { classes = [ ( cssStyles, classNames ) ]
     , attributes = []
     , modifiers = []
     }
@@ -155,6 +154,22 @@ class ( styles, classNames ) =
 classes : List ( List Style, List String ) -> ExtendedStyle msg modifier
 classes classList =
     { classes = classList
+    , attributes = []
+    , modifiers = []
+    }
+
+
+style : Style -> ExtendedStyle msg modifier
+style cssStyle =
+    { classes = [ ( [ cssStyle ], [] ) ]
+    , attributes = []
+    , modifiers = []
+    }
+
+
+styles : List Style -> ExtendedStyle msg modifier
+styles cssStyles =
+    { classes = [ ( cssStyles, [] ) ]
     , attributes = []
     , modifiers = []
     }
@@ -401,7 +416,7 @@ dropdown element styling openerContent contentElement contentStyling content =
     in
     mergeElement dropdownStyle
         element
-        styling
+        ((tabindex -1 |> attribute) :: styling)
         (openerContent ++ [ inner ])
 
 
@@ -961,14 +976,25 @@ swap :
     -> List (Html msg)
     -> List (Html msg)
     -> List (Html msg)
-    -> (Bool -> msg)
+    -> Maybe (Bool -> msg)
     -> Bool
     -> Html msg
 swap styling onContent offContent indeterminateContent onChange isOn =
     mergeElement swapStyle
         label
         styling
-        (input [ Attr.type_ "checkbox", checked isOn, onCheck onChange ] []
+        (input
+            (Attr.type_ "checkbox"
+                :: checked isOn
+                :: (case onChange of
+                        Just msg ->
+                            [ onCheck msg ]
+
+                        Nothing ->
+                            []
+                   )
+            )
+            []
             :: List.concat
                 [ case onContent of
                     [] ->
