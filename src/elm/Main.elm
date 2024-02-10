@@ -85,94 +85,103 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        UrlChanged url ->
-            let
-                ( route, routeCmd ) =
-                    Routing.update shared.route shared.url shared.key
+    let
+        ( _, updateRoute ) =
+            Routing.update model.shared.route model.shared.url model.shared.key
 
-                shared : SharedModel Msg
-                shared =
-                    model.shared
+        ( handleResultModel, handleResultCmd ) =
+            case msg of
+                UrlChanged url ->
+                    let
+                        ( route, routeCmd ) =
+                            Routing.update shared.route shared.url shared.key
 
-                updatedShared : SharedModel Msg
-                updatedShared =
-                    { shared | route = route, url = url }
-            in
-            ( { model | shared = updatedShared }, routeCmd )
+                        shared : SharedModel Msg
+                        shared =
+                            model.shared
 
-        LinkClicked request ->
-            case request of
-                Internal url ->
-                    ( model
-                    , Browser.Navigation.pushUrl
-                        model.shared.key
-                        (Url.toString url)
-                    )
+                        updatedShared : SharedModel Msg
+                        updatedShared =
+                            { shared | route = route, url = url }
+                    in
+                    ( { model | shared = updatedShared }, routeCmd )
 
-                External url ->
-                    ( model, Browser.Navigation.load url )
+                LinkClicked request ->
+                    case request of
+                        Internal url ->
+                            ( model
+                            , Browser.Navigation.pushUrl
+                                model.shared.key
+                                (Url.toString url)
+                            )
 
-        UpdateRoute ->
-            let
-                ( route, routeCmd ) =
-                    Routing.update shared.route shared.url shared.key
+                        External url ->
+                            ( model, Browser.Navigation.load url )
 
-                shared : SharedModel Msg
-                shared =
-                    model.shared
-            in
-            ( { model | shared = { shared | route = route } }, routeCmd )
+                UpdateRoute ->
+                    let
+                        ( route, routeCmd ) =
+                            Routing.update shared.route shared.url shared.key
 
-        SharedMsg inner ->
-            let
-                ( shared, cmd ) =
-                    Model.Shared.update inner model.shared
-            in
-            ( { model | shared = shared }
-            , cmd
-            )
+                        shared : SharedModel Msg
+                        shared =
+                            model.shared
+                    in
+                    ( { model | shared = { shared | route = route } }, routeCmd )
 
-        LocalStorageMsg inner ->
-            let
-                currentShared : SharedModel Msg
-                currentShared =
-                    model.shared
-
-                updateResult : Result String ( LocalStorage.Model Msg, Cmd Msg )
-                updateResult =
-                    LocalStorage.update inner currentShared.ls
-            in
-            case updateResult of
-                Ok ( ls, cmd ) ->
-                    ( { model | shared = { currentShared | ls = ls } }
+                SharedMsg inner ->
+                    let
+                        ( shared, cmd ) =
+                            Model.Shared.update inner model.shared
+                    in
+                    ( { model | shared = shared }
                     , cmd
                     )
 
-                Err error ->
+                LocalStorageMsg inner ->
                     let
-                        shared : SharedModel Msg
-                        shared =
-                            Model.Shared.addTextAlert
-                                Model.Shared.AlertError
-                                currentShared
-                                "Port-Funnels"
-                                error
-                    in
-                    ( { model
-                        | shared = shared
-                      }
-                    , Cmd.none
-                    )
+                        currentShared : SharedModel Msg
+                        currentShared =
+                            model.shared
 
-        Layout inner ->
-            let
-                ( shared, layout, cmd ) =
-                    Layout.update inner model.shared model.layout
-            in
-            ( { model | shared = shared, layout = layout }
-            , cmd
-            )
+                        updateResult : Result String ( LocalStorage.Model Msg, Cmd Msg )
+                        updateResult =
+                            LocalStorage.update inner currentShared.ls
+                    in
+                    case updateResult of
+                        Ok ( ls, cmd ) ->
+                            ( { model | shared = { currentShared | ls = ls } }
+                            , cmd
+                            )
+
+                        Err error ->
+                            let
+                                shared : SharedModel Msg
+                                shared =
+                                    Model.Shared.addTextAlert
+                                        Model.Shared.AlertError
+                                        currentShared
+                                        "Port-Funnels"
+                                        error
+                            in
+                            ( { model
+                                | shared = shared
+                              }
+                            , Cmd.none
+                            )
+
+                Layout inner ->
+                    let
+                        ( shared, layout, cmd ) =
+                            Layout.update inner model.shared model.layout
+                    in
+                    ( { model | shared = shared, layout = layout }
+                    , cmd
+                    )
+    in
+    ( handleResultModel
+    , Cmd.batch [ handleResultCmd, updateRoute ]
+    )
 
 
 
