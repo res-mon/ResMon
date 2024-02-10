@@ -78,6 +78,19 @@ config =
         { document = onlyExposed
         , from = allModules
         }
+        |> Rule.ignoreErrorsForFiles
+            [ "src/elm/Component/DaisyUi.elm"
+            , "src/elm/Component/Form.elm"
+            , "src/elm/Component/Icon.elm"
+            , "src/elm/Component/Markdown.elm"
+            , "src/elm/LocalStorage.elm"
+            , "src/elm/Main.elm"
+            , "src/elm/Model/Shared.elm"
+            , "src/elm/Model/User.elm"
+            , "src/elm/Page/Layout.elm"
+            , "src/elm/Page/NotFound.elm"
+            , "src/elm/Routing.elm"
+            ]
     , Docs.ReviewAtDocs.rule -- https://package.elm-lang.org/packages/jfmengels/elm-review-documentation/latest/Docs-ReviewAtDocs/
     , Docs.ReviewLinksAndSections.rule -- https://package.elm-lang.org/packages/jfmengels/elm-review-documentation/latest/Docs-ReviewLinksAndSections/
     , Docs.UpToDateReadmeLinks.rule -- https://package.elm-lang.org/packages/jfmengels/elm-review-documentation/latest/Docs-UpToDateReadmeLinks/

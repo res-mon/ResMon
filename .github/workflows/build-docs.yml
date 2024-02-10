@@ -1,43 +1,42 @@
 name: Build ResMon Docs
 
 on:
-  push:
-    branches: []
+    push:
+        branches: []
 
 jobs:
-  build:
+    build:
+        runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-    steps:
-    - uses: actions/checkout@v4
+            - name: Log in to Docker Hub
+              uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+            - name: Cache Docker layers
+              uses: actions/cache@v3
+              with:
+                  path: /tmp/.buildx-cache
+                  key: ${{ runner.os }}-buildx-${{ github.sha }}
+                  restore-keys: |
+                      ${{ runner.os }}-buildx-
 
-    - name: Cache Docker layers
-      uses: actions/cache@v3
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-
-
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v3
-      with:
-        context: .
-        file: ./docker/Documentation.Dockerfile
-        push: true
-        tags: yertools/res-mon-docs:latest
-        labels: yertools/res-mon-docs
-        builder: ${{ steps.buildx.outputs.name }}
-        platforms: linux/amd64
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v3
+              with:
+                  context: .
+                  file: ./docker/Documentation.Dockerfile
+                  push: true
+                  tags: yertools/res-mon-docs:latest
+                  labels: yertools/res-mon-docs
+                  builder: ${{ steps.buildx.outputs.name }}
+                  platforms: linux/amd64
+                  cache-from: type=local,src=/tmp/.buildx-cache
+                  cache-to: type=local,dest=/tmp/.buildx-cache

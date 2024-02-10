@@ -15,7 +15,7 @@
         "generate": "npx ts-node --compilerOptions {\\\"strict\\\":false} ./lib/ts/elm-tailwind-modules/cli.ts --tailwind-config ./config/tailwind.config.js --dir ./generated/elm",
         "prepare": "husky",
         "review": "npx elm-review",
-        "test": "npx elm-verify-examples && npx elm-test --fuzz 250 && npm run build && go test -race"
+        "test": "npx elm-verify-examples && npx elm-test --fuzz 250 && npm run review && npm run build && go test -race"
     },
     "devDependencies": {
         "@tailwindcss/aspect-ratio": "^0.4.2",
