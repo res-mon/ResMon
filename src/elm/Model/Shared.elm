@@ -2,10 +2,10 @@ port module Model.Shared exposing (Alert, AlertLevel(..), Internal, Msg(..), Rou
 
 import Browser.Navigation exposing (Key, replaceUrl)
 import Extension.Time exposing (fixVariationFloored)
-import Html.Styled exposing (Html, text)
+import Html.Styled as Dom
 import Json.Decode as D exposing (Value)
 import Json.Encode
-import LocalStorage as LS
+import LocalStorage as Ls
 import Model.User exposing (User, decodeUser)
 import Task
 import Time exposing (Zone)
@@ -31,7 +31,7 @@ type alias SharedModel msg =
     { route : Route
     , url : Url
     , key : Key
-    , ls : LS.Model msg
+    , ls : Ls.Model msg
     , user : Maybe User
     , time : Maybe Time.Posix
     , timeZone : Maybe Zone
@@ -52,8 +52,8 @@ type alias Internal msg =
 
 type alias Alert msg =
     { number : Int
-    , title : List (Html msg)
-    , message : List (Html msg)
+    , title : List (Dom.Html msg)
+    , message : List (Dom.Html msg)
     , level : AlertLevel
     }
 
@@ -72,7 +72,7 @@ init :
     -> Route
     -> Url
     -> Key
-    -> LS.Model msg
+    -> Ls.Model msg
     -> ( SharedModel msg, Cmd msg )
 init toMsg updateRoute route url key localStorage =
     let
@@ -84,7 +84,7 @@ init toMsg updateRoute route url key localStorage =
 
         lsCmd : Cmd msg
         lsCmd =
-            LS.getMsg (\res -> toMsg (UserLoaded res))
+            Ls.getMsg (\res -> toMsg (UserLoaded res))
                 model.ls
                 currentUserKey
 
@@ -131,7 +131,7 @@ type Msg msg
     | GotTimeZone Zone
     | Tick Time.Posix
     | DarkModeChanged Bool Bool
-    | AlertAdded AlertLevel (List (Html msg)) (List (Html msg))
+    | AlertAdded AlertLevel (List (Dom.Html msg)) (List (Dom.Html msg))
 
 
 update : Msg msg -> SharedModel msg -> ( SharedModel msg, Cmd msg )
@@ -224,15 +224,15 @@ addTextAlert :
 addTextAlert level model title message =
     addAlert level
         model
-        [ text title ]
-        [ text message ]
+        [ Dom.text title ]
+        [ Dom.text message ]
 
 
 addAlert :
     AlertLevel
     -> SharedModel msg
-    -> List (Html msg)
-    -> List (Html msg)
+    -> List (Dom.Html msg)
+    -> List (Dom.Html msg)
     -> SharedModel msg
 addAlert level model title message =
     let
@@ -287,8 +287,8 @@ subscriptions model =
                     Err err ->
                         model.internal.toMsg
                             (AlertAdded AlertError
-                                [ text "Unexpected value from dark mode changed port" ]
-                                [ D.errorToString err |> text ]
+                                [ Dom.text "Unexpected value from dark mode changed port" ]
+                                [ D.errorToString err |> Dom.text ]
                             )
             )
         ]

@@ -6,12 +6,12 @@ module Component.Markdown exposing
     , markdownConfiguration
     )
 
-import Component.DaisyUi exposing (mergeStyles)
-import Html.Styled exposing (Attribute, Html, article, fromUnstyled)
+import Html.Styled as Dom
 import Markdown
-import Tailwind.Breakpoints exposing (lg)
-import Tailwind.Classes exposing (prose_base)
-import Tailwind.Utilities exposing (prose_lg)
+import Tailwind.Breakpoints as Br
+import Tailwind.Classes as Cls
+import Tailwind.Utilities as Tw
+import Component.DaisyUi as Ui
 
 
 
@@ -31,42 +31,42 @@ markdownConfiguration =
 -- VIEW
 
 
-fromMarkdownBase : Bool -> List (Attribute msg) -> String -> Html msg
+fromMarkdownBase : Bool -> List (Dom.Attribute msg) -> String -> Dom.Html msg
 fromMarkdownBase sanitize attributes content =
     let
-        result : Html msg
+        result : Dom.Html msg
         result =
             Markdown.toHtmlWith
                 { markdownConfiguration | sanitize = sanitize }
                 []
                 content
-                |> fromUnstyled
+                |> Dom.fromUnstyled
     in
-    article
-        (mergeStyles
-            [ ( [ lg [ prose_lg ] ], [] )
-            , prose_base
+    Dom.article
+        (Ui.mergeStyles
+            [ ( [ Br.lg [ Tw.prose_lg ] ], [] )
+            , Cls.prose_base
             ]
             attributes
         )
         [ result ]
 
 
-fromUnsanitizedMarkdownStyled : List (Html.Styled.Attribute msg) -> String -> Html.Styled.Html msg
+fromUnsanitizedMarkdownStyled : List (Dom.Attribute msg) -> String -> Dom.Html msg
 fromUnsanitizedMarkdownStyled =
     fromMarkdownBase False
 
 
-fromUnsanitizedMarkdown : String -> Html msg
+fromUnsanitizedMarkdown : String -> Dom.Html msg
 fromUnsanitizedMarkdown =
     fromUnsanitizedMarkdownStyled []
 
 
-fromMarkdownStyled : List (Html.Styled.Attribute msg) -> String -> Html.Styled.Html msg
+fromMarkdownStyled : List (Dom.Attribute msg) -> String -> Dom.Html msg
 fromMarkdownStyled =
     fromMarkdownBase True
 
 
-fromMarkdown : String -> Html msg
+fromMarkdown : String -> Dom.Html msg
 fromMarkdown =
     fromMarkdownStyled []

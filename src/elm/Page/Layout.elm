@@ -1,45 +1,17 @@
 module Page.Layout exposing (Model, Msg, init, update, view)
 
 import Browser exposing (Document)
-import Component.DaisyUi as D exposing (SwapModifier(..), modifier)
-import Component.Icon as Icon
+import Component.DaisyUi as Ui
+import Component.Icon as Ico
 import Css.Global exposing (global)
-import Html.Styled exposing (Html, a, button, div, fromUnstyled, h3, img, li, main_, span, text, toUnstyled, ul)
-import Html.Styled.Attributes exposing (attribute, css, href, src, tabindex)
+import Html.Styled as Dom
+import Html.Styled.Attributes as Attr
 import Html.Styled.Events exposing (onClick)
 import List exposing (map)
 import Model.Shared exposing (AlertLevel(..), SharedModel, removeAlert, setDarkModeMessage)
-import Tailwind.Classes exposing (shadow_lg)
-import Tailwind.Theme exposing (base_100, base_300)
-import Tailwind.Utilities
-    exposing
-        ( bg_color
-        , duration_500
-        , flex_1
-        , flex_none
-        , float_right
-        , font_bold
-        , font_mono
-        , globalStyles
-        , grid
-        , h_full
-        , h_screen
-        , justify_between
-        , m_4
-        , mt_3
-        , p_16
-        , p_2
-        , place_items_center
-        , rounded_box
-        , shadow_md
-        , text_2xl
-        , text_3xl
-        , text_4xl
-        , text_7xl
-        , text_xl
-        , w_52
-        , z_10
-        )
+import Tailwind.Classes as Cls
+import Tailwind.Theme as Color
+import Tailwind.Utilities as Tw
 import Time
 
 
@@ -79,7 +51,7 @@ update msg shared model =
 view : SharedModel msg -> Model msg -> Bool -> Document msg -> Document msg
 view shared model minimal body =
     let
-        content : List (Html msg)
+        content : List (Dom.Html msg)
         content =
             List.concat
                 [ if minimal then
@@ -97,38 +69,38 @@ view shared model minimal body =
                     [ footer shared model ]
                 ]
 
-        mainElement : Html msg
+        mainElement : Dom.Html msg
         mainElement =
-            main_
-                [ css
-                    [ p_16
-                    , bg_color base_100
-                    , grid
-                    , h_screen
-                    , place_items_center
+            Dom.main_
+                [ Attr.css
+                    [ Tw.p_16
+                    , Tw.bg_color Color.base_100
+                    , Tw.grid
+                    , Tw.h_screen
+                    , Tw.place_items_center
                     ]
                 ]
-                (div [ css [ text_7xl, font_mono ] ]
-                    [ D.countdown []
-                        [ duration_500 ]
+                (Dom.div [ Attr.css [ Tw.text_7xl, Tw.font_mono ] ]
+                    [ Ui.countdown []
+                        [ Tw.duration_500 ]
                         (Maybe.map2 Time.toHour shared.timeZone shared.time |> Maybe.withDefault 0)
-                    , text ":"
-                    , D.countdown []
-                        [ duration_500 ]
+                    , Dom.text ":"
+                    , Ui.countdown []
+                        [ Tw.duration_500 ]
                         (Maybe.map2 Time.toMinute shared.timeZone shared.time |> Maybe.withDefault 0)
-                    , text ":"
-                    , D.countdown []
-                        [ duration_500 ]
+                    , Dom.text ":"
+                    , Ui.countdown []
+                        [ Tw.duration_500 ]
                         (Maybe.map2 Time.toSecond shared.timeZone shared.time |> Maybe.withDefault 0)
                     ]
-                    :: map fromUnstyled body.body
+                    :: map Dom.fromUnstyled body.body
                 )
     in
     { title = body.title ++ " - ResMon"
     , body =
-        [ global globalStyles
-        , div
-            [ attribute "data-theme"
+        [ global Tw.globalStyles
+        , Dom.div
+            [ Attr.attribute "data-theme"
                 (if shared.darkMode then
                     "dark"
 
@@ -140,79 +112,79 @@ view shared model minimal body =
                 :: content
             )
         ]
-            |> map toUnstyled
+            |> map Dom.toUnstyled
     }
 
 
-navigation : SharedModel msg -> Model msg -> Html msg
+navigation : SharedModel msg -> Model msg -> Dom.Html msg
 navigation shared _ =
-    D.navbar div
-        [ bg_color base_300 |> D.style ]
-        [ div [ css [ flex_none ] ]
-            [ D.btn button
-                [ D.modifiers [ D.BtnPrimary, D.BtnSquare, D.BtnGhost ] ]
-                [ Icon.list [ text_4xl ]
+    Ui.navbar Dom.div
+        [ Tw.bg_color Color.base_300 |> Ui.style ]
+        [ Dom.div [ Attr.css [ Tw.flex_none ] ]
+            [ Ui.btn Dom.button
+                [ Ui.modifiers [ Ui.BtnPrimary, Ui.BtnSquare, Ui.BtnGhost ] ]
+                [ Ico.list [ Tw.text_4xl ]
                 ]
             ]
-        , div [ css [ flex_1 ] ]
-            [ D.btn a
-                [ D.modifiers [ D.BtnLink ]
-                , href "/" |> D.attribute
+        , Dom.div [ Attr.css [ Tw.flex_1 ] ]
+            [ Ui.btn Dom.a
+                [ Ui.modifiers [ Ui.BtnLink ]
+                , Attr.href "/" |> Ui.attribute
                 ]
-                [ img
-                    [ src <|
+                [ Dom.img
+                    [ Attr.src <|
                         if shared.darkMode then
                             "/img/logo/svg/full-text-inverted.svg"
 
                         else
                             "/img/logo/svg/full-text.svg"
-                    , css [ h_full ]
+                    , Attr.css [ Tw.h_full ]
                     ]
                     []
                 ]
             ]
-        , D.dropdown div
-            [ D.modifier D.DropdownEnd ]
-            [ D.btn div
-                [ D.modifier D.BtnGhost
-                , [ attribute "role" "button"
-                  , tabindex 0
+        , Ui.dropdown Dom.div
+            [ Ui.modifier Ui.DropdownEnd ]
+            [ Ui.btn Dom.div
+                [ Ui.modifier Ui.BtnGhost
+                , [ Attr.attribute "role" "button"
+                  , Attr.tabindex 0
                   ]
-                    |> D.attributes
+                    |> Ui.attributes
                 ]
-                [ Icon.threeDots [ text_4xl ] ]
+                [ Ico.threeDots [ Tw.text_4xl ] ]
             ]
-            ul
-            [ D.styles
-                [ mt_3
-                , p_2
-                , shadow_md
-                , bg_color base_300
-                , rounded_box
-                , w_52
-                , z_10
+            Dom.ul
+            [ Ui.styles
+                [ Tw.mt_3
+                , Tw.p_2
+                , Tw.shadow_md
+                , Tw.bg_color Color.base_300
+                , Tw.rounded_box
+                , Tw.w_52
+                , Tw.z_10
                 ]
-            , D.classes
-                [ D.menuStyle [ D.MenuSm ]
+            , Ui.classes
+                [ Ui.menuStyle [ Ui.MenuSm ]
                 ]
             ]
-            [ li []
-                [ span
-                    [ css [ justify_between, text_2xl ]
+            [ Dom.li []
+                [ Dom.span
+                    [ Attr.css [ Tw.justify_between, Tw.text_2xl ]
                     , onClick (setDarkModeMessage shared (not shared.darkMode))
                     ]
-                    [ text <|
+                    [ Dom.text <|
                         if shared.darkMode then
                             "Light-Mode"
 
                         else
                             "Dark-Mode"
-                    , D.swap
-                        [ modifier SwapRotate
-                        , D.styles [ float_right, m_4 ]
+                    , Ui.swap
+                        [ Ui.modifier Ui.SwapRotate
+                        , Ui.styles [ Tw.float_right, Tw.m_4 ]
                         ]
-                        [ Icon.sunFill [] ]
-                        [ Icon.moonFill [] ]
+                        [ Ico.sunFill [] ]
+                        [ Ico.moonFill [] ]
                         []
                         Nothing
                         shared.darkMode
@@ -222,64 +194,64 @@ navigation shared _ =
         ]
 
 
-footer : SharedModel msg -> Model msg -> Html msg
+footer : SharedModel msg -> Model msg -> Dom.Html msg
 footer _ _ =
-    div []
+    Dom.div []
         []
 
 
-alerts : (Msg msg -> msg) -> List (Model.Shared.Alert msg) -> Html msg
+alerts : (Msg msg -> msg) -> List (Model.Shared.Alert msg) -> Dom.Html msg
 alerts toMsg items =
-    D.toast
-        [ D.modifiers [ D.ToastTop, D.ToastEnd ] ]
+    Ui.toast
+        [ Ui.modifiers [ Ui.ToastTop, Ui.ToastEnd ] ]
         (map (alert toMsg) items)
 
 
-alert : (Msg msg -> msg) -> Model.Shared.Alert msg -> Html msg
+alert : (Msg msg -> msg) -> Model.Shared.Alert msg -> Dom.Html msg
 alert toMsg item =
     let
         ( ico, alertModifier, btnModifier ) =
             case item.level of
                 AlertNone ->
-                    ( Icon.infoCircle
+                    ( Ico.infoCircle
                     , []
-                    , [ D.BtnPrimary ]
+                    , [ Ui.BtnPrimary ]
                     )
 
                 AlertInfo ->
-                    ( Icon.infoCircle
-                    , [ D.AlertInfo ]
-                    , [ D.BtnInfo ]
+                    ( Ico.infoCircle
+                    , [ Ui.AlertInfo ]
+                    , [ Ui.BtnInfo ]
                     )
 
                 AlertSuccess ->
-                    ( Icon.checkCircle
-                    , [ D.AlertSuccess ]
-                    , [ D.BtnSuccess ]
+                    ( Ico.checkCircle
+                    , [ Ui.AlertSuccess ]
+                    , [ Ui.BtnSuccess ]
                     )
 
                 AlertWarning ->
-                    ( Icon.exclamationTriangle
-                    , [ D.AlertWarning ]
-                    , [ D.BtnWarning ]
+                    ( Ico.exclamationTriangle
+                    , [ Ui.AlertWarning ]
+                    , [ Ui.BtnWarning ]
                     )
 
                 AlertError ->
-                    ( Icon.xCircle
-                    , [ D.AlertError ]
-                    , [ D.BtnError ]
+                    ( Ico.xCircle
+                    , [ Ui.AlertError ]
+                    , [ Ui.BtnError ]
                     )
     in
-    D.alert [ D.modifiers alertModifier, D.class shadow_lg ]
-        [ ico [ text_3xl ]
-        , div []
-            [ h3 [ css [ font_bold, text_xl ] ] item.title
-            , div [] item.message
+    Ui.alert [ Ui.modifiers alertModifier, Ui.class Cls.shadow_lg ]
+        [ ico [ Tw.text_3xl ]
+        , Dom.div []
+            [ Dom.h3 [ Attr.css [ Tw.font_bold, Tw.text_xl ] ] item.title
+            , Dom.div [] item.message
             ]
-        , D.btn button
-            [ D.modifiers btnModifier
-            , D.attribute <| onClick (RemoveAlert item.number |> toMsg)
+        , Ui.btn Dom.button
+            [ Ui.modifiers btnModifier
+            , Ui.attribute <| onClick (RemoveAlert item.number |> toMsg)
             ]
-            [ text "Löschen"
+            [ Dom.text "Löschen"
             ]
         ]

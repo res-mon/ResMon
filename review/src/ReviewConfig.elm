@@ -31,12 +31,14 @@ import NoEmptyText
 import NoEtaReducibleLambdas
 import NoExposingEverything
 import NoImportingEverything
+import NoInconsistentAliases
 import NoLongImportLines
 import NoMissingSubscriptionsCall
 import NoMissingTypeAnnotation
 import NoMissingTypeAnnotationInLetIn
 import NoMissingTypeConstructor
 import NoMissingTypeExpose
+import NoModuleOnExposedNames
 import NoPrematureLetComputation
 import NoPrimitiveTypeAlias
 import NoRecordAliasConstructor
@@ -113,12 +115,28 @@ config =
         }
     , NoExposingEverything.rule -- https://package.elm-lang.org/packages/jfmengels/elm-review-common/latest/NoExposingEverything/
     , NoImportingEverything.rule [] -- https://package.elm-lang.org/packages/jfmengels/elm-review-common/latest/NoImportingEverything/
+
+    -- https://package.elm-lang.org/packages/sparksp/elm-review-imports/latest/NoInconsistentAliases
+    , NoInconsistentAliases.config
+        [ ( "Component.DaisyUi", "Ui" )
+        , ( "Component.Icon", "Ico" )
+        , ( "Html.Styled", "Dom" )
+        , ( "Html.Styled.Attributes", "Attr" )
+        , ( "LocalStorage", "Ls" )
+        , ( "Tailwind.Breakpoints", "Br")
+        , ( "Tailwind.Classes", "Cls" )
+        , ( "Tailwind.Theme", "Color" )
+        , ( "Tailwind.Utilities", "Tw" )
+        ]
+        |> NoInconsistentAliases.noMissingAliases
+        |> NoInconsistentAliases.rule
     , NoLongImportLines.rule -- https://package.elm-lang.org/packages/r-k-b/no-long-import-lines/latest/NoLongImportLines
     , NoMissingSubscriptionsCall.rule -- https://package.elm-lang.org/packages/jfmengels/elm-review-the-elm-architecture/latest/NoMissingSubscriptionsCall
     , NoMissingTypeAnnotation.rule -- https://package.elm-lang.org/packages/jfmengels/elm-review-common/latest/NoMissingTypeAnnotation/
     , NoMissingTypeAnnotationInLetIn.rule -- https://package.elm-lang.org/packages/jfmengels/elm-review-common/latest/NoMissingTypeAnnotationInLetIn
     , NoMissingTypeConstructor.rule -- https://package.elm-lang.org/packages/Arkham/elm-review-no-missing-type-constructor/latest/NoMissingTypeConstructor
     , NoMissingTypeExpose.rule -- https://package.elm-lang.org/packages/jfmengels/elm-review-common/latest/NoMissingTypeExpose/
+    , NoModuleOnExposedNames.rule -- https://package.elm-lang.org/packages/sparksp/elm-review-imports/latest/NoModuleOnExposedNames
     , NoPrematureLetComputation.rule -- https://package.elm-lang.org/packages/jfmengels/elm-review-common/latest/NoPrematureLetComputation/
     , NoPrimitiveTypeAlias.rule -- https://package.elm-lang.org/packages/dillonkearns/elm-review-no-primitive-type-alias/latest/NoPrimitiveTypeAlias
     , NoRecordAliasConstructor.rule -- https://package.elm-lang.org/packages/lue-bird/elm-review-record-alias-constructor/latest/NoRecordAliasConstructor

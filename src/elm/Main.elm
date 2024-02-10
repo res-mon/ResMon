@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation exposing (Key)
-import LocalStorage
+import LocalStorage as Ls
 import Model.Shared exposing (Route(..), SharedModel)
 import Page.Layout as Layout
 import Page.NotFound as NotFound
@@ -58,7 +58,7 @@ init () url key =
                 route
                 url
                 key
-                (LocalStorage.init LocalStorageMsg)
+                (Ls.init LocalStorageMsg)
     in
     ( model
     , Cmd.batch
@@ -79,7 +79,7 @@ type Msg
     | LinkClicked UrlRequest
     | UpdateRoute
     | SharedMsg (Model.Shared.Msg Msg)
-    | LocalStorageMsg (LocalStorage.Msg Msg)
+    | LocalStorageMsg (Ls.Msg Msg)
     | Layout (Layout.Msg Msg)
 
 
@@ -141,9 +141,9 @@ update msg model =
                         currentShared =
                             model.shared
 
-                        updateResult : Result String ( LocalStorage.Model Msg, Cmd Msg )
+                        updateResult : Result String ( Ls.Model Msg, Cmd Msg )
                         updateResult =
-                            LocalStorage.update inner currentShared.ls
+                            Ls.update inner currentShared.ls
                     in
                     case updateResult of
                         Ok ( ls, cmd ) ->
@@ -218,6 +218,6 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ LocalStorage.subscriptions model.shared.ls
+        [ Ls.subscriptions model.shared.ls
         , Model.Shared.subscriptions model.shared
         ]

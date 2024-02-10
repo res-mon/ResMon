@@ -2,26 +2,12 @@ module Component.Form exposing (InputElement, InputError, InputState, Model, Msg
 
 import Css exposing (focus)
 import Dict exposing (Dict)
-import Html.Styled exposing (Html, div, label, li, span, text, ul)
-import Html.Styled.Attributes exposing (css, type_, value)
+import Html.Styled as Dom
+import Html.Styled.Attributes as Attr
 import Html.Styled.Events exposing (onBlur, onFocus, onInput)
 import Maybe exposing (withDefault)
-import Tailwind.Theme exposing (black, gray_200, gray_700, rose_600)
-import Tailwind.Utilities
-    exposing
-        ( block
-        , border_0
-        , border_b_2
-        , border_color
-        , font_semibold
-        , mb_2
-        , mt_0
-        , mt_2
-        , px_0_dot_5
-        , ring_0
-        , text_color
-        , w_full
-        )
+import Tailwind.Theme as Color
+import Tailwind.Utilities as Tw
 
 
 
@@ -59,9 +45,9 @@ type alias InputElement msg =
     , render :
         String
         -> List InputError
-        -> List (Html.Styled.Attribute msg)
-        -> List (Html msg)
-        -> Html msg
+        -> List (Dom.Attribute msg)
+        -> List (Dom.Html msg)
+        -> Dom.Html msg
     }
 
 
@@ -122,12 +108,12 @@ input :
     -> (String -> msg)
     -> String
     -> List InputError
-    -> List (Html.Styled.Attribute msg)
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Attribute msg)
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 input inputType model id labelText onInputMsg currentValue errors attributes elements =
     let
-        renderedErrors : Html msg
+        renderedErrors : Dom.Html msg
         renderedErrors =
             errors
                 |> List.filter
@@ -137,17 +123,17 @@ input inputType model id labelText onInputMsg currentValue errors attributes ele
                     )
                 |> List.map
                     (\err ->
-                        li
-                            [ css
-                                [ text_color rose_600
-                                , mt_2
-                                , mb_2
+                        Dom.li
+                            [ Attr.css
+                                [ Tw.text_color Color.rose_600
+                                , Tw.mt_2
+                                , Tw.mb_2
                                 ]
                             ]
-                            [ text err.value
+                            [ Dom.text err.value
                             ]
                     )
-                |> ul []
+                |> Dom.ul []
 
         showResolvableErrors : Bool
         showResolvableErrors =
@@ -162,35 +148,35 @@ input inputType model id labelText onInputMsg currentValue errors attributes ele
         state =
             Dict.get id model.inputStates
     in
-    div []
-        (label
-            [ css
-                [ block
+    Dom.div []
+        (Dom.label
+            [ Attr.css
+                [ Tw.block
                 ]
             ]
-            [ span
-                [ css
-                    [ text_color gray_700
-                    , font_semibold
+            [ Dom.span
+                [ Attr.css
+                    [ Tw.text_color Color.gray_700
+                    , Tw.font_semibold
                     ]
                 ]
-                [ text labelText ]
-            , Html.Styled.input
-                (css
-                    [ mt_0
-                    , block
-                    , w_full
-                    , px_0_dot_5
-                    , border_0
-                    , border_b_2
-                    , border_color gray_200
+                [ Dom.text labelText ]
+            , Dom.input
+                (Attr.css
+                    [ Tw.mt_0
+                    , Tw.block
+                    , Tw.w_full
+                    , Tw.px_0_dot_5
+                    , Tw.border_0
+                    , Tw.border_b_2
+                    , Tw.border_color Color.gray_200
                     , focus
-                        [ ring_0
-                        , border_color black
+                        [ Tw.ring_0
+                        , Tw.border_color Color.black
                         ]
                     ]
-                    :: type_ inputType
-                    :: value currentValue
+                    :: Attr.type_ inputType
+                    :: Attr.value currentValue
                     :: onFocus (model.toMsg (FocusChanged id True))
                     :: onBlur (model.toMsg (FocusChanged id False))
                     :: onInput onInputMsg
@@ -210,8 +196,8 @@ textInput :
     -> (String -> msg)
     -> String
     -> List InputError
-    -> List (Html.Styled.Attribute msg)
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Attribute msg)
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 textInput =
     input "text"

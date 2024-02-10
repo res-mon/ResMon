@@ -1,11 +1,11 @@
 module Page.NotFound exposing (view)
 
 import Browser exposing (Document)
-import Html.Styled exposing (Html, strong, text, toUnstyled)
-import Html.Styled.Attributes exposing (css)
+import Html.Styled as Dom
+import Html.Styled.Attributes as Attr
 import List exposing (map)
 import Model.Shared exposing (SharedModel)
-import Tailwind.Utilities as U
+import Tailwind.Utilities as Tw
 import Url exposing (Url)
 
 
@@ -16,13 +16,13 @@ import Url exposing (Url)
 view : SharedModel msg -> Document msg
 view shared =
     { title = "Nicht gefunden"
-    , body = map toUnstyled (mainContent shared.url)
+    , body = map Dom.toUnstyled (mainContent shared.url)
     }
 
 
-mainContent : Url -> List (Html msg)
+mainContent : Url -> List (Dom.Html msg)
 mainContent url =
-    [ text " Die angefragte Seite "
-    , strong [ css [ U.font_bold ] ] [ text url.path ]
-    , text " konnte nicht gefunden werden."
+    [ Dom.text " Die angefragte Seite "
+    , Dom.strong [ Attr.css [ Tw.font_bold ] ] [ Dom.text url.path ]
+    , Dom.text " konnte nicht gefunden werden."
     ]

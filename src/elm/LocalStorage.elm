@@ -3,7 +3,7 @@ module LocalStorage exposing (GetCmdCallback, GetMsgCallback, Model, Msg, getCmd
 import Dict exposing (Dict)
 import Json.Encode exposing (Value)
 import Platform.Cmd as Cmd
-import PortFunnel.LocalStorage as LS exposing (Response(..))
+import PortFunnel.LocalStorage as Ls exposing (Response(..))
 import PortFunnels exposing (FunnelDict, Handler(..))
 import Task
 
@@ -101,8 +101,8 @@ type alias GetMsgCallback msg =
 
 set : Model msg -> String -> Maybe Value -> Cmd msg
 set model key value =
-    LS.send (getCmdPort Process LS.moduleName model)
-        (LS.put key value)
+    Ls.send (getCmdPort Process Ls.moduleName model)
+        (Ls.put key value)
         model.funnel.storage
 
 
@@ -113,8 +113,8 @@ getCmd callback model key =
             let
                 cmd : Cmd msg
                 cmd =
-                    LS.send (getCmdPort Process LS.moduleName model)
-                        (LS.get key)
+                    Ls.send (getCmdPort Process Ls.moduleName model)
+                        (Ls.get key)
                         model.funnel.storage
             in
             model.toMsg (ActionMsg (Get key callback cmd))
@@ -144,7 +144,7 @@ funnelDict =
 
 
 storageHandler :
-    LS.Response
+    Response
     -> PortFunnels.State
     -> Model msg
     -> ( Model msg, Cmd msg )

@@ -1,10 +1,10 @@
 module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DropdownModifier(..), ExtendedStyle, InputModifier(..), MenuItemModifier(..), MenuModifier(..), SwapModifier(..), ToastModifier(..), alert, alertStyle, attribute, attributes, btn, btnStyle, class, classes, countdown, countdownStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, modifier, modifiers, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, style, styles, swap, swapStyle, toast, toastStyle)
 
 import Css exposing (Style, before, important)
-import Html.Styled exposing (Attribute, Html, div, input, label, li, span, ul)
-import Html.Styled.Attributes as Attr exposing (checked, tabindex)
+import Html.Styled as Dom
+import Html.Styled.Attributes as Attr
 import Html.Styled.Events exposing (onCheck)
-import Tailwind.Classes as C
+import Tailwind.Classes as Cls
 
 
 
@@ -16,11 +16,11 @@ merge :
     -> List Style
     -> List String
     -> List modifier
-    -> List (Attribute msg)
-    -> List (Attribute msg)
+    -> List (Dom.Attribute msg)
+    -> List (Dom.Attribute msg)
 merge modifierFunc daisyStyles daisyClasses modifierList attributeList =
     let
-        classList : Attribute msg
+        classList : Dom.Attribute msg
         classList =
             daisyClasses
                 :: modifierClasses
@@ -32,7 +32,7 @@ merge modifierFunc daisyStyles daisyClasses modifierList attributeList =
             List.map modifierFunc modifierList
                 |> List.unzip
 
-        styleAttribute : Attribute msg
+        styleAttribute : Dom.Attribute msg
         styleAttribute =
             daisyStyles
                 :: modifierAttributes
@@ -57,10 +57,10 @@ mergeModifiedStyles modifierFunc classList modifierList =
 
 mergeElement :
     (List modifier -> ( List Style, List String ))
-    -> (List (Attribute msg) -> List (Html msg) -> Html msg)
+    -> (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg modifier)
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 mergeElement modifierMapFunc element stylings children =
     let
         activeClasses : List ( String, Bool )
@@ -68,7 +68,7 @@ mergeElement modifierMapFunc element stylings children =
             classNames
                 |> List.map (\name -> ( name, True ))
 
-        attributeList : List (Attribute msg)
+        attributeList : List (Dom.Attribute msg)
         attributeList =
             List.concatMap .attributes stylings
 
@@ -90,10 +90,10 @@ mergeElement modifierMapFunc element stylings children =
 
 mergeUnmodifiedElement :
     ( List Style, List String )
-    -> (List (Attribute msg) -> List (Html msg) -> Html msg)
+    -> (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg modifier)
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 mergeUnmodifiedElement styleTuple element styling =
     mergeElement (\_ -> ( [], [] )) element (class styleTuple :: styling)
 
@@ -101,24 +101,24 @@ mergeUnmodifiedElement styleTuple element styling =
 mergeUnmodified :
     List Style
     -> List String
-    -> List (Attribute msg)
-    -> List (Attribute msg)
+    -> List (Dom.Attribute msg)
+    -> List (Dom.Attribute msg)
 mergeUnmodified daisyStyles daisyClasses =
     merge (\_ -> ( [], [] )) daisyStyles daisyClasses []
 
 
 mergeUnmodifiedTuple :
     ( List Style, List String )
-    -> List (Attribute msg)
-    -> List (Attribute msg)
+    -> List (Dom.Attribute msg)
+    -> List (Dom.Attribute msg)
 mergeUnmodifiedTuple ( daisyStyles, daisyClasses ) =
     mergeUnmodified daisyStyles daisyClasses
 
 
 mergeStyles :
     List ( List Style, List String )
-    -> List (Attribute msg)
-    -> List (Attribute msg)
+    -> List (Dom.Attribute msg)
+    -> List (Dom.Attribute msg)
 mergeStyles classList =
     mergeUnmodifiedTuple (classList |> unzip)
 
@@ -138,7 +138,7 @@ unzip list =
 
 type alias ExtendedStyle msg modifier =
     { classes : List ( List Style, List String )
-    , attributes : List (Attribute msg)
+    , attributes : List (Dom.Attribute msg)
     , modifiers : List modifier
     }
 
@@ -175,7 +175,7 @@ styles cssStyles =
     }
 
 
-attribute : Attribute msg -> ExtendedStyle msg modifier
+attribute : Dom.Attribute msg -> ExtendedStyle msg modifier
 attribute attr =
     { classes = []
     , attributes = [ attr ]
@@ -183,7 +183,7 @@ attribute attr =
     }
 
 
-attributes : List (Attribute msg) -> ExtendedStyle msg modifier
+attributes : List (Dom.Attribute msg) -> ExtendedStyle msg modifier
 attributes attributeList =
     { classes = []
     , attributes = attributeList
@@ -241,73 +241,73 @@ btnModifier : BtnModifier -> ( List Style, List String )
 btnModifier mod =
     case mod of
         BtnNeutral ->
-            C.btn_neutral
+            Cls.btn_neutral
 
         BtnPrimary ->
-            C.btn_primary
+            Cls.btn_primary
 
         BtnSecondary ->
-            C.btn_secondary
+            Cls.btn_secondary
 
         BtnAccent ->
-            C.btn_accent
+            Cls.btn_accent
 
         BtnInfo ->
-            C.btn_info
+            Cls.btn_info
 
         BtnSuccess ->
-            C.btn_success
+            Cls.btn_success
 
         BtnWarning ->
-            C.btn_warning
+            Cls.btn_warning
 
         BtnError ->
-            C.btn_error
+            Cls.btn_error
 
         BtnGhost ->
-            C.btn_ghost
+            Cls.btn_ghost
 
         BtnLink ->
-            C.btn_link
+            Cls.btn_link
 
         BtnOutline ->
-            C.btn_outline
+            Cls.btn_outline
 
         BtnActive ->
-            C.btn_active
+            Cls.btn_active
 
         BtnDisabled ->
-            C.btn_disabled
+            Cls.btn_disabled
 
         BtnGlass ->
-            C.glass
+            Cls.glass
 
         BtnNoAnimation ->
-            C.no_animation
+            Cls.no_animation
 
         BtnLg ->
-            C.btn_lg
+            Cls.btn_lg
 
         BtnMd ->
-            C.btn_md
+            Cls.btn_md
 
         BtnSm ->
-            C.btn_sm
+            Cls.btn_sm
 
         BtnXs ->
-            C.btn_xs
+            Cls.btn_xs
 
         BtnWide ->
-            C.btn_wide
+            Cls.btn_wide
 
         BtnBlock ->
-            C.btn_block
+            Cls.btn_block
 
         BtnCircle ->
-            C.btn_circle
+            Cls.btn_circle
 
         BtnSquare ->
-            C.btn_square
+            Cls.btn_square
 
 
 {-| Buttons allow the user to take actions or make choices.
@@ -320,7 +320,7 @@ btnStyle :
     List BtnModifier
     -> ( List Style, List String )
 btnStyle =
-    mergeModifiedStyles btnModifier [ C.btn ]
+    mergeModifiedStyles btnModifier [ Cls.btn ]
 
 
 {-| Buttons allow the user to take actions or make choices.
@@ -330,10 +330,10 @@ Button.
 
 -}
 btn :
-    (List (Attribute msg) -> List (Html msg) -> Html msg)
+    (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg BtnModifier)
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 btn element styling children =
     mergeElement btnStyle element styling children
 
@@ -356,25 +356,25 @@ dropdownModifier : DropdownModifier -> ( List Style, List String )
 dropdownModifier mod =
     case mod of
         DropdownEnd ->
-            C.dropdown_end
+            Cls.dropdown_end
 
         DropdownTop ->
-            C.dropdown_top
+            Cls.dropdown_top
 
         DropdownBottom ->
-            C.dropdown_bottom
+            Cls.dropdown_bottom
 
         DropdownLeft ->
-            C.dropdown_left
+            Cls.dropdown_left
 
         DropdownRight ->
-            C.dropdown_right
+            Cls.dropdown_right
 
         DropdownHover ->
-            C.dropdown_hover
+            Cls.dropdown_hover
 
         DropdownOpen ->
-            C.dropdown_open
+            Cls.dropdown_open
 
 
 {-| Dropdown can open a menu or any other element when the button is clicked.
@@ -387,7 +387,7 @@ dropdownStyle :
     List DropdownModifier
     -> ( List Style, List String )
 dropdownStyle =
-    mergeModifiedStyles dropdownModifier [ C.dropdown ]
+    mergeModifiedStyles dropdownModifier [ Cls.dropdown ]
 
 
 {-| Dropdown can open a menu or any other element when the button is clicked.
@@ -397,16 +397,16 @@ Container element.
 
 -}
 dropdown :
-    (List (Attribute msg) -> List (Html msg) -> Html msg)
+    (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg DropdownModifier)
-    -> List (Html msg)
-    -> (List (Attribute msg) -> List (Html msg) -> Html msg)
+    -> List (Dom.Html msg)
+    -> (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg ())
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 dropdown element styling openerContent contentElement contentStyling content =
     let
-        inner : Html msg
+        inner : Dom.Html msg
         inner =
             mergeUnmodifiedElement
                 dropdownContentStyle
@@ -416,7 +416,7 @@ dropdown element styling openerContent contentElement contentStyling content =
     in
     mergeElement dropdownStyle
         element
-        ((tabindex -1 |> attribute) :: styling)
+        ((Attr.tabindex -1 |> attribute) :: styling)
         (openerContent ++ [ inner ])
 
 
@@ -428,7 +428,7 @@ Use inside of `dropdown` component.
 -}
 dropdownContentStyle : ( List Style, List String )
 dropdownContentStyle =
-    C.dropdown_content
+    Cls.dropdown_content
 
 
 {-| Dropdown container for content.
@@ -438,10 +438,10 @@ Use inside of `dropdown` component.
 
 -}
 dropdownContent :
-    (List (Attribute msg) -> List (Html msg) -> Html msg)
+    (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg ())
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 dropdownContent element styling content =
     mergeUnmodifiedElement
         dropdownContentStyle
@@ -462,7 +462,7 @@ Container element.
 -}
 navbarStyle : ( List Style, List String )
 navbarStyle =
-    C.navbar
+    Cls.navbar
 
 
 {-| Navbar is used to show a navigation bar on the top of the page.
@@ -472,10 +472,10 @@ Container element.
 
 -}
 navbar :
-    (List (Attribute msg) -> List (Html msg) -> Html msg)
+    (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg ())
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 navbar element styling content =
     mergeUnmodifiedElement
         navbarStyle
@@ -492,7 +492,7 @@ Use inside of `navbar` component.
 -}
 navbarStartStyle : ( List Style, List String )
 navbarStartStyle =
-    C.navbar_start
+    Cls.navbar_start
 
 
 {-| Child element, fills 50% of width to be on start.
@@ -502,10 +502,10 @@ Use inside of `navbar` component.
 
 -}
 navbarStart :
-    (List (Attribute msg) -> List (Html msg) -> Html msg)
+    (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg ())
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 navbarStart element styling content =
     mergeUnmodifiedElement navbarStartStyle
         element
@@ -521,7 +521,7 @@ Use inside of `navbar` component.
 -}
 navbarCenterStyle : ( List Style, List String )
 navbarCenterStyle =
-    C.navbar_center
+    Cls.navbar_center
 
 
 {-| Child element, fills remaining space to be on center.
@@ -531,10 +531,10 @@ Use inside of `navbar` component.
 
 -}
 navbarCenter :
-    (List (Attribute msg) -> List (Html msg) -> Html msg)
+    (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg ())
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 navbarCenter element styling content =
     mergeUnmodifiedElement navbarCenterStyle
         element
@@ -550,7 +550,7 @@ Use inside of `navbar` component.
 -}
 navbarEndStyle : ( List Style, List String )
 navbarEndStyle =
-    C.navbar_end
+    Cls.navbar_end
 
 
 {-| Child element, fills 50% of width to be on end.
@@ -560,10 +560,10 @@ Use inside of `navbar` component.
 
 -}
 navbarEnd :
-    (List (Attribute msg) -> List (Html msg) -> Html msg)
+    (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg ())
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 navbarEnd element styling content =
     mergeUnmodifiedElement navbarEndStyle
         element
@@ -594,35 +594,35 @@ menuModifier : MenuModifier -> ( List Style, List String )
 menuModifier mod =
     case mod of
         MenuXs ->
-            C.menu_xs
+            Cls.menu_xs
 
         MenuSm ->
-            C.menu_sm
+            Cls.menu_sm
 
         MenuMd ->
-            C.menu_md
+            Cls.menu_md
 
         MenuLg ->
-            C.menu_lg
+            Cls.menu_lg
 
         MenuVertical ->
-            C.menu_vertical
+            Cls.menu_vertical
 
         MenuHorizontal ->
-            C.menu_horizontal
+            Cls.menu_horizontal
 
 
 menuItemModifier : MenuItemModifier -> ( List Style, List String )
 menuItemModifier mod =
     case mod of
         MenuDisabled ->
-            C.disabled
+            Cls.disabled
 
         MenuActive ->
-            C.active
+            Cls.active
 
         MenuFocus ->
-            C.focus
+            Cls.focus
 
 
 {-| Menu is used to display a list of links vertically or horizontally. (`<ul>`)
@@ -635,7 +635,7 @@ menuStyle :
     List MenuModifier
     -> ( List Style, List String )
 menuStyle =
-    mergeModifiedStyles menuModifier [ C.menu ]
+    mergeModifiedStyles menuModifier [ Cls.menu ]
 
 
 {-| Menu is used to display a list of links vertically or horizontally. (`<ul>`)
@@ -646,10 +646,10 @@ Container <ul> element.
 -}
 menu :
     List (ExtendedStyle msg MenuModifier)
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 menu styling content =
-    mergeElement menuStyle ul styling content
+    mergeElement menuStyle Dom.ul styling content
 
 
 {-| Specifies the title of menu.
@@ -660,7 +660,7 @@ Use inside of `menu` component.
 -}
 menuTitleStyle : ( List Style, List String )
 menuTitleStyle =
-    C.menu_title
+    Cls.menu_title
 
 
 {-| Specifies the title of menu.
@@ -670,10 +670,10 @@ Use inside of `menu` component.
 
 -}
 menuTitle :
-    (List (Attribute msg) -> List (Html msg) -> Html msg)
+    (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg ())
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 menuTitle element styling content =
     mergeUnmodifiedElement menuTitleStyle
         element
@@ -702,10 +702,10 @@ Use inside of `menu` component.
 -}
 menuItem :
     List (ExtendedStyle msg MenuItemModifier)
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 menuItem styling content =
-    mergeElement menuItemStyle li styling content
+    mergeElement menuItemStyle Dom.li styling content
 
 
 
@@ -719,7 +719,7 @@ menuItem styling content =
 -}
 stackStyle : ( List Style, List String )
 stackStyle =
-    C.stack
+    Cls.stack
 
 
 {-| Stack visually puts elements on top of each other.
@@ -728,10 +728,10 @@ stackStyle =
 
 -}
 stack :
-    (List (Attribute msg) -> List (Html msg) -> Html msg)
+    (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
     -> List (ExtendedStyle msg ())
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 stack element styling content =
     mergeUnmodifiedElement stackStyle
         element
@@ -759,7 +759,7 @@ toastModifier mod =
             ( [], [ "toast-start" ] )
 
         ToastCenter ->
-            C.toast_center
+            Cls.toast_center
 
         ToastEnd ->
             ( [], [ "toast-end" ] )
@@ -783,7 +783,7 @@ toastStyle :
     List ToastModifier
     -> ( List Style, List String )
 toastStyle =
-    mergeModifiedStyles toastModifier [ C.toast ]
+    mergeModifiedStyles toastModifier [ Cls.toast ]
 
 
 {-| Toast is a wrapper to stack elements, positioned on the corner of page.
@@ -793,10 +793,10 @@ toastStyle =
 -}
 toast :
     List (ExtendedStyle msg ToastModifier)
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 toast styling content =
-    mergeElement toastStyle div styling content
+    mergeElement toastStyle Dom.div styling content
 
 
 
@@ -814,16 +814,16 @@ alertModifier : AlertModifier -> ( List Style, List String )
 alertModifier mod =
     case mod of
         AlertInfo ->
-            unzip [ C.alert_info ]
+            unzip [ Cls.alert_info ]
 
         AlertSuccess ->
-            C.alert_success
+            Cls.alert_success
 
         AlertWarning ->
-            C.alert_warning
+            Cls.alert_warning
 
         AlertError ->
-            C.alert_error
+            Cls.alert_error
 
 
 {-| Alert informs users about important events.
@@ -835,7 +835,7 @@ alertStyle :
     List AlertModifier
     -> ( List Style, List String )
 alertStyle =
-    mergeModifiedStyles alertModifier [ C.alert ]
+    mergeModifiedStyles alertModifier [ Cls.alert ]
 
 
 {-| Alert informs users about important events.
@@ -845,12 +845,12 @@ alertStyle =
 -}
 alert :
     List (ExtendedStyle msg AlertModifier)
-    -> List (Html msg)
-    -> Html msg
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
 alert styling content =
     mergeElement
         alertStyle
-        div
+        Dom.div
         (attribute
             (Attr.attribute "role" "alert")
             :: styling
@@ -890,7 +890,7 @@ Value must be a number between 0 and 99.
 -}
 countdownStyle : ( List Style, List String )
 countdownStyle =
-    C.countdown
+    Cls.countdown
 
 
 {-| Countdown gives you a transition effect of changing numbers.
@@ -903,7 +903,7 @@ countdown :
     List (ExtendedStyle msg ())
     -> List Style
     -> Int
-    -> Html msg
+    -> Dom.Html msg
 countdown styling valueStyle value =
     let
         lastTwoDigits : Int
@@ -912,9 +912,9 @@ countdown styling valueStyle value =
                 |> modBy 100
     in
     mergeUnmodifiedElement countdownStyle
-        span
+        Dom.span
         styling
-        [ span
+        [ Dom.span
             [ Attr.attribute "style"
                 ([ "--value:"
                  , String.fromInt lastTwoDigits
@@ -945,13 +945,13 @@ swapModifier : SwapModifier -> ( List Style, List String )
 swapModifier mod =
     case mod of
         SwapActive ->
-            C.swap_active
+            Cls.swap_active
 
         SwapRotate ->
-            C.swap_rotate
+            Cls.swap_rotate
 
         SwapFlip ->
-            C.swap_flip
+            Cls.swap_flip
 
 
 {-| Swap allows you to toggle the visibility of two elements using a checkbox or a class name.
@@ -963,7 +963,7 @@ swapStyle :
     List SwapModifier
     -> ( List Style, List String )
 swapStyle =
-    mergeModifiedStyles swapModifier [ C.swap ]
+    mergeModifiedStyles swapModifier [ Cls.swap ]
 
 
 {-| Swap allows you to toggle the visibility of two elements using a checkbox or a class name.
@@ -973,19 +973,19 @@ swapStyle =
 -}
 swap :
     List (ExtendedStyle msg SwapModifier)
-    -> List (Html msg)
-    -> List (Html msg)
-    -> List (Html msg)
+    -> List (Dom.Html msg)
+    -> List (Dom.Html msg)
+    -> List (Dom.Html msg)
     -> Maybe (Bool -> msg)
     -> Bool
-    -> Html msg
+    -> Dom.Html msg
 swap styling onContent offContent indeterminateContent onChange isOn =
     mergeElement swapStyle
-        label
+        Dom.label
         styling
-        (input
+        (Dom.input
             (Attr.type_ "checkbox"
-                :: checked isOn
+                :: Attr.checked isOn
                 :: (case onChange of
                         Just msg ->
                             [ onCheck msg ]
@@ -1001,19 +1001,19 @@ swap styling onContent offContent indeterminateContent onChange isOn =
                         []
 
                     content ->
-                        [ mergeUnmodifiedElement C.swap_on div [] content ]
+                        [ mergeUnmodifiedElement Cls.swap_on Dom.div [] content ]
                 , case offContent of
                     [] ->
                         []
 
                     content ->
-                        [ mergeUnmodifiedElement C.swap_off div [] content ]
+                        [ mergeUnmodifiedElement Cls.swap_off Dom.div [] content ]
                 , case indeterminateContent of
                     [] ->
                         []
 
                     content ->
-                        [ mergeUnmodifiedElement C.swap_indeterminate div [] content
+                        [ mergeUnmodifiedElement Cls.swap_indeterminate Dom.div [] content
                         ]
                 ]
         )
