@@ -1,8 +1,9 @@
-module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DropdownModifier(..), ExtendedStyle, InputModifier(..), MenuItemModifier(..), MenuModifier(..), ToastModifier(..), alert, alertStyle, attribute, attributes, btn, btnStyle, class, classes, countdown, countdownStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, modifier, modifiers, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, toast, toastStyle)
+module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DropdownModifier(..), ExtendedStyle, InputModifier(..), MenuItemModifier(..), MenuModifier(..), SwapModifier(..), ToastModifier(..), alert, alertStyle, attribute, attributes, btn, btnStyle, class, classes, countdown, countdownStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, modifier, modifiers, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, swap, swapStyle, toast, toastStyle)
 
 import Css exposing (Style, before, important)
-import Html.Styled exposing (Attribute, Html, div, li, span, ul)
-import Html.Styled.Attributes as Attr
+import Html.Styled exposing (Attribute, Html, div, input, label, li, span, ul)
+import Html.Styled.Attributes as Attr exposing (checked)
+import Html.Styled.Events exposing (onCheck)
 import Svg.Styled exposing (style)
 import Tailwind.Classes as C
 
@@ -913,3 +914,80 @@ countdown styling valueStyle value =
             ]
             []
         ]
+
+
+
+-- SWAP
+
+
+type SwapModifier
+    = SwapActive -- Activates the swap (no need for checkbox)
+    | SwapRotate -- Adds rotate effect to swap
+    | SwapFlip -- Adds flip effect to swap
+
+
+swapModifier : SwapModifier -> ( List Style, List String )
+swapModifier mod =
+    case mod of
+        SwapActive ->
+            C.swap_active
+
+        SwapRotate ->
+            C.swap_rotate
+
+        SwapFlip ->
+            C.swap_flip
+
+
+{-| Swap allows you to toggle the visibility of two elements using a checkbox or a class name.
+
+<https://daisyui.com/components/swap/>
+
+-}
+swapStyle :
+    List SwapModifier
+    -> ( List Style, List String )
+swapStyle =
+    mergeModifiedStyles swapModifier [ C.swap ]
+
+
+{-| Swap allows you to toggle the visibility of two elements using a checkbox or a class name.
+
+<https://daisyui.com/components/swap/>
+
+-}
+swap :
+    List (ExtendedStyle msg SwapModifier)
+    -> List (Html msg)
+    -> List (Html msg)
+    -> List (Html msg)
+    -> (Bool -> msg)
+    -> Bool
+    -> Html msg
+swap styling onContent offContent indeterminateContent onChange isOn =
+    mergeElement swapStyle
+        label
+        styling
+        (input [ Attr.type_ "checkbox", checked isOn, onCheck onChange ] []
+            :: List.concat
+                [ case onContent of
+                    [] ->
+                        []
+
+                    content ->
+                        [ mergeUnmodifiedElement C.swap_on div [] content ]
+                , case offContent of
+                    [] ->
+                        []
+
+                    content ->
+                        [ mergeUnmodifiedElement C.swap_off div [] content ]
+                , case indeterminateContent of
+                    [] ->
+                        []
+
+                    content ->
+                        [ mergeUnmodifiedElement C.swap_indeterminate div [] content
+                        ]
+                ]
+        )
