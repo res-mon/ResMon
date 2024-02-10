@@ -74,7 +74,7 @@ process value model =
 
 
 
--- SUBSCRIPTIONS
+-- SUBSCRIPTION
 
 
 subscriptions : Model msg -> Sub msg

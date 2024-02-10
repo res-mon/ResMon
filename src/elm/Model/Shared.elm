@@ -253,7 +253,7 @@ removeAlert model number =
 
 
 
--- SUBSCRIPTIONS
+-- SUBSCRIPTION
 
 
 subscriptions : SharedModel msg -> Sub msg

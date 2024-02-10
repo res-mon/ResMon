@@ -203,7 +203,7 @@ view model =
 
 
 
--- SUBSCRIPTIONS
+-- SUBSCRIPTION
 
 
 subscriptions : Model -> Sub Msg

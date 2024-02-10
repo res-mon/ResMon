@@ -44,10 +44,6 @@ merge modifierFunc daisyStyles daisyClasses modifierList attributeList =
         :: attributeList
 
 
-
--- OK
-
-
 mergeModifiedStyles :
     (modifier -> ( List Style, List String ))
     -> List ( List Style, List String )
