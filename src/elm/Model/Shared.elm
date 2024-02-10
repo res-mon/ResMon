@@ -1,9 +1,10 @@
-module Model.Shared exposing (Alert, AlertLevel(..), Internal, Msg(..), Route(..), SharedModel, addTextAlert, init, removeAlert, subscriptions, update)
+port module Model.Shared exposing (Alert, AlertLevel(..), Internal, Msg(..), Route(..), SharedModel, addTextAlert, init, removeAlert, setDarkModeMessage, subscriptions, update)
 
 import Browser.Navigation exposing (Key, replaceUrl)
 import Extension.Time exposing (fixVariation, floorTo)
 import Html.Styled exposing (Html, text)
 import Json.Decode as D exposing (Value)
+import Json.Encode
 import LocalStorage as LS
 import Model.User exposing (User, decodeUser)
 import Task
@@ -36,6 +37,7 @@ type alias SharedModel msg =
     , timeZone : Maybe Zone
     , alerts : List (Alert msg)
     , internal : Internal msg
+    , darkMode : Bool
     }
 
 
@@ -103,6 +105,7 @@ init toMsg updateRoute route url key localStorage =
                 , exactTime = Nothing
                 , alertCount = 0
                 }
+            , darkMode = False
             }
 
         timeZoneCmd : Cmd msg
@@ -127,6 +130,8 @@ type Msg msg
     = UserLoaded (Maybe Value)
     | GotTimeZone Zone
     | Tick Time.Posix
+    | DarkModeChanged Bool Bool
+    | AlertAdded AlertLevel (List (Html msg)) (List (Html msg))
 
 
 update : Msg msg -> SharedModel msg -> ( SharedModel msg, Cmd msg )
@@ -197,6 +202,18 @@ update msg model =
             , Cmd.none
             )
 
+        DarkModeChanged darkMode save ->
+            ( { model | darkMode = darkMode }
+            , if save then
+                setDarkMode (Json.Encode.bool darkMode)
+
+              else
+                Cmd.none
+            )
+
+        AlertAdded level title message ->
+            ( addAlert level model title message, Cmd.none )
+
 
 
 -- API
@@ -252,10 +269,40 @@ removeAlert model number =
     }
 
 
+setDarkModeMessage : SharedModel msg -> Bool -> msg
+setDarkModeMessage model darkMode =
+    model.internal.toMsg (DarkModeChanged darkMode True)
+
+
 
 -- SUBSCRIPTION
 
 
 subscriptions : SharedModel msg -> Sub msg
 subscriptions model =
-    Time.every (toFloat clockInterval) (model.internal.toMsg << Tick)
+    Sub.batch
+        [ Time.every (toFloat clockInterval) (model.internal.toMsg << Tick)
+        , darkModeChanged
+            (\value ->
+                case D.decodeValue D.bool value of
+                    Ok darkMode ->
+                        model.internal.toMsg (DarkModeChanged darkMode False)
+
+                    Err err ->
+                        model.internal.toMsg
+                            (AlertAdded AlertError
+                                [ text "Unexpected value from dark mode changed port" ]
+                                [ D.errorToString err |> text ]
+                            )
+            )
+        ]
+
+
+
+-- PORT
+
+
+port darkModeChanged : (Value -> msg) -> Sub msg
+
+
+port setDarkMode : Json.Encode.Value -> Cmd msg

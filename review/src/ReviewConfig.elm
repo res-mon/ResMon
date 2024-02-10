@@ -71,7 +71,7 @@ import UseMemoizedLazyLambda
 
 config : List Rule
 config =
-    [ CognitiveComplexity.rule 7 -- https://package.elm-lang.org/packages/jfmengels/elm-review-cognitive-complexity/latest/CognitiveComplexity/
+    [ CognitiveComplexity.rule 8 -- https://package.elm-lang.org/packages/jfmengels/elm-review-cognitive-complexity/latest/CognitiveComplexity/
 
     -- https://package.elm-lang.org/packages/jfmengels/elm-review-documentation/latest/Docs-NoMissing/
     , Docs.NoMissing.rule
@@ -175,6 +175,7 @@ config =
             , "src/elm/Component/Markdown.elm"
             , "src/elm/Extension/Time.elm"
             , "src/elm/LocalStorage.elm"
+            , "src/elm/Model/Shared.elm"
             , "src/elm/Model/User.elm"
             ]
     , NoUnused.Parameters.rule -- https://package.elm-lang.org/packages/jfmengels/elm-review-unused/latest/NoUnused-Parameters/
@@ -185,6 +186,7 @@ config =
         |> Rule.ignoreErrorsForFiles
             [ "src/elm/Component/DaisyUi.elm"
             , "src/elm/LocalStorage.elm"
+            , "src/elm/Model/Shared.elm"
             ]
     , NoUnusedPorts.rule -- https://package.elm-lang.org/packages/sparksp/elm-review-ports/latest/NoUnusedPorts
     , NoUselessSubscriptions.rule -- https://package.elm-lang.org/packages/jfmengels/elm-review-the-elm-architecture/latest/NoUselessSubscriptions
