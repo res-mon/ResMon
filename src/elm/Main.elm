@@ -86,9 +86,6 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
-        ( _, updateRoute ) =
-            Routing.update model.shared.route model.shared.url model.shared.key
-
         ( handleResultModel, handleResultCmd ) =
             case msg of
                 UrlChanged url ->
@@ -178,6 +175,9 @@ update msg model =
                     ( { model | shared = shared, layout = layout }
                     , cmd
                     )
+
+        ( _, updateRoute ) =
+            Routing.update model.shared.route model.shared.url model.shared.key
     in
     ( handleResultModel
     , Cmd.batch [ handleResultCmd, updateRoute ]
