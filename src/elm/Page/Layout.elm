@@ -95,7 +95,7 @@ view shared model minimal body =
                 ]
                 (Dom.div
                     [ Attr.css
-                        [ Tw.text_6xl
+                        [ Tw.text_5xl
                         , Tw.font_mono
                         , Br.md [ Tw.text_9xl ]
                         , Br.sm [ Tw.text_8xl ]
