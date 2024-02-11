@@ -8,7 +8,14 @@ import Html.Styled as Dom
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events exposing (onClick)
 import List exposing (map)
-import Model.Shared exposing (AlertLevel(..), SharedModel, removeAlert, setDarkModeMessage)
+import Model.Shared
+    exposing
+        ( AlertLevel(..)
+        , SharedModel
+        , removeAlert
+        , setDarkModeMessage
+        )
+import Tailwind.Breakpoints as Br
 import Tailwind.Classes as Cls
 import Tailwind.Theme as Color
 import Tailwind.Utilities as Tw
@@ -37,7 +44,11 @@ type Msg msg
     = RemoveAlert Int
 
 
-update : Msg msg -> SharedModel msg -> Model msg -> ( SharedModel msg, Model msg, Cmd msg )
+update :
+    Msg msg
+    -> SharedModel msg
+    -> Model msg
+    -> ( SharedModel msg, Model msg, Cmd msg )
 update msg shared model =
     case msg of
         RemoveAlert number ->
@@ -58,7 +69,9 @@ view shared model minimal body =
                     []
 
                   else
-                    [ navigation shared model
+                    [ Dom.header []
+                        [ navigation shared model
+                        ]
                     ]
                 , [ mainElement
                   ]
@@ -76,22 +89,35 @@ view shared model minimal body =
                     [ Tw.p_16
                     , Tw.bg_color Color.base_100
                     , Tw.grid
-                    , Tw.h_screen
+                    , Tw.flex_1
                     , Tw.place_items_center
                     ]
                 ]
-                (Dom.div [ Attr.css [ Tw.text_7xl, Tw.font_mono ] ]
+                (Dom.div
+                    [ Attr.css
+                        [ Tw.text_6xl
+                        , Tw.font_mono
+                        , Br.md [ Tw.text_9xl ]
+                        , Br.sm [ Tw.text_8xl ]
+                        ]
+                    ]
                     [ Ui.countdown []
                         [ Tw.duration_500 ]
-                        (Maybe.map2 Time.toHour shared.timeZone shared.time |> Maybe.withDefault 0)
+                        (Maybe.map2 Time.toHour shared.timeZone shared.time
+                            |> Maybe.withDefault 0
+                        )
                     , Dom.text ":"
                     , Ui.countdown []
                         [ Tw.duration_500 ]
-                        (Maybe.map2 Time.toMinute shared.timeZone shared.time |> Maybe.withDefault 0)
+                        (Maybe.map2 Time.toMinute shared.timeZone shared.time
+                            |> Maybe.withDefault 0
+                        )
                     , Dom.text ":"
                     , Ui.countdown []
                         [ Tw.duration_500 ]
-                        (Maybe.map2 Time.toSecond shared.timeZone shared.time |> Maybe.withDefault 0)
+                        (Maybe.map2 Time.toSecond shared.timeZone shared.time
+                            |> Maybe.withDefault 0
+                        )
                     ]
                     :: map Dom.fromUnstyled body.body
                 )
@@ -107,6 +133,12 @@ view shared model minimal body =
                  else
                     "light"
                 )
+            , Attr.css
+                [ Tw.bg_color Color.base_100
+                , Tw.h_screen
+                , Tw.flex
+                , Tw.flex_col
+                ]
             ]
             (alerts model.toMsg shared.alerts
                 :: content
@@ -165,29 +197,27 @@ navigation shared _ =
                 , Tw.z_10
                 ]
             , Ui.classes
-                [ Ui.menuStyle [ Ui.MenuSm ]
+                [ Ui.menuStyle [ Ui.MenuLg ]
                 ]
             ]
-            [ Dom.li []
+            [ Ui.menuItem []
                 [ Dom.span
-                    [ Attr.css [ Tw.justify_between, Tw.text_2xl ]
-                    , onClick (setDarkModeMessage shared (not shared.darkMode))
+                    [ onClick (setDarkModeMessage shared (not shared.darkMode))
                     ]
-                    [ Dom.text <|
-                        if shared.darkMode then
-                            "Light-Mode"
-
-                        else
-                            "Dark-Mode"
-                    , Ui.swap
+                    [ Ui.swap
                         [ Ui.modifier Ui.SwapRotate
-                        , Ui.styles [ Tw.float_right, Tw.m_4 ]
                         ]
                         [ Ico.sunFill [] ]
                         [ Ico.moonFill [] ]
                         []
                         Nothing
                         shared.darkMode
+                    , Dom.text <|
+                        if shared.darkMode then
+                            "Light-Mode"
+
+                        else
+                            "Dark-Mode"
                     ]
                 ]
             ]
@@ -196,7 +226,7 @@ navigation shared _ =
 
 footer : SharedModel msg -> Model msg -> Dom.Html msg
 footer _ _ =
-    Dom.div []
+    Dom.div [ Attr.css [ Tw.bg_color Color.base_300, Tw.p_4 ] ]
         []
 
 
