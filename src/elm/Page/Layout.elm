@@ -74,7 +74,7 @@ view shared model minimal body =
                         "layout-sidebar-toggle"
                 in
                 Ui.drawer sidebarToggleId
-                    []
+                    [ Br.lg [ Tw.drawer_open ] |> Ui.style ]
                     [ Ui.styles
                         [ Tw.h_screen
                         , Tw.flex
@@ -95,8 +95,32 @@ view shared model minimal body =
                             , Tw.text_color Color.base_content
                             , Br.sm [ Tw.w_80 ]
                             ]
+                        , Ui.modifier Ui.MenuLg
                         ]
-                        []
+                        [ Ui.menuItem [] [ resMonLogo shared ]
+                        , Ui.menuItem [] []
+                        , Ui.menuItem []
+                            [ Dom.span
+                                [ onClick (setDarkModeMessage shared (not shared.darkMode))
+                                , Attr.css [ Tw.cursor_pointer ]
+                                ]
+                                [ Ui.swap
+                                    [ Ui.modifier Ui.SwapRotate
+                                    ]
+                                    [ Ico.sunFill [] ]
+                                    [ Ico.moonFill [] ]
+                                    []
+                                    Nothing
+                                    shared.darkMode
+                                , Dom.text <|
+                                    if shared.darkMode then
+                                        "Light-Mode"
+
+                                    else
+                                        "Dark-Mode"
+                                ]
+                            ]
+                        ]
                     ]
 
         mainElement : Dom.Html msg
@@ -115,7 +139,7 @@ view shared model minimal body =
                     [ Attr.css
                         [ Tw.text_5xl
                         , Tw.font_mono
-                        , Br.md [ Tw.text_9xl ]
+                        , Br.xl [ Tw.text_9xl ]
                         , Br.sm [ Tw.text_8xl ]
                         ]
                     ]
@@ -168,9 +192,13 @@ view shared model minimal body =
 
 
 navigation : SharedModel msg -> Model msg -> String -> Dom.Html msg
-navigation shared _ sidebarToggleId =
+navigation _ _ sidebarToggleId =
     Ui.navbar Dom.div
-        [ Tw.bg_color Color.base_300 |> Ui.style ]
+        [ [ Tw.bg_color Color.base_300
+          , Br.lg [ Tw.hidden ]
+          ]
+            |> Ui.styles
+        ]
         [ Dom.div [ Attr.css [ Tw.flex_none ] ]
             [ Ui.styleElement Dom.label
                 [ Ui.btnStyle
@@ -182,54 +210,6 @@ navigation shared _ sidebarToggleId =
                 , Attr.for sidebarToggleId |> Ui.attribute
                 ]
                 [ Ico.list [ Tw.text_4xl ] ]
-            ]
-        , Dom.div [ Attr.css [ Tw.flex_1 ] ]
-            [ resMonLogo shared ]
-        , Ui.dropdown Dom.div
-            [ Ui.modifier Ui.DropdownEnd ]
-            [ Ui.btn Dom.div
-                [ Ui.modifier Ui.BtnGhost
-                , [ Attr.attribute "role" "button"
-                  , Attr.tabindex 0
-                  ]
-                    |> Ui.attributes
-                ]
-                [ Ico.threeDots [ Tw.text_4xl ] ]
-            ]
-            Dom.ul
-            [ Ui.styles
-                [ Tw.mt_3
-                , Tw.p_2
-                , Tw.shadow_md
-                , Tw.bg_color Color.base_300
-                , Tw.rounded_box
-                , Tw.w_52
-                , Tw.z_10
-                ]
-            , Ui.menuStyle
-                [ Ui.MenuLg ]
-                |> Ui.class
-            ]
-            [ Ui.menuItem []
-                [ Dom.span
-                    [ onClick (setDarkModeMessage shared (not shared.darkMode))
-                    ]
-                    [ Ui.swap
-                        [ Ui.modifier Ui.SwapRotate
-                        ]
-                        [ Ico.sunFill [] ]
-                        [ Ico.moonFill [] ]
-                        []
-                        Nothing
-                        shared.darkMode
-                    , Dom.text <|
-                        if shared.darkMode then
-                            "Light-Mode"
-
-                        else
-                            "Dark-Mode"
-                    ]
-                ]
             ]
         ]
 
