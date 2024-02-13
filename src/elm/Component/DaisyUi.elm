@@ -1,4 +1,4 @@
-module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DropdownModifier(..), ExtendedStyle, InputModifier(..), MenuItemModifier(..), MenuModifier(..), SwapModifier(..), ToastModifier(..), alert, alertStyle, attribute, attributes, btn, btnStyle, class, classes, countdown, countdownStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, modifier, modifiers, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, style, styles, swap, swapStyle, toast, toastStyle)
+module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DrawerModifier(..), DropdownModifier(..), ExtendedStyle, InputModifier(..), MenuItemModifier(..), MenuModifier(..), SwapModifier(..), ToastModifier(..), alert, alertStyle, attribute, attributes, btn, btnStyle, class, classes, countdown, countdownStyle, drawer, drawerStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, modifier, modifiers, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, style, styleElement, styles, swap, swapStyle, toast, toastStyle)
 
 import Css exposing (Style, before, important)
 import Html.Styled as Dom
@@ -130,6 +130,15 @@ unzip list =
             List.unzip list
     in
     ( List.concat cssStyles, List.concat classList )
+
+
+styleElement :
+    (List (Dom.Attribute msg) -> List (Dom.Html msg) -> Dom.Html msg)
+    -> List (ExtendedStyle msg ())
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
+styleElement element stylings children =
+    mergeUnmodifiedElement ( [], [] ) element stylings children
 
 
 
@@ -1017,3 +1026,82 @@ swap styling onContent offContent indeterminateContent onChange isOn =
                         ]
                 ]
         )
+
+
+
+-- DRAWER
+
+
+type DrawerModifier
+    = DrawerEnd -- Puts drawer to the right
+    | DrawerOpen -- Forces the drawer to be open
+
+
+drawerModifier : DrawerModifier -> ( List Style, List String )
+drawerModifier mod =
+    case mod of
+        DrawerEnd ->
+            Cls.drawer_end
+
+        DrawerOpen ->
+            Cls.drawer_open
+
+
+{-| Drawer is a grid layout that can show/hide a sidebar on the left or right side of the page.
+
+<https://daisyui.com/components/drawer/>
+
+-}
+drawerStyle :
+    List DrawerModifier
+    -> ( List Style, List String )
+drawerStyle =
+    mergeModifiedStyles drawerModifier [ Cls.drawer ]
+
+
+{-| Drawer is a grid layout that can show/hide a sidebar on the left or right side of the page.
+
+<https://daisyui.com/components/drawer/>
+
+-}
+drawer :
+    String
+    -> List (ExtendedStyle msg DrawerModifier)
+    -> List (ExtendedStyle msg ())
+    -> List (Dom.Html msg)
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
+drawer toggleId styling pageStyling pageContent sidebarContent =
+    mergeElement drawerStyle
+        Dom.div
+        styling
+        [ mergeUnmodifiedElement Cls.drawer_toggle
+            Dom.input
+            [ attributes
+                [ Attr.id toggleId
+                , Attr.type_ "checkbox"
+                ]
+            , class Cls.drawer_toggle
+            ]
+            []
+        , mergeUnmodifiedElement
+            Cls.drawer_content
+            Dom.div
+            pageStyling
+            pageContent
+        , mergeUnmodifiedElement
+            Cls.drawer_side
+            Dom.div
+            []
+            (mergeUnmodifiedElement
+                Cls.drawer_overlay
+                Dom.label
+                [ attributes
+                    [ Attr.for toggleId
+                    , Attr.attribute "aria-label" "Menü schließen"
+                    ]
+                ]
+                []
+                :: sidebarContent
+            )
+        ]

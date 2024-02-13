@@ -62,25 +62,42 @@ update msg shared model =
 view : SharedModel msg -> Model msg -> Bool -> Document msg -> Document msg
 view shared model minimal body =
     let
-        content : List (Dom.Html msg)
+        content : Dom.Html msg
         content =
-            List.concat
-                [ if minimal then
-                    []
+            if minimal then
+                mainElement
 
-                  else
-                    [ Dom.header []
-                        [ navigation shared model
+            else
+                let
+                    sidebarToggleId : String
+                    sidebarToggleId =
+                        "layout-sidebar-toggle"
+                in
+                Ui.drawer sidebarToggleId
+                    []
+                    [ Ui.styles
+                        [ Tw.h_screen
+                        , Tw.flex
+                        , Tw.flex_col
                         ]
                     ]
-                , [ mainElement
-                  ]
-                , if minimal then
-                    []
-
-                  else
-                    [ footer shared model ]
-                ]
+                    [ Dom.header []
+                        [ navigation shared model sidebarToggleId ]
+                    , mainElement
+                    , footer shared model
+                    ]
+                    [ Ui.menu
+                        [ Ui.styles
+                            [ Tw.p_4
+                            , Tw.w_64
+                            , Tw.min_h_full
+                            , Tw.bg_color Color.base_300
+                            , Tw.text_color Color.base_content
+                            , Br.sm [ Tw.w_80 ]
+                            ]
+                        ]
+                        []
+                    ]
 
         mainElement : Dom.Html msg
         mainElement =
@@ -88,6 +105,7 @@ view shared model minimal body =
                 [ Attr.css
                     [ Tw.p_16
                     , Tw.bg_color Color.base_100
+                    , Tw.text_color Color.base_content
                     , Tw.grid
                     , Tw.flex_1
                     , Tw.place_items_center
@@ -135,46 +153,38 @@ view shared model minimal body =
                 )
             , Attr.css
                 [ Tw.bg_color Color.base_100
+                , Tw.text_color Color.base_content
                 , Tw.h_screen
                 , Tw.flex
                 , Tw.flex_col
                 ]
             ]
-            (alerts model.toMsg shared.alerts
-                :: content
-            )
+            [ alerts model.toMsg shared.alerts
+            , content
+            ]
         ]
             |> map Dom.toUnstyled
     }
 
 
-navigation : SharedModel msg -> Model msg -> Dom.Html msg
-navigation shared _ =
+navigation : SharedModel msg -> Model msg -> String -> Dom.Html msg
+navigation shared _ sidebarToggleId =
     Ui.navbar Dom.div
         [ Tw.bg_color Color.base_300 |> Ui.style ]
         [ Dom.div [ Attr.css [ Tw.flex_none ] ]
-            [ Ui.btn Dom.button
-                [ Ui.modifiers [ Ui.BtnPrimary, Ui.BtnSquare, Ui.BtnGhost ] ]
-                [ Ico.list [ Tw.text_4xl ]
+            [ Ui.styleElement Dom.label
+                [ Ui.btnStyle
+                    [ Ui.BtnPrimary
+                    , Ui.BtnSquare
+                    , Ui.BtnGhost
+                    ]
+                    |> Ui.class
+                , Attr.for sidebarToggleId |> Ui.attribute
                 ]
+                [ Ico.list [ Tw.text_4xl ] ]
             ]
         , Dom.div [ Attr.css [ Tw.flex_1 ] ]
-            [ Ui.btn Dom.a
-                [ Ui.modifiers [ Ui.BtnLink ]
-                , Attr.href "/" |> Ui.attribute
-                ]
-                [ Dom.img
-                    [ Attr.src <|
-                        if shared.darkMode then
-                            "/img/logo/svg/full-text-inverted.svg"
-
-                        else
-                            "/img/logo/svg/full-text.svg"
-                    , Attr.css [ Tw.h_full ]
-                    ]
-                    []
-                ]
-            ]
+            [ resMonLogo shared ]
         , Ui.dropdown Dom.div
             [ Ui.modifier Ui.DropdownEnd ]
             [ Ui.btn Dom.div
@@ -196,9 +206,9 @@ navigation shared _ =
                 , Tw.w_52
                 , Tw.z_10
                 ]
-            , Ui.classes
-                [ Ui.menuStyle [ Ui.MenuLg ]
-                ]
+            , Ui.menuStyle
+                [ Ui.MenuLg ]
+                |> Ui.class
             ]
             [ Ui.menuItem []
                 [ Dom.span
@@ -221,6 +231,25 @@ navigation shared _ =
                     ]
                 ]
             ]
+        ]
+
+
+resMonLogo : SharedModel msg -> Dom.Html msg
+resMonLogo shared =
+    Ui.btn Dom.a
+        [ Ui.modifiers [ Ui.BtnLink ]
+        , Attr.href "/" |> Ui.attribute
+        ]
+        [ Dom.img
+            [ Attr.src <|
+                if shared.darkMode then
+                    "/img/logo/svg/full-text-inverted.svg"
+
+                else
+                    "/img/logo/svg/full-text.svg"
+            , Attr.css [ Tw.h_full, Tw.py_1 ]
+            ]
+            []
         ]
 
 
