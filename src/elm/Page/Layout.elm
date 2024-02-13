@@ -97,7 +97,7 @@ view shared model minimal body =
                             ]
                         , Ui.modifier Ui.MenuLg
                         ]
-                        [ Ui.menuItem [] [ resMonLogo shared ]
+                        [ Ui.menuItem [] [ resMonLogo "/" shared ]
                         , Ui.menuItem [] []
                         , Ui.menuItem []
                             [ Dom.span
@@ -214,11 +214,11 @@ navigation _ _ sidebarToggleId =
         ]
 
 
-resMonLogo : SharedModel msg -> Dom.Html msg
-resMonLogo shared =
+resMonLogo : String -> SharedModel msg -> Dom.Html msg
+resMonLogo href shared =
     Ui.btn Dom.a
         [ Ui.modifiers [ Ui.BtnLink ]
-        , Attr.href "/" |> Ui.attribute
+        , Attr.href href |> Ui.attribute
         ]
         [ Dom.img
             [ Attr.src <|
@@ -234,9 +234,33 @@ resMonLogo shared =
 
 
 footer : SharedModel msg -> Model msg -> Dom.Html msg
-footer _ _ =
-    Dom.div [ Attr.css [ Tw.bg_color Color.base_300, Tw.p_4 ] ]
-        []
+footer shared _ =
+    Dom.div
+        [ Attr.css
+            [ Tw.p_2
+            , Tw.bg_color Color.base_300
+            , Tw.text_color Color.base_content
+            , Tw.text_center
+            ]
+        ]
+        [ Ui.menu
+            [ Ui.modifiers [ Ui.MenuLg, Ui.MenuHorizontal ]
+            ]
+            [ Ui.menuItem []
+                [ Dom.a
+                    [ Attr.href "https://github.com/yerTools/ResMon"
+                    ]
+                    [ Dom.text "GitHub-Projekt" ]
+                ]
+            , Ui.menuItem [] [ resMonLogo "https://resmon.de" shared ]
+            , Ui.menuItem []
+                [ Dom.a
+                    [ Attr.href "https://docs.resmon.de/packages/yertools/res-mon/latest/"
+                    ]
+                    [ Dom.text "Dokumentation" ]
+                ]
+            ]
+        ]
 
 
 alerts : (Msg msg -> msg) -> List (Model.Shared.Alert msg) -> Dom.Html msg
