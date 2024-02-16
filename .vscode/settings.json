@@ -1,11 +1,22 @@
 {
-    "editor.formatOnSave": true,
+    "cSpell.language": "en,de",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
     "files.eol": "\n",
+    "git.autofetch": true,
+    "go.coverOnSave": true,
+    "go.diagnostic.vulncheck": "Imports",
+    "go.inlayHints.assignVariableTypes": true,
+    "go.inlayHints.compositeLiteralFields": true,
+    "go.inlayHints.compositeLiteralTypes": true,
+    "go.inlayHints.constantValues": true,
+    "go.inlayHints.rangeVariableTypes": true,
+    "go.survey.prompt": false,
+    "go.testExplorer.packageDisplayMode": "nested",
+    "go.testExplorer.showDynamicSubtestsInEditor": true,
+    "line-length-checker.blacklist": ["*.md", "node_modules/**"],
     "sortLines.filterBlankLines": true,
-    "line-length-checker.blacklist": [
-        "*.md",
-        "node_modules/**"
-    ],
-    "cSpell.language": "en,de"
+    "[go]": {
+        "editor.defaultFormatter": "golang.go"
+    }
 }
