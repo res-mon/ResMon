@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY main.go go.mod go.sum /app/
 COPY webroot/ /app/webroot/
+COPY src/sql/ /app/src/sql/
 COPY src/go/ /app/src/go/
 COPY generated/go/ /app/generated/go/
 
