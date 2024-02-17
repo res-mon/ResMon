@@ -15,7 +15,6 @@
         "generate": "npm run generate:elm && npm run generate:model",
         "generate:elm": "npx ts-node --compilerOptions {\\\"strict\\\":false} ./lib/ts/elm-tailwind-modules/cli.ts --tailwind-config ./config/tailwind.config.js --dir ./generated/elm",
         "generate:model": "go run github.com/sqlc-dev/sqlc/cmd/sqlc@latest generate --file ./src/sql/sqlc.yaml",
-        "install:go": "go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest",
         "prepare": "husky",
         "review": "npm run review:elm && npm run review:go && npm run review:model",
         "review:elm": "npx elm-review",
