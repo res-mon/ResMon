@@ -1,0 +1,32 @@
+version: "2"
+sql:
+    - engine: "sqlite"
+      queries: "queries"
+      schema: "migrations"
+      strict_function_checks: true
+      strict_order_by: true
+      gen:
+          go:
+              package: "model"
+              out: "../../generated/go/model"
+              emit_db_tags: true
+              emit_prepared_queries: true
+              emit_interface: true
+              emit_exact_table_names: true
+              emit_json_tags: true
+              emit_pointers_for_null_types: true
+              emit_sql_as_comment: true
+              json_tags_case_style: camel
+
+      rules:
+          - no-delete
+          - no-update
+rules:
+    - name: no-delete
+      message: "DELETE is not allowed"
+      rule: |
+          query.sql.contains("DELETE")
+    - name: no-update
+      message: "UPDATE is not allowed"
+      rule: |
+          query.sql.contains("UPDATE")

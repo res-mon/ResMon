@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/signal"
 	"sync"
@@ -16,6 +17,9 @@ import (
 
 //go:embed webroot
 var webroot embed.FS
+
+//go:embed src/sql/migrations
+var migrations embed.FS
 
 func createContext(killTimeout time.Duration) (
 	ctx context.Context, killCtx context.Context,
@@ -62,8 +66,13 @@ func main() {
 		panic(fmt.Sprintf("could not create data directory: %v", err))
 	}
 
+	migrationsFS, err := fs.Sub(migrations, "src/sql/migrations")
+	if err != nil {
+		panic(fmt.Sprintf("could not get embedded migrations: %v", err))
+	}
+
 	fmt.Println("opening database ...")
-	db, err := database.OpenDB(ctx, "./data/database.db")
+	db, err := database.OpenDB(ctx, "./data/database.db", migrationsFS)
 	if err != nil {
 		panic(fmt.Sprintf("could not open database: %v", err))
 	}

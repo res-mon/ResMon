@@ -8,13 +8,16 @@ require (
 )
 
 require (
-	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/mattn/go-sqlite3 v1.14.17 // indirect
+	github.com/hashicorp/errwrap v1.1.0 // indirect
+	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	go.uber.org/atomic v1.11.0 // indirect
 )
 
 require (
-	golang.org/x/net v0.17.0 // indirect
-	gorm.io/driver/sqlite v1.5.4
-	gorm.io/gorm v1.25.5
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/golang-migrate/migrate/v4 v4.17.0
+	github.com/mattn/go-sqlite3 v1.14.22
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/stretchr/testify v1.8.4 // indirect
+	golang.org/x/net v0.21.0 // indirect
 )

@@ -1,4 +1,12 @@
 {
+    "Prettier-SQL.SQLFlavourOverride": "sqlite",
+    "Prettier-SQL.commaPosition": "tabular",
+    "Prettier-SQL.expressionWidth": 70,
+    "Prettier-SQL.ignoreTabSettings": true,
+    "Prettier-SQL.indentStyle": "standard",
+    "Prettier-SQL.keywordCase": "upper",
+    "Prettier-SQL.linesBetweenQueries": 2,
+    "Prettier-SQL.tabulateAlias": true,
     "cSpell.language": "en,de",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
@@ -15,8 +23,13 @@
     "go.testExplorer.packageDisplayMode": "nested",
     "go.testExplorer.showDynamicSubtestsInEditor": true,
     "line-length-checker.blacklist": ["*.md", "node_modules/**"],
+    "line-length-checker.level": "Info",
+    "line-length-checker.lineLength": 80,
     "sortLines.filterBlankLines": true,
     "[go]": {
         "editor.defaultFormatter": "golang.go"
+    },
+    "[sql]": {
+        "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
     }
 }

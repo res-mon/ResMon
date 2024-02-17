@@ -2,71 +2,109 @@ package database
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
+	"io/fs"
 
-	"github.com/yerTools/ResMon/src/go/database/model"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
+	"github.com/golang-migrate/migrate/v4"
+	migrateDB "github.com/golang-migrate/migrate/v4/database"
+	"github.com/golang-migrate/migrate/v4/database/sqlite3"
+	_ "github.com/mattn/go-sqlite3"
+
+	"github.com/yerTools/ResMon/generated/go/model"
 )
 
+var errDatabaseIsNil = errors.New("database is nil")
+
 type database struct {
-	db *gorm.DB
+	db      *sql.DB
+	driver  migrateDB.Driver
+	migrate *migrate.Migrate
 }
 
-func OpenDB(ctx context.Context, path string) (*database, error) {
-	db, err := gorm.Open(sqlite.Open(path), &gorm.Config{})
+func OpenDB(
+	ctx context.Context, path string, migrationsFS fs.FS,
+) (*database, error) {
+	db, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return nil, fmt.Errorf("could not open database: %w", err)
 	}
 
-	d := &database{
-		db: db,
-	}
-
-	err = d.setup(ctx)
+	err = db.PingContext(ctx)
 	if err != nil {
-		d.Close()
-		return nil, fmt.Errorf("could not setup database: %w", err)
+		db.Close()
+		return nil, fmt.Errorf("could not ping database: %w", err)
 	}
 
-	return d, nil
+	driver, err := sqlite3.WithInstance(db, &sqlite3.Config{
+		MigrationsTable: "migrations",
+		DatabaseName:    "",
+		NoTxWrap:        false,
+	})
+
+	if err != nil {
+		db.Close()
+		return nil, fmt.Errorf("could not create driver: %w", err)
+	}
+
+	targetVersion, err := registerMigrationContainer(ctx, db, migrationsFS)
+	if err != nil {
+		driver.Close()
+		return nil, fmt.Errorf(
+			"could not register migration container: %w", err)
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(
+		"migrationcontainer://",
+		"sqlite3", driver,
+	)
+	if err != nil {
+		driver.Close()
+		return nil, fmt.Errorf("could not create migrate: %w", err)
+	}
+
+	err = m.Migrate(targetVersion)
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		m.Close()
+		return nil, fmt.Errorf(
+			"could not migrate database to target version %d: %w",
+			targetVersion, err)
+	}
+
+	mdl, err := model.Prepare(ctx, db)
+	if err != nil {
+		m.Close()
+		return nil, fmt.Errorf("could not prepare model: %w", err)
+	}
+
+	err = mdl.Close()
+	if err != nil {
+		m.Close()
+		return nil, fmt.Errorf("could not close prepared model: %w", err)
+	}
+
+	result := database{
+		db:      db,
+		driver:  driver,
+		migrate: m,
+	}
+
+	return &result, nil
 }
 
-type Product struct {
-	model.Model
-	Code  string
-	Price uint
-}
+func (db *database) Close() error {
+	if db == nil {
+		return errDatabaseIsNil
+	}
 
-func (d *database) setup(ctx context.Context) error {
-	// Migrate the schema
-	d.db.AutoMigrate(&Product{})
-
-	// Create
-	d.db.Create(&Product{Code: "D42", Price: 100})
-
-	// Read
-	var product Product
-	d.db.First(&product, 1)                 // find product with integer primary key
-	d.db.First(&product, "code = ?", "D42") // find product with code D42
-
-	// Update - update product's price to 200
-	d.db.Model(&product).Update("Price", 200)
-	// Update - update multiple fields
-	d.db.Model(&product).Updates(Product{Price: 200, Code: "F42"}) // non-zero fields
-	d.db.Model(&product).Updates(map[string]interface{}{"Price": 200, "Code": "F42"})
-
-	// Delete - delete product
-	d.db.Delete(&product, 1)
+	sourceErr, driverErr := db.migrate.Close()
+	if sourceErr != nil {
+		return fmt.Errorf("could not close source: %w", sourceErr)
+	}
+	if driverErr != nil {
+		return fmt.Errorf("could not close driver: %w", driverErr)
+	}
 
 	return nil
-}
-
-func (d *database) Close() error {
-	db, err := d.db.DB()
-	if err != nil {
-		return fmt.Errorf("could not get database: %w", err)
-	}
-
-	return db.Close()
 }
