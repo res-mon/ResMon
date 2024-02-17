@@ -31,5 +31,6 @@
     },
     "[sql]": {
         "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
-    }
+    },
+    "cSpell.words": ["github", "mattn", "sqlite"]
 }

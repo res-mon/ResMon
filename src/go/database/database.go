@@ -6,86 +6,53 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"strings"
 
 	"github.com/golang-migrate/migrate/v4"
-	migrateDB "github.com/golang-migrate/migrate/v4/database"
-	"github.com/golang-migrate/migrate/v4/database/sqlite3"
+	"github.com/golang-migrate/migrate/v4/database"
 	_ "github.com/mattn/go-sqlite3"
-
-	"github.com/yerTools/ResMon/generated/go/model"
 )
 
 var errDatabaseIsNil = errors.New("database is nil")
 
-type database struct {
+type db struct {
 	db      *sql.DB
-	driver  migrateDB.Driver
+	driver  database.Driver
 	migrate *migrate.Migrate
 }
 
 func OpenDB(
 	ctx context.Context, path string, migrationsFS fs.FS,
-) (*database, error) {
-	db, err := sql.Open("sqlite3", path)
+) (*db, error) {
+	var pathBuilder strings.Builder
+	pathBuilder.WriteString(path)
+
+	if strings.Contains(path, "?") {
+		pathBuilder.WriteByte('&')
+	} else {
+		pathBuilder.WriteByte('?')
+	}
+	pathBuilder.WriteString("_pragma=page_size(8192)")
+
+	sqlDB, err := sql.Open("sqlite3", pathBuilder.String())
 	if err != nil {
 		return nil, fmt.Errorf("could not open database: %w", err)
 	}
 
-	err = db.PingContext(ctx)
+	err = sqlDB.PingContext(ctx)
 	if err != nil {
-		db.Close()
+		sqlDB.Close()
 		return nil, fmt.Errorf("could not ping database: %w", err)
 	}
 
-	driver, err := sqlite3.WithInstance(db, &sqlite3.Config{
-		MigrationsTable: "migrations",
-		DatabaseName:    "",
-		NoTxWrap:        false,
-	})
-
+	driver, m, err := setup(ctx, sqlDB, migrationsFS)
 	if err != nil {
-		db.Close()
-		return nil, fmt.Errorf("could not create driver: %w", err)
+		sqlDB.Close()
+		return nil, fmt.Errorf("could not setup database: %w", err)
 	}
 
-	targetVersion, err := registerMigrationContainer(ctx, db, migrationsFS)
-	if err != nil {
-		driver.Close()
-		return nil, fmt.Errorf(
-			"could not register migration container: %w", err)
-	}
-
-	m, err := migrate.NewWithDatabaseInstance(
-		"migrationcontainer://",
-		"sqlite3", driver,
-	)
-	if err != nil {
-		driver.Close()
-		return nil, fmt.Errorf("could not create migrate: %w", err)
-	}
-
-	err = m.Migrate(targetVersion)
-	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		m.Close()
-		return nil, fmt.Errorf(
-			"could not migrate database to target version %d: %w",
-			targetVersion, err)
-	}
-
-	mdl, err := model.Prepare(ctx, db)
-	if err != nil {
-		m.Close()
-		return nil, fmt.Errorf("could not prepare model: %w", err)
-	}
-
-	err = mdl.Close()
-	if err != nil {
-		m.Close()
-		return nil, fmt.Errorf("could not close prepared model: %w", err)
-	}
-
-	result := database{
-		db:      db,
+	result := db{
+		db:      sqlDB,
 		driver:  driver,
 		migrate: m,
 	}
@@ -93,7 +60,7 @@ func OpenDB(
 	return &result, nil
 }
 
-func (db *database) Close() error {
+func (db *db) Close() error {
 	if db == nil {
 		return errDatabaseIsNil
 	}

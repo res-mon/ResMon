@@ -11,7 +11,7 @@ COPY generated/go/ /app/generated/go/
 RUN apt-get update && apt-get install -y gcc libc6-dev
 
 ENV CGO_ENABLED=1
-RUN go build -tags netgo -ldflags '-extldflags "-static"' -o res-mon
+RUN go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions' -ldflags '-extldflags "-static"' -o res-mon
 
 
 
@@ -23,7 +23,10 @@ RUN mkdir /app && groupadd -r appuser && useradd -r -g appuser -d /app appuser
 
 RUN chown appuser:appuser /app && chmod 500 /app
 RUN mkdir /app/data && chown appuser:appuser /app/data && chmod 500 /app/data
+
 RUN touch /app/data/database.db && chown appuser:appuser /app/data/database.db && chmod 600 /app/data/database.db
+RUN touch /app/data/database.db-shm && chown appuser:appuser /app/data/database.db-shm && chmod 600 /app/data/database.db-shm
+RUN touch /app/data/database.db-wal && chown appuser:appuser /app/data/database.db-wal && chmod 600 /app/data/database.db-wal
 
 WORKDIR /app
 COPY --from=builder /app/res-mon .
