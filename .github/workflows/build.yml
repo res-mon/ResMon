@@ -66,26 +66,3 @@ jobs:
                   platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
                   cache-from: type=local,src=/tmp/.buildx-cache
                   cache-to: type=local,dest=/tmp/.buildx-cache
-
-    generate:
-        runs-on: ubuntu-latest
-
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Set up Go
-              uses: actions/setup-go@v4
-              with:
-                  go-version: "1.21"
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: 18.x
-                  cache: "npm"
-
-            - name: Install npm dependencies
-              run: npm ci
-
-            - name: Run generate
-              run: npm run generate
