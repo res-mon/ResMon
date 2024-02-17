@@ -1,4 +1,5 @@
 {
+    "description": "Designed to streamline project workflows for freelancers and small businesses, ResMon combines time tracking with project management features in a user-friendly platform. Gain insights into productivity and manage projects with ease, all in one place.",
     "scripts": {
         "build": "npm run build:frontend && npm run build:backend",
         "build:backend": "go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions'",

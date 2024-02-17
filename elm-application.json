@@ -1,8 +1,6 @@
 {
     "name": "yertools/res-mon",
-    "summary": "A simple resource monitor",
+    "summary": "Designed to streamline project workflows for freelancers and small businesses, ResMon combines time tracking with project management features in a user-friendly platform. Gain insights into productivity and manage projects with ease, all in one place.",
     "version": "0.0.0",
-    "exposed-modules": [
-        "Extension.Url"
-    ]
+    "exposed-modules": ["Extension.Url"]
 }
