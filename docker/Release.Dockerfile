@@ -5,6 +5,7 @@ WORKDIR /app
 COPY main.go go.mod go.sum /app/
 COPY webroot/ /app/webroot/
 COPY src/go/ /app/src/go/
+COPY generated/go/ /app/generated/go/
 
 RUN apt-get update && apt-get install -y gcc libc6-dev
 
