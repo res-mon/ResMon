@@ -38,7 +38,7 @@ jobs:
               run: npm run test
 
             - name: Build documentation
-              run: npm run _build_docs_
+              run: npm run build:docs
 
             - name: Build project
               run: npm run build
