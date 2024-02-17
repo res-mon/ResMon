@@ -39,29 +39,6 @@ func (q *Queries) CreateMigrationScript(ctx context.Context, arg CreateMigration
 	return err
 }
 
-const deleteMigrationScript = `-- name: DeleteMigrationScript :exec
-DELETE FROM "migration_script"
-WHERE
-  "version" = ?1
-  AND "identifier" = ?2
-`
-
-type DeleteMigrationScriptParams struct {
-	Version    int64  `db:"version" json:"version"`
-	Identifier string `db:"identifier" json:"identifier"`
-}
-
-// DeleteMigrationScript
-//
-//	DELETE FROM "migration_script"
-//	WHERE
-//	  "version" = ?1
-//	  AND "identifier" = ?2
-func (q *Queries) DeleteMigrationScript(ctx context.Context, arg DeleteMigrationScriptParams) error {
-	_, err := q.exec(ctx, q.deleteMigrationScriptStmt, deleteMigrationScript, arg.Version, arg.Identifier)
-	return err
-}
-
 const listMigrationScripts = `-- name: ListMigrationScripts :many
 SELECT
   "version"   ,

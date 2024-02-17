@@ -16,13 +16,6 @@ type Querier interface {
 	//  VALUES
 	//    (?1, ?2, ?3, ?4)
 	CreateMigrationScript(ctx context.Context, arg CreateMigrationScriptParams) error
-	//DeleteMigrationScript
-	//
-	//  DELETE FROM "migration_script"
-	//  WHERE
-	//    "version" = ?1
-	//    AND "identifier" = ?2
-	DeleteMigrationScript(ctx context.Context, arg DeleteMigrationScriptParams) error
 	//ListMigrationScripts
 	//
 	//  SELECT

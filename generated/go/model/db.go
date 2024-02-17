@@ -27,9 +27,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createMigrationScriptStmt, err = db.PrepareContext(ctx, createMigrationScript); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateMigrationScript: %w", err)
 	}
-	if q.deleteMigrationScriptStmt, err = db.PrepareContext(ctx, deleteMigrationScript); err != nil {
-		return nil, fmt.Errorf("error preparing query DeleteMigrationScript: %w", err)
-	}
 	if q.listMigrationScriptsStmt, err = db.PrepareContext(ctx, listMigrationScripts); err != nil {
 		return nil, fmt.Errorf("error preparing query ListMigrationScripts: %w", err)
 	}
@@ -41,11 +38,6 @@ func (q *Queries) Close() error {
 	if q.createMigrationScriptStmt != nil {
 		if cerr := q.createMigrationScriptStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createMigrationScriptStmt: %w", cerr)
-		}
-	}
-	if q.deleteMigrationScriptStmt != nil {
-		if cerr := q.deleteMigrationScriptStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing deleteMigrationScriptStmt: %w", cerr)
 		}
 	}
 	if q.listMigrationScriptsStmt != nil {
@@ -93,7 +85,6 @@ type Queries struct {
 	db                        DBTX
 	tx                        *sql.Tx
 	createMigrationScriptStmt *sql.Stmt
-	deleteMigrationScriptStmt *sql.Stmt
 	listMigrationScriptsStmt  *sql.Stmt
 }
 
@@ -102,7 +93,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		db:                        tx,
 		tx:                        tx,
 		createMigrationScriptStmt: q.createMigrationScriptStmt,
-		deleteMigrationScriptStmt: q.deleteMigrationScriptStmt,
 		listMigrationScriptsStmt:  q.listMigrationScriptsStmt,
 	}
 }
