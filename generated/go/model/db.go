@@ -24,25 +24,41 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
-	if q.createMigrationScriptStmt, err = db.PrepareContext(ctx, createMigrationScript); err != nil {
-		return nil, fmt.Errorf("error preparing query CreateMigrationScript: %w", err)
+	if q.addActivityStmt, err = db.PrepareContext(ctx, addActivity); err != nil {
+		return nil, fmt.Errorf("error preparing query AddActivity: %w", err)
 	}
-	if q.listMigrationScriptsStmt, err = db.PrepareContext(ctx, listMigrationScripts); err != nil {
-		return nil, fmt.Errorf("error preparing query ListMigrationScripts: %w", err)
+	if q.insertMigrationScriptStmt, err = db.PrepareContext(ctx, insertMigrationScript); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertMigrationScript: %w", err)
+	}
+	if q.isActiveStmt, err = db.PrepareContext(ctx, isActive); err != nil {
+		return nil, fmt.Errorf("error preparing query IsActive: %w", err)
+	}
+	if q.migrationScriptsStmt, err = db.PrepareContext(ctx, migrationScripts); err != nil {
+		return nil, fmt.Errorf("error preparing query MigrationScripts: %w", err)
 	}
 	return &q, nil
 }
 
 func (q *Queries) Close() error {
 	var err error
-	if q.createMigrationScriptStmt != nil {
-		if cerr := q.createMigrationScriptStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing createMigrationScriptStmt: %w", cerr)
+	if q.addActivityStmt != nil {
+		if cerr := q.addActivityStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing addActivityStmt: %w", cerr)
 		}
 	}
-	if q.listMigrationScriptsStmt != nil {
-		if cerr := q.listMigrationScriptsStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing listMigrationScriptsStmt: %w", cerr)
+	if q.insertMigrationScriptStmt != nil {
+		if cerr := q.insertMigrationScriptStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertMigrationScriptStmt: %w", cerr)
+		}
+	}
+	if q.isActiveStmt != nil {
+		if cerr := q.isActiveStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing isActiveStmt: %w", cerr)
+		}
+	}
+	if q.migrationScriptsStmt != nil {
+		if cerr := q.migrationScriptsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing migrationScriptsStmt: %w", cerr)
 		}
 	}
 	return err
@@ -84,15 +100,19 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                        DBTX
 	tx                        *sql.Tx
-	createMigrationScriptStmt *sql.Stmt
-	listMigrationScriptsStmt  *sql.Stmt
+	addActivityStmt           *sql.Stmt
+	insertMigrationScriptStmt *sql.Stmt
+	isActiveStmt              *sql.Stmt
+	migrationScriptsStmt      *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                        tx,
 		tx:                        tx,
-		createMigrationScriptStmt: q.createMigrationScriptStmt,
-		listMigrationScriptsStmt:  q.listMigrationScriptsStmt,
+		addActivityStmt:           q.addActivityStmt,
+		insertMigrationScriptStmt: q.insertMigrationScriptStmt,
+		isActiveStmt:              q.isActiveStmt,
+		migrationScriptsStmt:      q.migrationScriptsStmt,
 	}
 }

@@ -9,14 +9,38 @@ import (
 )
 
 type Querier interface {
-	//CreateMigrationScript
+	//AddActivity
+	//
+	//  INSERT INTO
+	//    "activity_log" ("timestamp", "active")
+	//  VALUES
+	//    (?1, ?2)
+	AddActivity(ctx context.Context, arg AddActivityParams) error
+	//InsertMigrationScript
 	//
 	//  INSERT OR IGNORE INTO
 	//    "migration_script" ("version", "identifier", "up", "down")
 	//  VALUES
 	//    (?1, ?2, ?3, ?4)
-	CreateMigrationScript(ctx context.Context, arg CreateMigrationScriptParams) error
-	//ListMigrationScripts
+	InsertMigrationScript(ctx context.Context, arg InsertMigrationScriptParams) error
+	//IsActive
+	//
+	//  SELECT
+	//    IFNULL(
+	//      (
+	//        SELECT
+	//          "active"
+	//        FROM
+	//          "activity_log"
+	//        ORDER BY
+	//          "timestamp" DESC
+	//        LIMIT
+	//          1
+	//      ),
+	//      0
+	//    ) AS "active"
+	IsActive(ctx context.Context) (interface{}, error)
+	//MigrationScripts
 	//
 	//  SELECT
 	//    "version"   ,
@@ -25,7 +49,7 @@ type Querier interface {
 	//    "down"
 	//  FROM
 	//    "migration_script"
-	ListMigrationScripts(ctx context.Context) ([]MigrationScript, error)
+	MigrationScripts(ctx context.Context) ([]MigrationScript, error)
 }
 
 var _ Querier = (*Queries)(nil)

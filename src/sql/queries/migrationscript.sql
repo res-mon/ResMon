@@ -1,4 +1,4 @@
--- name: ListMigrationScripts :many
+-- name: MigrationScripts :many
 SELECT
   "version"   ,
   "identifier",
@@ -8,7 +8,7 @@ FROM
   "migration_script";
 
 
--- name: CreateMigrationScript :exec
+-- name: InsertMigrationScript :exec
 INSERT OR IGNORE INTO
   "migration_script" ("version", "identifier", "up", "down")
 VALUES

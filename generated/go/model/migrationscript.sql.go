@@ -9,28 +9,28 @@ import (
 	"context"
 )
 
-const createMigrationScript = `-- name: CreateMigrationScript :exec
+const insertMigrationScript = `-- name: InsertMigrationScript :exec
 INSERT OR IGNORE INTO
   "migration_script" ("version", "identifier", "up", "down")
 VALUES
   (?1, ?2, ?3, ?4)
 `
 
-type CreateMigrationScriptParams struct {
+type InsertMigrationScriptParams struct {
 	Version    int64  `db:"version" json:"version"`
 	Identifier string `db:"identifier" json:"identifier"`
 	Up         string `db:"up" json:"up"`
 	Down       string `db:"down" json:"down"`
 }
 
-// CreateMigrationScript
+// InsertMigrationScript
 //
 //	INSERT OR IGNORE INTO
 //	  "migration_script" ("version", "identifier", "up", "down")
 //	VALUES
 //	  (?1, ?2, ?3, ?4)
-func (q *Queries) CreateMigrationScript(ctx context.Context, arg CreateMigrationScriptParams) error {
-	_, err := q.exec(ctx, q.createMigrationScriptStmt, createMigrationScript,
+func (q *Queries) InsertMigrationScript(ctx context.Context, arg InsertMigrationScriptParams) error {
+	_, err := q.exec(ctx, q.insertMigrationScriptStmt, insertMigrationScript,
 		arg.Version,
 		arg.Identifier,
 		arg.Up,
@@ -39,7 +39,7 @@ func (q *Queries) CreateMigrationScript(ctx context.Context, arg CreateMigration
 	return err
 }
 
-const listMigrationScripts = `-- name: ListMigrationScripts :many
+const migrationScripts = `-- name: MigrationScripts :many
 SELECT
   "version"   ,
   "identifier",
@@ -49,7 +49,7 @@ FROM
   "migration_script"
 `
 
-// ListMigrationScripts
+// MigrationScripts
 //
 //	SELECT
 //	  "version"   ,
@@ -58,8 +58,8 @@ FROM
 //	  "down"
 //	FROM
 //	  "migration_script"
-func (q *Queries) ListMigrationScripts(ctx context.Context) ([]MigrationScript, error) {
-	rows, err := q.query(ctx, q.listMigrationScriptsStmt, listMigrationScripts)
+func (q *Queries) MigrationScripts(ctx context.Context) ([]MigrationScript, error) {
+	rows, err := q.query(ctx, q.migrationScriptsStmt, migrationScripts)
 	if err != nil {
 		return nil, err
 	}

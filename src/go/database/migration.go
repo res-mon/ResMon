@@ -163,7 +163,7 @@ func registerMigrationContainer(
 
 	mdl := model.New(db)
 	for _, m := range migrations {
-		err = mdl.CreateMigrationScript(ctx, model.CreateMigrationScriptParams{
+		err = mdl.InsertMigrationScript(ctx, model.InsertMigrationScriptParams{
 			Version:    int64(m.version),
 			Identifier: m.identifier,
 			Up:         string(m.up),
@@ -175,9 +175,9 @@ func registerMigrationContainer(
 		}
 	}
 
-	existingScripts, err := mdl.ListMigrationScripts(ctx)
+	existingScripts, err := mdl.MigrationScripts(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("could not list migration scripts: %w", err)
+		return 0, fmt.Errorf("could not get migration scripts: %w", err)
 	}
 
 	for _, script := range existingScripts {
