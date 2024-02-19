@@ -1,0 +1,11 @@
+schema {
+    query: RootQuery
+    mutation: RootMutation
+}
+
+type RootQuery {
+    workClock: WorkClockQuery!
+}
+type RootMutation {
+    workClock: WorkClockMutation!
+}

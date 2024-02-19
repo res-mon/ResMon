@@ -1,0 +1,7 @@
+type ActivityQuery {
+    active: Boolean!
+}
+
+type ActivityMutation {
+    setActive(active: Boolean!): Boolean!
+}

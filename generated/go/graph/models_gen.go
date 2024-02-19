@@ -2,5 +2,24 @@
 
 package graph
 
-type Query struct {
+type ActivityMutation struct {
+	SetActive bool `json:"setActive"`
+}
+
+type ActivityQuery struct {
+	Active bool `json:"active"`
+}
+
+type RootMutation struct {
+}
+
+type RootQuery struct {
+}
+
+type WorkClockMutation struct {
+	Activity *ActivityMutation `json:"activity"`
+}
+
+type WorkClockQuery struct {
+	Activity *ActivityQuery `json:"activity"`
 }

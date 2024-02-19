@@ -38,19 +38,49 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	RootMutation() RootMutationResolver
+	RootQuery() RootQueryResolver
 }
 
 type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Query struct {
+	ActivityMutation struct {
+		SetActive func(childComplexity int, active bool) int
+	}
+
+	ActivityQuery struct {
+		Active func(childComplexity int) int
+	}
+
+	RootMutation struct {
+		WorkClock func(childComplexity int) int
+	}
+
+	RootQuery struct {
+		WorkClock          func(childComplexity int) int
 		__resolve__service func(childComplexity int) int
+	}
+
+	WorkClockMutation struct {
+		Activity func(childComplexity int) int
+	}
+
+	WorkClockQuery struct {
+		Activity func(childComplexity int) int
 	}
 
 	_Service struct {
 		SDL func(childComplexity int) int
 	}
+}
+
+type RootMutationResolver interface {
+	WorkClock(ctx context.Context) (*WorkClockMutation, error)
+}
+type RootQueryResolver interface {
+	WorkClock(ctx context.Context) (*WorkClockQuery, error)
 }
 
 type executableSchema struct {
@@ -72,12 +102,59 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Query._service":
-		if e.complexity.Query.__resolve__service == nil {
+	case "ActivityMutation.setActive":
+		if e.complexity.ActivityMutation.SetActive == nil {
 			break
 		}
 
-		return e.complexity.Query.__resolve__service(childComplexity), true
+		args, err := ec.field_ActivityMutation_setActive_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ActivityMutation.SetActive(childComplexity, args["active"].(bool)), true
+
+	case "ActivityQuery.active":
+		if e.complexity.ActivityQuery.Active == nil {
+			break
+		}
+
+		return e.complexity.ActivityQuery.Active(childComplexity), true
+
+	case "RootMutation.workClock":
+		if e.complexity.RootMutation.WorkClock == nil {
+			break
+		}
+
+		return e.complexity.RootMutation.WorkClock(childComplexity), true
+
+	case "RootQuery.workClock":
+		if e.complexity.RootQuery.WorkClock == nil {
+			break
+		}
+
+		return e.complexity.RootQuery.WorkClock(childComplexity), true
+
+	case "RootQuery._service":
+		if e.complexity.RootQuery.__resolve__service == nil {
+			break
+		}
+
+		return e.complexity.RootQuery.__resolve__service(childComplexity), true
+
+	case "WorkClockMutation.activity":
+		if e.complexity.WorkClockMutation.Activity == nil {
+			break
+		}
+
+		return e.complexity.WorkClockMutation.Activity(childComplexity), true
+
+	case "WorkClockQuery.activity":
+		if e.complexity.WorkClockQuery.Activity == nil {
+			break
+		}
+
+		return e.complexity.WorkClockQuery.Activity(childComplexity), true
 
 	case "_Service.sdl":
 		if e.complexity._Service.SDL == nil {
@@ -104,7 +181,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			if first {
 				first = false
 				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-				data = ec._Query(ctx, rc.Operation.SelectionSet)
+				data = ec._RootQuery(ctx, rc.Operation.SelectionSet)
 			} else {
 				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
 					result := <-ec.deferredResults
@@ -126,6 +203,21 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 
 			return &response
+		}
+	case ast.Mutation:
+		return func(ctx context.Context) *graphql.Response {
+			if !first {
+				return nil
+			}
+			first = false
+			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
+			data := ec._RootMutation(ctx, rc.Operation.SelectionSet)
+			var buf bytes.Buffer
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
 		}
 
 	default:
@@ -175,7 +267,33 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../../../src/gql/schema.gql", Input: ``, BuiltIn: false},
+	{Name: "../../../src/gql/schema.gql", Input: `schema {
+    query: RootQuery
+    mutation: RootMutation
+}
+
+type RootQuery {
+    workClock: WorkClockQuery!
+}
+type RootMutation {
+    workClock: WorkClockMutation!
+}
+`, BuiltIn: false},
+	{Name: "../../../src/gql/workclock/activity.gql", Input: `type ActivityQuery {
+    active: Boolean!
+}
+
+type ActivityMutation {
+    setActive(active: Boolean!): Boolean!
+}
+`, BuiltIn: false},
+	{Name: "../../../src/gql/workclock/schema.gql", Input: `type WorkClockQuery {
+    activity: ActivityQuery!
+}
+type WorkClockMutation {
+    activity: ActivityMutation!
+}
+`, BuiltIn: false},
 	{Name: "../../../federation/directives.graphql", Input: `
 	directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
 	directive @requires(fields: _FieldSet!) on FIELD_DEFINITION
@@ -190,7 +308,7 @@ type _Service {
   sdl: String
 }
 
-extend type Query {
+extend type RootQuery {
   _service: _Service!
 }
 `, BuiltIn: true},
@@ -201,7 +319,22 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_ActivityMutation_setActive_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 bool
+	if tmp, ok := rawArgs["active"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+		arg0, err = ec.unmarshalNBoolean2bool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["active"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_RootQuery___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -254,8 +387,203 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Query__service(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query__service(ctx, field)
+func (ec *executionContext) _ActivityMutation_setActive(ctx context.Context, field graphql.CollectedField, obj *ActivityMutation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityMutation_setActive(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SetActive, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityMutation_setActive(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityMutation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ActivityMutation_setActive_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityQuery_active(ctx context.Context, field graphql.CollectedField, obj *ActivityQuery) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityQuery_active(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Active, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityQuery_active(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityQuery",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RootMutation_workClock(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RootMutation_workClock(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.RootMutation().WorkClock(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*WorkClockMutation)
+	fc.Result = res
+	return ec.marshalNWorkClockMutation2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐWorkClockMutation(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_RootMutation_workClock(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RootMutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "activity":
+				return ec.fieldContext_WorkClockMutation_activity(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type WorkClockMutation", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RootQuery_workClock(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RootQuery_workClock(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.RootQuery().WorkClock(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*WorkClockQuery)
+	fc.Result = res
+	return ec.marshalNWorkClockQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐWorkClockQuery(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_RootQuery_workClock(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RootQuery",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "activity":
+				return ec.fieldContext_WorkClockQuery_activity(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type WorkClockQuery", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RootQuery__service(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RootQuery__service(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -285,9 +613,9 @@ func (ec *executionContext) _Query__service(ctx context.Context, field graphql.C
 	return ec.marshalN_Service2githubᚗcomᚋ99designsᚋgqlgenᚋpluginᚋfederationᚋfedruntimeᚐService(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query__service(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_RootQuery__service(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Query",
+		Object:     "RootQuery",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: false,
@@ -302,8 +630,8 @@ func (ec *executionContext) fieldContext_Query__service(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query___type(ctx, field)
+func (ec *executionContext) _RootQuery___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RootQuery___type(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -330,9 +658,9 @@ func (ec *executionContext) _Query___type(ctx context.Context, field graphql.Col
 	return ec.marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query___type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_RootQuery___type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Query",
+		Object:     "RootQuery",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: false,
@@ -369,15 +697,15 @@ func (ec *executionContext) fieldContext_Query___type(ctx context.Context, field
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query___type_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_RootQuery___type_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query___schema(ctx, field)
+func (ec *executionContext) _RootQuery___schema(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RootQuery___schema(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -404,9 +732,9 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_RootQuery___schema(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Query",
+		Object:     "RootQuery",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: false,
@@ -426,6 +754,102 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkClockMutation_activity(ctx context.Context, field graphql.CollectedField, obj *WorkClockMutation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WorkClockMutation_activity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Activity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ActivityMutation)
+	fc.Result = res
+	return ec.marshalNActivityMutation2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐActivityMutation(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_WorkClockMutation_activity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkClockMutation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "setActive":
+				return ec.fieldContext_ActivityMutation_setActive(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ActivityMutation", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkClockQuery_activity(ctx context.Context, field graphql.CollectedField, obj *WorkClockQuery) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WorkClockQuery_activity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Activity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ActivityQuery)
+	fc.Result = res
+	return ec.marshalNActivityQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐActivityQuery(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_WorkClockQuery_activity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkClockQuery",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_ActivityQuery_active(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ActivityQuery", field.Name)
 		},
 	}
 	return fc, nil
@@ -2253,12 +2677,90 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** object.gotpl ****************************
 
-var queryImplementors = []string{"Query"}
+var activityMutationImplementors = []string{"ActivityMutation"}
 
-func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, queryImplementors)
+func (ec *executionContext) _ActivityMutation(ctx context.Context, sel ast.SelectionSet, obj *ActivityMutation) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, activityMutationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ActivityMutation")
+		case "setActive":
+			out.Values[i] = ec._ActivityMutation_setActive(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var activityQueryImplementors = []string{"ActivityQuery"}
+
+func (ec *executionContext) _ActivityQuery(ctx context.Context, sel ast.SelectionSet, obj *ActivityQuery) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, activityQueryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ActivityQuery")
+		case "active":
+			out.Values[i] = ec._ActivityQuery_active(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var rootMutationImplementors = []string{"RootMutation"}
+
+func (ec *executionContext) _RootMutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, rootMutationImplementors)
 	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
-		Object: "Query",
+		Object: "RootMutation",
 	})
 
 	out := graphql.NewFieldSet(fields)
@@ -2271,7 +2773,78 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("Query")
+			out.Values[i] = graphql.MarshalString("RootMutation")
+		case "workClock":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RootMutation_workClock(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var rootQueryImplementors = []string{"RootQuery"}
+
+func (ec *executionContext) _RootQuery(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, rootQueryImplementors)
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "RootQuery",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RootQuery")
+		case "workClock":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._RootQuery_workClock(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "_service":
 			field := field
 
@@ -2281,7 +2854,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query__service(ctx, field)
+				res = ec._RootQuery__service(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -2296,12 +2869,90 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Query___type(ctx, field)
+				return ec._RootQuery___type(ctx, field)
 			})
 		case "__schema":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Query___schema(ctx, field)
+				return ec._RootQuery___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var workClockMutationImplementors = []string{"WorkClockMutation"}
+
+func (ec *executionContext) _WorkClockMutation(ctx context.Context, sel ast.SelectionSet, obj *WorkClockMutation) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workClockMutationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WorkClockMutation")
+		case "activity":
+			out.Values[i] = ec._WorkClockMutation_activity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var workClockQueryImplementors = []string{"WorkClockQuery"}
+
+func (ec *executionContext) _WorkClockQuery(ctx context.Context, sel ast.SelectionSet, obj *WorkClockQuery) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workClockQueryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WorkClockQuery")
+		case "activity":
+			out.Values[i] = ec._WorkClockQuery_activity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2687,6 +3338,26 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNActivityMutation2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐActivityMutation(ctx context.Context, sel ast.SelectionSet, v *ActivityMutation) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ActivityMutation(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNActivityQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐActivityQuery(ctx context.Context, sel ast.SelectionSet, v *ActivityQuery) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ActivityQuery(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2715,6 +3386,34 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNWorkClockMutation2githubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐWorkClockMutation(ctx context.Context, sel ast.SelectionSet, v WorkClockMutation) graphql.Marshaler {
+	return ec._WorkClockMutation(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNWorkClockMutation2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐWorkClockMutation(ctx context.Context, sel ast.SelectionSet, v *WorkClockMutation) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._WorkClockMutation(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNWorkClockQuery2githubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐWorkClockQuery(ctx context.Context, sel ast.SelectionSet, v WorkClockQuery) graphql.Marshaler {
+	return ec._WorkClockQuery(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNWorkClockQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐWorkClockQuery(ctx context.Context, sel ast.SelectionSet, v *WorkClockQuery) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._WorkClockQuery(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalN_FieldSet2string(ctx context.Context, v interface{}) (string, error) {
