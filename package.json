@@ -13,8 +13,11 @@
         "dev:frontend": "npx webpack serve --port 8122 --config config/webpack.dev.js",
         "docs": "npx elm-doc-preview",
         "fix": "npx elm-review --fix-all",
-        "generate": "npm run generate:elm && npm run generate:model",
+        "generate": "npm run generate:elm && npm run generate:model && npm run generate:graph",
         "generate:elm": "npx ts-node --compilerOptions {\\\"strict\\\":false} ./lib/ts/elm-tailwind-modules/cli.ts --tailwind-config ./config/tailwind.config.js --dir ./generated/elm",
+        "generate:graph": "npx run generate:graph:go",
+        "generate:graph:elm": "npx elm-graphql src/gql --base Graph --output generated/elm",
+        "generate:graph:go": "go run github.com/99designs/gqlgen",
         "generate:model": "go run github.com/sqlc-dev/sqlc/cmd/sqlc@latest generate --file ./src/sql/sqlc.yaml",
         "prepare": "husky",
         "review": "npm run review:elm && npm run review:go && npm run review:model",
@@ -26,6 +29,7 @@
         "test:go": "npm run build:frontend && go test -race -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions'"
     },
     "devDependencies": {
+        "@dillonkearns/elm-graphql": "^4.3.1",
         "@tailwindcss/aspect-ratio": "^0.4.2",
         "@tailwindcss/typography": "^0.5.10",
         "@types/color-name": "^1.1.3",
