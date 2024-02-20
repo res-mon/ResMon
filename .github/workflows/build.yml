@@ -28,6 +28,9 @@ jobs:
                   node-version: 18.x
                   cache: "npm"
 
+            - name: Create empty file in webroot
+              run: mkdir -p webroot && touch webroot/empty
+
             - name: Install go dependencies
               run: go install
 
