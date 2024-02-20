@@ -93,6 +93,8 @@ func (s *server) Run(ctx, killCtx context.Context, shutdown func()) error {
 		return fmt.Errorf("could not default route: %w", err)
 	}
 
+	startAPI(router)
+
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", s.port),
 		ReadTimeout:       300 * time.Second,
