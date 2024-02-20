@@ -81,6 +81,5 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.17.0
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/rs/cors v1.10.1
 	golang.org/x/net v0.21.0 // indirect
 )

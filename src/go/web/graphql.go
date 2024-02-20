@@ -12,10 +12,12 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/yerTools/ResMon/generated/go/graph"
+	"github.com/yerTools/ResMon/src/go/api"
 )
 
 func startAPI(router *httprouter.Router) {
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.New(
+		graph.NewExecutableSchema(api.New()))
 
 	srv.AddTransport(transport.SSE{})
 	srv.AddTransport(transport.POST{})
