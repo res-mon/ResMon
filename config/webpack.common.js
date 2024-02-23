@@ -39,7 +39,7 @@ module.exports = (withDebug) => {
                             loader: "elm-webpack-loader",
                             options: {
                                 debug: withDebug,
-                                optimize: false
+                                optimize: !withDebug
                             }
                         }
                     ]
