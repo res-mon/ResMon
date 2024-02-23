@@ -16,7 +16,7 @@
         "generate": "npm run generate:elm && npm run generate:model && npm run generate:graph",
         "generate:elm": "npx ts-node --compilerOptions {\\\"strict\\\":false} ./lib/ts/elm-tailwind-modules/cli.ts --tailwind-config ./config/tailwind.config.js --dir ./generated/elm",
         "generate:graph": "npm run generate:graph:go && npm run generate:graph:elm",
-        "generate:graph:elm": "go run main.go --generate-elm-graphql-schema",
+        "generate:graph:elm": "npm run touch:webroot && go run main.go --generate-elm-graphql-schema",
         "generate:graph:go": "go run github.com/99designs/gqlgen",
         "generate:model": "go run github.com/sqlc-dev/sqlc/cmd/sqlc@latest generate --file ./src/sql/sqlc.yaml",
         "prepare": "husky",
@@ -26,7 +26,8 @@
         "review:model": "go run github.com/sqlc-dev/sqlc/cmd/sqlc@latest vet --file ./src/sql/sqlc.yaml",
         "test": "npm run test:elm && npm run review && npm run build && npm run test:go",
         "test:elm": "npx elm-verify-examples && npx elm-test --fuzz 250",
-        "test:go": "npm run build:frontend && go test -race -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions'"
+        "test:go": "npm run build:frontend && go test -race -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions'",
+        "touch:webroot": "mkdir -p webroot && touch webroot/empty"
     },
     "devDependencies": {
         "@dillonkearns/elm-graphql": "^4.3.1",
