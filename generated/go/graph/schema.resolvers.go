@@ -17,12 +17,19 @@ func (r *rootQueryResolver) WorkClock(ctx context.Context) (*WorkClockQuery, err
 	panic(fmt.Errorf("not implemented: WorkClock - workClock"))
 }
 
+func (r *rootSubscriptionResolver) WorkClock(ctx context.Context) (<-chan *WorkClockQuery, error) {
+	panic(fmt.Errorf("not implemented: WorkClock - workClock"))
+}
+
 func (r *Resolver) RootMutation() RootMutationResolver { return &rootMutationResolver{r} }
 
 func (r *Resolver) RootQuery() RootQueryResolver { return &rootQueryResolver{r} }
 
+func (r *Resolver) RootSubscription() RootSubscriptionResolver { return &rootSubscriptionResolver{r} }
+
 type rootMutationResolver struct{ *Resolver }
 type rootQueryResolver struct{ *Resolver }
+type rootSubscriptionResolver struct{ *Resolver }
 
 // !!! WARNING !!!
 // The code below was going to be deleted when updating resolvers. It has been copied here so you have

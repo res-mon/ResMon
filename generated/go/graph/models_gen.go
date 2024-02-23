@@ -16,6 +16,9 @@ type RootMutation struct {
 type RootQuery struct {
 }
 
+type RootSubscription struct {
+}
+
 type WorkClockMutation struct {
 	Activity *ActivityMutation `json:"activity"`
 }
