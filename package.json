@@ -16,7 +16,7 @@
         "generate": "npm run generate:elm && npm run generate:model && npm run generate:graph",
         "generate:elm": "npx ts-node --compilerOptions {\\\"strict\\\":false} ./lib/ts/elm-tailwind-modules/cli.ts --tailwind-config ./config/tailwind.config.js --dir ./generated/elm",
         "generate:graph": "npm run generate:graph:go",
-        "generate:graph:elm": "npx elm-graphql src/gql --base Graph --output generated/elm",
+        "generate:graph:elm": "go run main.go --generate-elm-graphql-schema",
         "generate:graph:go": "go run github.com/99designs/gqlgen",
         "generate:model": "go run github.com/sqlc-dev/sqlc/cmd/sqlc@latest generate --file ./src/sql/sqlc.yaml",
         "prepare": "husky",

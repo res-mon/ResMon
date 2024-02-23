@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"os/exec"
 	"os/signal"
 	"sync"
 	"syscall"
@@ -92,6 +93,20 @@ func main() {
 		}
 		wg.Done()
 	})()
+
+	if len(os.Args) == 2 && os.Args[1] == "--generate-elm-graphql-schema" {
+		cmdStruct := exec.Command(
+			"npx", "elm-graphql",
+			"http://127.0.0.1:8321/api",
+			"--base", "Graph",
+			"--output", "generated/elm")
+		out, err := cmdStruct.Output()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(out))
+		shutdown()
+	}
 
 	wg.Wait()
 }
