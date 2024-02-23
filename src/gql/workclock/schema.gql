@@ -1,6 +1,7 @@
 type WorkClockQuery {
     activity: ActivityQuery!
 }
+
 type WorkClockMutation {
     activity: ActivityMutation!
 }
