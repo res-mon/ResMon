@@ -31,6 +31,26 @@ func startAPI(router *httprouter.Router) {
 	})
 	srv.Use(extension.Introspection{})
 
-	router.Handler("POST", "/api", srv)
-	router.Handler("GET", "/api", playground.Handler("ResMon API", "/api"))
+	router.GET("/api", func(
+		w http.ResponseWriter,
+		r *http.Request,
+		_ httprouter.Params,
+	) {
+		if r.Header.Get("Upgrade") == "websocket" {
+			srv.ServeHTTP(w, r)
+			return
+		}
+
+		playground.
+			Handler("ResMon API", "/api").
+			ServeHTTP(w, r)
+	})
+
+	router.POST("/api", func(
+		w http.ResponseWriter,
+		r *http.Request,
+		_ httprouter.Params,
+	) {
+		srv.ServeHTTP(w, r)
+	})
 }
