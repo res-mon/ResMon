@@ -3,10 +3,15 @@
 package graph
 
 type ActivityMutation struct {
+	// Sets the current activity state.
+	// This indicates if the user is currently working or not.
+	// Returns the new activity state.
 	SetActive bool `json:"setActive"`
 }
 
 type ActivityQuery struct {
+	// This indicates if the user is currently working or not.
+	// Returns the current activity state.
 	Active bool `json:"active"`
 }
 

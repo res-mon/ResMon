@@ -13,10 +13,6 @@ type ActivityQuery
     = ActivityQuery
 
 
-type ActivitySubscription
-    = ActivitySubscription
-
-
 type Service_
     = Service_
 
@@ -27,7 +23,3 @@ type WorkClockMutation
 
 type WorkClockQuery
     = WorkClockQuery
-
-
-type WorkClockSubscription
-    = WorkClockSubscription

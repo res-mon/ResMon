@@ -19,6 +19,9 @@ import Graphql.SelectionSet exposing (SelectionSet)
 import Json.Decode as Decode
 
 
+{-| This indicates if the user is currently working or not.
+Returns the current activity state.
+-}
 active : SelectionSet Bool Graph.Object.ActivityQuery
 active =
     Object.selectionForField "Bool" "active" [] Decode.bool

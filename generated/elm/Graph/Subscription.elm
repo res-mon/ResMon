@@ -20,7 +20,7 @@ import Json.Decode as Decode exposing (Decoder)
 
 
 workClock :
-    SelectionSet decodesTo Graph.Object.WorkClockSubscription
+    SelectionSet decodesTo Graph.Object.WorkClockQuery
     -> SelectionSet decodesTo RootSubscription
 workClock object____ =
     Object.selectionForCompositeField "workClock" [] object____ Basics.identity

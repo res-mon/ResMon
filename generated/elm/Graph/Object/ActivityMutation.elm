@@ -23,6 +23,10 @@ type alias SetActiveRequiredArguments =
     { active : Bool }
 
 
+{-| Sets the current activity state.
+This indicates if the user is currently working or not.
+Returns the new activity state.
+-}
 setActive :
     SetActiveRequiredArguments
     -> SelectionSet Bool Graph.Object.ActivityMutation

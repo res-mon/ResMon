@@ -323,10 +323,19 @@ type RootSubscription {
 }
 `, BuiltIn: false},
 	{Name: "../../../src/gql/workclock/activity.gql", Input: `type ActivityQuery {
+    """
+    This indicates if the user is currently working or not.
+    Returns the current activity state.
+    """
     active: Boolean!
 }
 
 type ActivityMutation {
+    """
+    Sets the current activity state.
+    This indicates if the user is currently working or not.
+    Returns the new activity state.
+    """
     setActive(active: Boolean!): Boolean!
 }
 `, BuiltIn: false},
