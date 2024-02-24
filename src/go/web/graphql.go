@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -19,8 +20,12 @@ func startAPI(router *httprouter.Router) {
 	srv := handler.New(
 		graph.NewExecutableSchema(api.New()))
 
-	srv.AddTransport(transport.SSE{})
-	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.Options{
+		AllowedMethods: []string{
+			"GET", "POST", "OPTIONS",
+		},
+	})
+
 	srv.AddTransport(transport.Websocket{
 		KeepAlivePingInterval: 10 * time.Second,
 		Upgrader: websocket.Upgrader{
@@ -29,28 +34,48 @@ func startAPI(router *httprouter.Router) {
 			},
 		},
 	})
+
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.GRAPHQL{})
+	srv.AddTransport(transport.SSE{})
+	srv.AddTransport(transport.POST{})
+
 	srv.Use(extension.Introspection{})
+
+	handle := func(
+		w http.ResponseWriter,
+		r *http.Request,
+		_ httprouter.Params,
+	) {
+		srv.ServeHTTP(w, r)
+	}
 
 	router.GET("/api", func(
 		w http.ResponseWriter,
 		r *http.Request,
 		_ httprouter.Params,
 	) {
-		if r.Header.Get("Upgrade") == "websocket" {
-			srv.ServeHTTP(w, r)
+		if r.Header.Get("Upgrade") == "" &&
+			strings.Contains(strings.ToLower(
+				r.Header.Get("Accept")), "text/html",
+			) {
+			http.Redirect(w, r, "/api/apollo", http.StatusFound)
 			return
 		}
 
-		playground.
-			Handler("ResMon API", "/api").
-			ServeHTTP(w, r)
-	})
-
-	router.POST("/api", func(
-		w http.ResponseWriter,
-		r *http.Request,
-		_ httprouter.Params,
-	) {
 		srv.ServeHTTP(w, r)
 	})
+
+	router.POST("/api", handle)
+	router.OPTIONS("/api", handle)
+
+	apolloHandler := playground.ApolloSandboxHandler(
+		"ResMon - Apollo GraphQL Sandbox", "/api")
+
+	router.Handler("DELETE", "/api/apollo", apolloHandler)
+	router.Handler("GET", "/api/apollo", apolloHandler)
+	router.Handler("HEAD", "/api/apollo", apolloHandler)
+	router.Handler("PATCH", "/api/apollo", apolloHandler)
+	router.Handler("POST", "/api/apollo", apolloHandler)
+	router.Handler("PUT", "/api/apollo", apolloHandler)
 }
