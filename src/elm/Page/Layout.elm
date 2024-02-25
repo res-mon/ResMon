@@ -1,5 +1,7 @@
 module Page.Layout exposing (Model, Msg, init, update, view)
 
+import Api
+import Api.General
 import Browser exposing (Document)
 import Component.DaisyUi as Ui
 import Component.Icon as Ico
@@ -135,31 +137,62 @@ view shared model minimal body =
                     , Tw.place_items_center
                     ]
                 ]
-                (Dom.div
-                    [ Attr.css
-                        [ Tw.text_5xl
-                        , Tw.font_mono
-                        , Br.xl [ Tw.text_9xl ]
-                        , Br.sm [ Tw.text_8xl ]
+                (Dom.div []
+                    [ Dom.div
+                        [ Attr.css
+                            [ Tw.text_5xl
+                            , Tw.font_mono
+                            , Br.xl [ Tw.text_9xl ]
+                            , Br.sm [ Tw.text_8xl ]
+                            ]
                         ]
-                    ]
-                    [ Ui.countdown []
-                        [ Tw.duration_500 ]
-                        (Maybe.map2 Time.toHour shared.timeZone shared.time
-                            |> Maybe.withDefault 0
-                        )
-                    , Dom.text ":"
-                    , Ui.countdown []
-                        [ Tw.duration_500 ]
-                        (Maybe.map2 Time.toMinute shared.timeZone shared.time
-                            |> Maybe.withDefault 0
-                        )
-                    , Dom.text ":"
-                    , Ui.countdown []
-                        [ Tw.duration_500 ]
-                        (Maybe.map2 Time.toSecond shared.timeZone shared.time
-                            |> Maybe.withDefault 0
-                        )
+                        [ Ui.countdown []
+                            [ Tw.duration_500 ]
+                            (Maybe.map2 Time.toHour shared.timeZone shared.time
+                                |> Maybe.withDefault 0
+                            )
+                        , Dom.text ":"
+                        , Ui.countdown []
+                            [ Tw.duration_500 ]
+                            (Maybe.map2 Time.toMinute shared.timeZone shared.time
+                                |> Maybe.withDefault 0
+                            )
+                        , Dom.text ":"
+                        , Ui.countdown []
+                            [ Tw.duration_500 ]
+                            (Maybe.map2 Time.toSecond shared.timeZone shared.time
+                                |> Maybe.withDefault 0
+                            )
+                        ]
+                    , Dom.div
+                        [ Attr.css [ Tw.text_center ] ]
+                        [ Dom.text "API Status: "
+                        , Dom.text <|
+                            case shared.api.status of
+                                Api.NotConnected ->
+                                    "Nicht verbunden"
+
+                                Api.Connected ->
+                                    "Verbunden"
+
+                                Api.Reconnecting ->
+                                    "Verbindung wird wiederhergestellt"
+                        ]
+                    , Dom.div
+                        [ Attr.css [ Tw.text_center ] ]
+                        [ Dom.text "Work Clock: "
+                        , Dom.text <|
+                            case shared.api.workClock.workClock of
+                                Api.General.Unknown ->
+                                    "Unknown"
+
+                                Api.General.Received state ->
+                                    if state.acticity.active then
+                                        "Aktiv"
+
+                                    else
+                                        "Inaktiv"
+                        ]
                     ]
                     :: map Dom.fromUnstyled body.body
                 )
