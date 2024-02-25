@@ -1,5 +1,6 @@
 port module Model.Shared exposing (Alert, AlertLevel(..), Internal, Msg(..), Route(..), SharedModel, addTextAlert, init, removeAlert, setDarkModeMessage, subscriptions, update)
 
+import Api
 import Browser.Navigation exposing (Key, replaceUrl)
 import Extension.Time exposing (fixVariationFloored)
 import Html.Styled as Dom
@@ -38,6 +39,7 @@ type alias SharedModel msg =
     , alerts : List (Alert msg)
     , internal : Internal msg
     , darkMode : Bool
+    , api : Api.Model msg
     }
 
 
@@ -76,6 +78,9 @@ init :
     -> ( SharedModel msg, Cmd msg )
 init toMsg updateRoute route url key localStorage =
     let
+        ( apiModel, apiCmd ) =
+            Api.init (ApiMsg >> toMsg)
+
         curentTimeCmd : Cmd msg
         curentTimeCmd =
             Time.now
@@ -106,6 +111,7 @@ init toMsg updateRoute route url key localStorage =
                 , alertCount = 0
                 }
             , darkMode = False
+            , api = apiModel
             }
 
         timeZoneCmd : Cmd msg
@@ -114,7 +120,14 @@ init toMsg updateRoute route url key localStorage =
                 (\zone -> toMsg (GotTimeZone zone))
                 Time.here
     in
-    ( model, Cmd.batch [ lsCmd, timeZoneCmd, curentTimeCmd ] )
+    ( model
+    , Cmd.batch
+        [ apiCmd
+        , lsCmd
+        , timeZoneCmd
+        , curentTimeCmd
+        ]
+    )
 
 
 clockInterval : Int
@@ -132,6 +145,7 @@ type Msg msg
     | Tick Time.Posix
     | DarkModeChanged Bool Bool
     | AlertAdded AlertLevel (List (Dom.Html msg)) (List (Dom.Html msg))
+    | ApiMsg (Api.Msg msg)
 
 
 update : Msg msg -> SharedModel msg -> ( SharedModel msg, Cmd msg )
@@ -209,6 +223,13 @@ update msg model =
 
         AlertAdded level title message ->
             ( addAlert level model title message, Cmd.none )
+
+        ApiMsg apiMsg ->
+            let
+                ( apiModel, apiCmd ) =
+                    Api.update apiMsg model.api
+            in
+            ( { model | api = apiModel }, apiCmd )
 
 
 
@@ -291,6 +312,7 @@ subscriptions model =
                                 [ D.errorToString err |> Dom.text ]
                             )
             )
+        , Api.subscriptions model.api
         ]
 
 
