@@ -26,12 +26,6 @@
     "line-length-checker.level": "Info",
     "line-length-checker.lineLength": 80,
     "sortLines.filterBlankLines": true,
-    "[go]": {
-        "editor.defaultFormatter": "golang.go"
-    },
-    "[sql]": {
-        "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
-    },
     "cSpell.words": [
         "github",
         "gqlgen",
@@ -39,5 +33,14 @@
         "julienschmidt",
         "mattn",
         "sqlite"
-    ]
+    ],
+    "[elm]": {
+        "editor.defaultFormatter": "elmTooling.elm-ls-vscode"
+    },
+    "[go]": {
+        "editor.defaultFormatter": "golang.go"
+    },
+    "[sql]": {
+        "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
+    }
 }
