@@ -180,14 +180,14 @@ view shared model minimal body =
                         ]
                     , Dom.div
                         [ Attr.css [ Tw.text_center ] ]
-                        [ Dom.text "Work Clock: "
+                        [ Dom.text "Stempeluhr: "
                         , Dom.text <|
-                            case shared.api.workClock.workClock of
+                            case shared.api.workClock.acticity of
                                 Api.General.Unknown ->
-                                    "Unknown"
+                                    "Unbekannt"
 
-                                Api.General.Received state ->
-                                    if state.acticity.active then
+                                Api.General.Received acticity ->
+                                    if acticity.active then
                                         "Aktiv"
 
                                     else

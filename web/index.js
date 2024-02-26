@@ -25,17 +25,20 @@ const client = createClient({
 const { Elm } = require("../src/elm/Main.elm");
 const app = Elm.Main.init();
 
-app.ports.createSubscriptions.subscribe(function (subscription) {
-    console.log("Creating subscription:", subscription);
+app.ports.createSubscriptions.subscribe(function (params) {
+    console.log("Creating subscription:", params);
 
     (async () => {
         const subscription = client.iterate({
-            query: "subscription{workClock{activity{active}}}",
+            query: params.query,
         });
 
-        for await (const event of subscription) {
-            console.log("Got subscription data", event);
-            app.ports.gotSubscriptionData.send(event);
+        for await (const data of subscription) {
+            console.log("Got subscription data", data, "for", params);
+            app.ports.gotSubscriptionData.send({
+                module: params.module,
+                data: data,
+            });
         }
     })();
 });

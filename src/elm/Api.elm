@@ -50,7 +50,7 @@ type SubscriptionStatus
 type alias Model msg =
     { toMsg : Msg msg -> msg
     , status : SubscriptionStatus
-    , workClock : Api.WorkClock.Model msg
+    , workClock : Api.WorkClock.Model
     }
 
 
@@ -70,14 +70,14 @@ starts the subscriptions to the server.
 init : (Msg msg -> msg) -> ( Model msg, Cmd msg )
 init toMsg =
     let
-        ( workClock, workClockSubscription ) =
-            Api.WorkClock.init (WorkClockMsg >> toMsg)
+        ( workClock, workClockCmd ) =
+            Api.WorkClock.init (subscribe WorkClockModule)
     in
     ( { toMsg = toMsg
       , status = NotConnected
       , workClock = workClock
       }
-    , subscribe workClockSubscription
+    , workClockCmd
     )
 
 
@@ -87,7 +87,83 @@ It can be used to forward messages from the application to the API.
 type Msg msg
     = SubscriptionDataReceived Json.Decode.Value
     | NewSubscriptionStatus SubscriptionStatus
-    | WorkClockMsg (Api.WorkClock.Msg msg)
+
+
+type ApiModule
+    = WorkClockModule
+
+
+moduleEncoder : ApiModule -> Json.Encode.Value
+moduleEncoder apiModule =
+    let
+        string : String
+        string =
+            case apiModule of
+                WorkClockModule ->
+                    "WorkClock"
+    in
+    Json.Encode.string string
+
+
+moduleDecoder : Json.Decode.Decoder ApiModule
+moduleDecoder =
+    Json.Decode.string
+        |> Json.Decode.andThen
+            (\string ->
+                case string of
+                    "WorkClock" ->
+                        Json.Decode.succeed WorkClockModule
+
+                    name ->
+                        ([ "API module with the name '"
+                         , name
+                         , "' is not recognized."
+                         ]
+                            |> String.concat
+                        )
+                            |> Json.Decode.fail
+            )
+
+
+moduleFieldDecoder : Json.Decode.Decoder ApiModule
+moduleFieldDecoder =
+    Json.Decode.field "module" moduleDecoder
+
+
+dataFieldDecoder : Json.Decode.Decoder Json.Decode.Value
+dataFieldDecoder =
+    Json.Decode.field "data" Json.Decode.value
+
+
+apiDecoder : Json.Decode.Decoder ( ApiModule, Json.Decode.Value )
+apiDecoder =
+    Json.Decode.map2
+        (\apiModule data ->
+            ( apiModule, data )
+        )
+        moduleFieldDecoder
+        dataFieldDecoder
+
+
+subscriptionsDecoder :
+    Model msg
+    -> ( ApiModule, Json.Decode.Value )
+    -> Result Json.Decode.Error ( Model msg, Cmd msg )
+subscriptionsDecoder model ( apiModule, data ) =
+    let
+        result : Json.Decode.Decoder ( Model msg, Cmd a )
+        result =
+            case apiModule of
+                WorkClockModule ->
+                    Api.WorkClock.subscriptionDecoder model.workClock
+                        |> Json.Decode.map
+                            (\( workClock, cmd ) ->
+                                ( { model | workClock = workClock }
+                                , cmd
+                                )
+                            )
+    in
+    Json.Decode.decodeValue result data
 
 
 
@@ -110,24 +186,46 @@ type Msg msg
 update : Msg msg -> Model msg -> ( Model msg, Cmd msg )
 update msg model =
     case msg of
-        SubscriptionDataReceived data ->
+        SubscriptionDataReceived rawData ->
             let
-                ( workClock, _, cmd ) =
-                    Api.WorkClock.update
-                        (Api.WorkClock.SubscriptionDataReceived data)
-                        model.workClock
+                decodedResult :
+                    Result
+                        Json.Decode.Error
+                        (Result
+                            Json.Decode.Error
+                            ( Model msg, Cmd msg )
+                        )
+                decodedResult =
+                    Json.Decode.decodeValue decoder rawData
+
+                decoder :
+                    Json.Decode.Decoder
+                        (Result
+                            Json.Decode.Error
+                            ( Model msg, Cmd msg )
+                        )
+                decoder =
+                    apiDecoder
+                        |> Json.Decode.map
+                            (subscriptionsDecoder model)
             in
-            ( { model | workClock = workClock }, cmd )
+            case decodedResult of
+                Ok (Ok ( updatedModel, cmd )) ->
+                    ( updatedModel, cmd )
+
+                Ok (Err error) ->
+                    handleError error model
+
+                Err error ->
+                    handleError error model
 
         NewSubscriptionStatus status ->
             ( { model | status = status }, Cmd.none )
 
-        WorkClockMsg workClockMsg ->
-            let
-                ( workClock, _, cmd ) =
-                    Api.WorkClock.update workClockMsg model.workClock
-            in
-            ( { model | workClock = workClock }, cmd )
+
+handleError : Json.Decode.Error -> Model msg -> ( Model msg, Cmd msg )
+handleError _ model =
+    ( model, Cmd.none )
 
 
 
@@ -159,13 +257,13 @@ subscriptions model =
 -- ADAPTERS
 
 
-subscribe : SelectionSet decodesTo RootSubscription -> Cmd msg
-subscribe subscription =
+subscribe : ApiModule -> SelectionSet decodesTo RootSubscription -> Cmd msg
+subscribe apiModule subscription =
     createSubscriptions
-        (Json.Encode.string
-            (subscription
-                |> Graphql.Document.serializeSubscription
-            )
+        (Json.Encode.object
+            [ ( "query", Json.Encode.string (Graphql.Document.serializeSubscription subscription) )
+            , ( "module", moduleEncoder apiModule )
+            ]
         )
 
 

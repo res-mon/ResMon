@@ -1,8 +1,8 @@
-module Api.WorkClock exposing (Activity, Model, Msg(..), WorkClock, init, update)
+module Api.WorkClock exposing (Activity, Model, WorkClock, init, subscriptionDecoder)
 
 {-| The work clock API section.
 
-@docs Activity, Model, Msg, WorkClock, init, update
+@docs Activity, Model, WorkClock, init, subscriptionDecoder
 
 -}
 
@@ -25,13 +25,11 @@ import Json.Decode
 
 **Fields**:
 
-  - `toMsg` - A function to convert the API messages to the application messages.
-  - `workClock` - The state of the work clock.
+  - `acticity` - The activity of the work clock.
 
 -}
-type alias Model msg =
-    { toMsg : Msg msg -> msg
-    , workClock : State WorkClock
+type alias Model =
+    { acticity : State Activity
     }
 
 
@@ -39,18 +37,20 @@ type alias Model msg =
 
 **Arguments**:
 
-  - `toMsg` - A function to convert the API messages to the application messages.
+  - `subscribe` - A function to convert a selection set to a command.
 
 **Returns**:
 
   - The initial model of the work clock API section.
-  - The selection set for the work clock subscription.
+  - A command containing the subscription to the work clock API section.
 
 -}
-init : (Msg msg -> msg) -> ( Model msg, SelectionSet WorkClock RootSubscription )
-init toMsg =
-    ( { toMsg = toMsg, workClock = Unknown }
-    , workClockSubscription
+init :
+    (SelectionSet WorkClock RootSubscription -> Cmd msg)
+    -> ( Model, Cmd msg )
+init subscribe =
+    ( { acticity = Unknown }
+    , subscribe workClockSubscription
     )
 
 
@@ -100,53 +100,27 @@ activitySelection =
 
 
 
--- UPDATE
+-- DECODER
 
 
-{-| The messages of the work clock API section.
-
-**Types**:
-
-  - `SubscriptionDataReceived` - The message to handle the received subscription data.
-
--}
-type Msg msg
-    = SubscriptionDataReceived Json.Decode.Value
-
-
-{-| Update the model of the work clock API section.
+{-| The subscription decoder of the work clock API section.
+This decoder is used to decode the subscription response of the work clock API section.
 
 **Arguments**:
 
-  - `msg` - The message to handle.
-  - `model` - The current model of the work clock API section.
+  - `model` - The model of the work clock API section.
 
 **Returns**:
 
-  - The new model of the work clock API section.
-  - The error if the message handling failed.
-  - The command to execute.
+      - A decoder to update the work clock API section.
 
 -}
-update : Msg msg -> Model msg -> ( Model msg, Maybe Json.Decode.Error, Cmd msg )
-update msg model =
-    case msg of
-        SubscriptionDataReceived json ->
-            let
-                decoder : Json.Decode.Decoder WorkClock
-                decoder =
-                    Graphql.Document.decoder workClockSubscription
-
-                result : Result Json.Decode.Error WorkClock
-                result =
-                    Json.Decode.decodeValue decoder json
-            in
-            case result of
-                Ok workClock ->
-                    ( { model | workClock = Received workClock }
-                    , Nothing
-                    , Cmd.none
-                    )
-
-                Err error ->
-                    ( model, Just error, Cmd.none )
+subscriptionDecoder : Model -> Json.Decode.Decoder ( Model, Cmd msg )
+subscriptionDecoder model =
+    Graphql.Document.decoder workClockSubscription
+        |> Json.Decode.map
+            (\workClock ->
+                ( { model | acticity = Received workClock.acticity }
+                , Cmd.none
+                )
+            )
