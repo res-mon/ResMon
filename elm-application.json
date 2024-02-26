@@ -2,5 +2,10 @@
     "name": "yertools/res-mon",
     "summary": "ResMon is a time tracking tool offering precise tracking and detailed reports.",
     "version": "0.0.0",
-    "exposed-modules": ["Extension.Url"]
+    "exposed-modules": [
+        "Api.General",
+        "Api.WorkClock",
+        "Extension.Time",
+        "Extension.Url"
+    ]
 }
