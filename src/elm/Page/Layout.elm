@@ -2,6 +2,7 @@ module Page.Layout exposing (Model, Msg, init, update, view)
 
 import Api
 import Api.General
+import Api.WorkClock
 import Browser exposing (Document)
 import Component.DaisyUi as Ui
 import Component.Icon as Ico
@@ -44,6 +45,8 @@ init toMsg _ =
 
 type Msg msg
     = RemoveAlert Int
+    | QueryWorkClock
+    | ToggleWorkClock
 
 
 update :
@@ -55,6 +58,25 @@ update msg shared model =
     case msg of
         RemoveAlert number ->
             ( removeAlert shared number, model, Cmd.none )
+
+        QueryWorkClock ->
+            ( shared
+            , model
+            , Api.WorkClock.queryWorkClock shared.api.workClock
+            )
+
+        ToggleWorkClock ->
+            ( shared
+            , model
+            , Api.WorkClock.setWorkClockActive shared.api.workClock
+                (case shared.api.workClock.acticity of
+                    Api.General.Unknown ->
+                        True
+
+                    Api.General.Received acticity ->
+                        not acticity.active
+                )
+            )
 
 
 
@@ -192,6 +214,20 @@ view shared model minimal body =
 
                                     else
                                         "Inaktiv"
+                        ]
+                    , Dom.div []
+                        [ Ui.btn Dom.button
+                            [ Ui.modifiers [ Ui.BtnPrimary ]
+                            , onClick (model.toMsg QueryWorkClock) |> Ui.attribute
+                            ]
+                            [ Dom.text "Query" ]
+                        ]
+                    , Dom.div []
+                        [ Ui.btn Dom.button
+                            [ Ui.modifiers [ Ui.BtnPrimary ]
+                            , onClick (model.toMsg ToggleWorkClock) |> Ui.attribute
+                            ]
+                            [ Dom.text "Toggle" ]
                         ]
                     ]
                     :: map Dom.fromUnstyled body.body

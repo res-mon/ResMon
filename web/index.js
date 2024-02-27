@@ -4,6 +4,9 @@ import "./tailwind.css";
 require("../src/sass/main.scss");
 import { createClient } from "graphql-ws";
 
+const { Elm } = require("../src/elm/Main.elm");
+const app = Elm.Main.init();
+
 const client = createClient({
     url:
         (window.location.protocol === "http:" ? "ws" : "wss") +
@@ -20,10 +23,12 @@ const client = createClient({
             )
         ),
     shouldRetry: () => true,
+    lazy: false,
+    onNonLazyError: (error) => {
+        console.error("Error from server", error);
+        app.ports.socketStatusReconnecting.send(error);
+    },
 });
-
-const { Elm } = require("../src/elm/Main.elm");
-const app = Elm.Main.init();
 
 app.ports.createSubscriptions.subscribe(function (params) {
     console.log("Creating subscription:", params);
@@ -39,6 +44,46 @@ app.ports.createSubscriptions.subscribe(function (params) {
                 module: params.module,
                 data: data,
             });
+        }
+    })();
+});
+
+app.ports.sendQuery.subscribe(function (params) {
+    console.log("Sending query:", params);
+
+    (async () => {
+        const subscription = client.iterate({
+            query: params.query,
+        });
+
+        for await (const data of subscription) {
+            console.log("Got query data", data, "for", params);
+            app.ports.gotQueryData.send({
+                module: params.module,
+                data: data,
+            });
+
+            break;
+        }
+    })();
+});
+
+app.ports.sendMutation.subscribe(function (params) {
+    console.log("Sending mutation:", params);
+
+    (async () => {
+        const subscription = client.iterate({
+            query: params.query,
+        });
+
+        for await (const data of subscription) {
+            console.log("Got mutation data", data, "for", params);
+            app.ports.gotMutationData.send({
+                module: params.module,
+                data: data,
+            });
+
+            break;
         }
     })();
 });

@@ -15,7 +15,7 @@ API requests are sent to the server through a websocket connection.
 
 import Api.WorkClock
 import Graphql.Document
-import Graphql.Operation exposing (RootSubscription)
+import Graphql.Operation exposing (RootMutation, RootQuery, RootSubscription)
 import Graphql.SelectionSet exposing (SelectionSet)
 import Json.Decode
 import Json.Encode
@@ -50,7 +50,7 @@ type SubscriptionStatus
 type alias Model msg =
     { toMsg : Msg msg -> msg
     , status : SubscriptionStatus
-    , workClock : Api.WorkClock.Model
+    , workClock : Api.WorkClock.Model msg
     }
 
 
@@ -71,7 +71,10 @@ init : (Msg msg -> msg) -> ( Model msg, Cmd msg )
 init toMsg =
     let
         ( workClock, workClockCmd ) =
-            Api.WorkClock.init (subscribe WorkClockModule)
+            Api.WorkClock.init
+                (subscribe WorkClockModule)
+                (query WorkClockModule)
+                (mutate WorkClockModule)
     in
     ( { toMsg = toMsg
       , status = NotConnected
@@ -86,6 +89,8 @@ It can be used to forward messages from the application to the API.
 -}
 type Msg msg
     = SubscriptionDataReceived Json.Decode.Value
+    | QueryDataReceived Json.Decode.Value
+    | MutationDataReceived Json.Decode.Value
     | NewSubscriptionStatus SubscriptionStatus
 
 
@@ -151,11 +156,53 @@ subscriptionsDecoder :
     -> Result Json.Decode.Error ( Model msg, Cmd msg )
 subscriptionsDecoder model ( apiModule, data ) =
     let
-        result : Json.Decode.Decoder ( Model msg, Cmd a )
+        result : Json.Decode.Decoder ( Model msg, Cmd msg )
         result =
             case apiModule of
                 WorkClockModule ->
                     Api.WorkClock.subscriptionDecoder model.workClock
+                        |> Json.Decode.map
+                            (\( workClock, cmd ) ->
+                                ( { model | workClock = workClock }
+                                , cmd
+                                )
+                            )
+    in
+    Json.Decode.decodeValue result data
+
+
+queryDecoder :
+    Model msg
+    -> ( ApiModule, Json.Decode.Value )
+    -> Result Json.Decode.Error ( Model msg, Cmd msg )
+queryDecoder model ( apiModule, data ) =
+    let
+        result : Json.Decode.Decoder ( Model msg, Cmd msg )
+        result =
+            case apiModule of
+                WorkClockModule ->
+                    Api.WorkClock.queryDecoder model.workClock
+                        |> Json.Decode.map
+                            (\( workClock, cmd ) ->
+                                ( { model | workClock = workClock }
+                                , cmd
+                                )
+                            )
+    in
+    Json.Decode.decodeValue result data
+
+
+mutationDecoder :
+    Model msg
+    -> ( ApiModule, Json.Decode.Value )
+    -> Result Json.Decode.Error ( Model msg, Cmd msg )
+mutationDecoder model ( apiModule, data ) =
+    let
+        result : Json.Decode.Decoder ( Model msg, Cmd msg )
+        result =
+            case apiModule of
+                WorkClockModule ->
+                    Api.WorkClock.mutationDecoder model.workClock
                         |> Json.Decode.map
                             (\( workClock, cmd ) ->
                                 ( { model | workClock = workClock }
@@ -219,6 +266,72 @@ update msg model =
                 Err error ->
                     handleError error model
 
+        QueryDataReceived rawData ->
+            let
+                decodedResult :
+                    Result
+                        Json.Decode.Error
+                        (Result
+                            Json.Decode.Error
+                            ( Model msg, Cmd msg )
+                        )
+                decodedResult =
+                    Json.Decode.decodeValue decoder rawData
+
+                decoder :
+                    Json.Decode.Decoder
+                        (Result
+                            Json.Decode.Error
+                            ( Model msg, Cmd msg )
+                        )
+                decoder =
+                    apiDecoder
+                        |> Json.Decode.map
+                            (queryDecoder model)
+            in
+            case decodedResult of
+                Ok (Ok ( updatedModel, cmd )) ->
+                    ( updatedModel, cmd )
+
+                Ok (Err error) ->
+                    handleError error model
+
+                Err error ->
+                    handleError error model
+
+        MutationDataReceived rawData ->
+            let
+                decodedResult :
+                    Result
+                        Json.Decode.Error
+                        (Result
+                            Json.Decode.Error
+                            ( Model msg, Cmd msg )
+                        )
+                decodedResult =
+                    Json.Decode.decodeValue decoder rawData
+
+                decoder :
+                    Json.Decode.Decoder
+                        (Result
+                            Json.Decode.Error
+                            ( Model msg, Cmd msg )
+                        )
+                decoder =
+                    apiDecoder
+                        |> Json.Decode.map
+                            (mutationDecoder model)
+            in
+            case decodedResult of
+                Ok (Ok ( updatedModel, cmd )) ->
+                    ( updatedModel, cmd )
+
+                Ok (Err error) ->
+                    handleError error model
+
+                Err error ->
+                    handleError error model
+
         NewSubscriptionStatus status ->
             ( { model | status = status }, Cmd.none )
 
@@ -247,6 +360,8 @@ subscriptions : Model msg -> Sub msg
 subscriptions model =
     Sub.batch
         [ gotSubscriptionData SubscriptionDataReceived
+        , gotQueryData QueryDataReceived
+        , gotMutationData MutationDataReceived
         , socketStatusConnected (\_ -> NewSubscriptionStatus Connected)
         , socketStatusReconnecting (\_ -> NewSubscriptionStatus Reconnecting)
         ]
@@ -257,18 +372,46 @@ subscriptions model =
 -- ADAPTERS
 
 
+requestObject : ApiModule -> String -> Json.Encode.Value
+requestObject apiModule q =
+    Json.Encode.object
+        [ ( "query", Json.Encode.string q )
+        , ( "module", moduleEncoder apiModule )
+        ]
+
+
 subscribe : ApiModule -> SelectionSet decodesTo RootSubscription -> Cmd msg
 subscribe apiModule subscription =
     createSubscriptions
-        (Json.Encode.object
-            [ ( "query", Json.Encode.string (Graphql.Document.serializeSubscription subscription) )
-            , ( "module", moduleEncoder apiModule )
-            ]
-        )
+        (requestObject apiModule (Graphql.Document.serializeSubscription subscription))
+
+
+query : ApiModule -> SelectionSet decodesTo RootQuery -> Cmd msg
+query apiModule q =
+    sendQuery
+        (requestObject apiModule (Graphql.Document.serializeQuery q))
+
+
+mutate : ApiModule -> SelectionSet decodesTo RootMutation -> Cmd msg
+mutate apiModule q =
+    sendMutation
+        (requestObject apiModule (Graphql.Document.serializeMutation q))
 
 
 
 -- PORTS
+
+
+port sendQuery : Json.Encode.Value -> Cmd msg
+
+
+port gotQueryData : (Json.Decode.Value -> msg) -> Sub msg
+
+
+port sendMutation : Json.Encode.Value -> Cmd msg
+
+
+port gotMutationData : (Json.Decode.Value -> msg) -> Sub msg
 
 
 port createSubscriptions : Json.Encode.Value -> Cmd msg
