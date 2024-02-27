@@ -1,4 +1,17 @@
-port module Model.Shared exposing (Alert, AlertLevel(..), Internal, Msg(..), Route(..), SharedModel, addTextAlert, init, removeAlert, setDarkModeMessage, subscriptions, update)
+port module Model.Shared exposing
+    ( Alert
+    , AlertLevel(..)
+    , Internal
+    , Msg(..)
+    , Route(..)
+    , SharedModel
+    , addTextAlert
+    , init
+    , removeAlert
+    , setDarkModeMessage
+    , subscriptions
+    , update
+    )
 
 import Api
 import Browser.Navigation exposing (Key, replaceUrl)
@@ -43,7 +56,11 @@ type alias SharedModel msg =
     }
 
 
-type alias Internal msg =
+type Internal msg
+    = Internal (InternalModel msg)
+
+
+type alias InternalModel msg =
     { toMsg : Msg msg -> msg
     , updateRoute : msg
     , startUrl : Url
@@ -104,12 +121,13 @@ init toMsg updateRoute route url key localStorage =
             , timeZone = Nothing
             , alerts = []
             , internal =
-                { toMsg = toMsg
-                , updateRoute = updateRoute
-                , startUrl = url
-                , exactTime = Nothing
-                , alertCount = 0
-                }
+                Internal
+                    { toMsg = toMsg
+                    , updateRoute = updateRoute
+                    , startUrl = url
+                    , exactTime = Nothing
+                    , alertCount = 0
+                    }
             , darkMode = False
             , api = apiModel
             }
@@ -128,6 +146,16 @@ init toMsg updateRoute route url key localStorage =
         , curentTimeCmd
         ]
     )
+
+
+unpackInternal : SharedModel msg -> InternalModel msg
+unpackInternal model =
+    let
+        unpack : Internal msg -> InternalModel msg
+        unpack (Internal internal) =
+            internal
+    in
+    unpack model.internal
 
 
 clockInterval : Int
@@ -165,12 +193,12 @@ update msg model =
                                 navigate : Cmd msg
                                 navigate =
                                     replaceUrl model.key
-                                        (toString model.internal.startUrl)
+                                        (toString (unpackInternal model).startUrl)
 
                                 updateRoute : Cmd msg
                                 updateRoute =
                                     Task.perform
-                                        (\_ -> model.internal.updateRoute)
+                                        (\_ -> (unpackInternal model).updateRoute)
                                         (Task.succeed ())
                             in
                             ( { model | user = Just user }
@@ -196,18 +224,19 @@ update msg model =
             let
                 flooredTime : Time.Posix
                 flooredTime =
-                    fixVariationFloored time model.internal.exactTime clockInterval
+                    fixVariationFloored time internal.exactTime clockInterval
 
-                internal : Internal msg
+                internal : InternalModel msg
                 internal =
-                    model.internal
+                    unpackInternal model
             in
             ( { model
                 | time = Just flooredTime
                 , internal =
-                    { internal
-                        | exactTime = Just time
-                    }
+                    Internal
+                        { internal
+                            | exactTime = Just time
+                        }
               }
             , Cmd.none
             )
@@ -257,9 +286,9 @@ addAlert :
     -> SharedModel msg
 addAlert level model title message =
     let
-        internal : Internal msg
+        internal : InternalModel msg
         internal =
-            model.internal
+            unpackInternal model
 
         number : Int
         number =
@@ -270,9 +299,10 @@ addAlert level model title message =
             { number = number, title = title, message = message, level = level }
                 :: model.alerts
         , internal =
-            { internal
-                | alertCount = number
-            }
+            Internal
+                { internal
+                    | alertCount = number
+                }
     }
 
 
@@ -288,7 +318,7 @@ removeAlert model number =
 
 setDarkModeMessage : SharedModel msg -> Bool -> msg
 setDarkModeMessage model darkMode =
-    model.internal.toMsg (DarkModeChanged darkMode True)
+    (unpackInternal model).toMsg (DarkModeChanged darkMode True)
 
 
 
@@ -298,15 +328,15 @@ setDarkModeMessage model darkMode =
 subscriptions : SharedModel msg -> Sub msg
 subscriptions model =
     Sub.batch
-        [ Time.every (toFloat clockInterval) (model.internal.toMsg << Tick)
+        [ Time.every (toFloat clockInterval) ((unpackInternal model).toMsg << Tick)
         , darkModeChanged
             (\value ->
                 case D.decodeValue D.bool value of
                     Ok darkMode ->
-                        model.internal.toMsg (DarkModeChanged darkMode False)
+                        (unpackInternal model).toMsg (DarkModeChanged darkMode False)
 
                     Err err ->
-                        model.internal.toMsg
+                        (unpackInternal model).toMsg
                             (AlertAdded AlertError
                                 [ Dom.text "Unexpected value from dark mode changed port" ]
                                 [ D.errorToString err |> Dom.text ]
