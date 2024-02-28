@@ -11,11 +11,14 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/yerTools/ResMon/generated/go/model"
 )
 
 var errDatabaseIsNil = errors.New("database is nil")
+var errDatabaseIsClosed = errors.New("database is closed")
 
-type db struct {
+type DB struct {
+	active  bool
 	db      *sql.DB
 	driver  database.Driver
 	migrate *migrate.Migrate
@@ -23,7 +26,7 @@ type db struct {
 
 func OpenDB(
 	ctx context.Context, path string, migrationsFS fs.FS,
-) (*db, error) {
+) (*DB, error) {
 	var pathBuilder strings.Builder
 	pathBuilder.WriteString(path)
 
@@ -51,7 +54,8 @@ func OpenDB(
 		return nil, fmt.Errorf("could not setup database: %w", err)
 	}
 
-	result := db{
+	result := DB{
+		active:  true,
 		db:      sqlDB,
 		driver:  driver,
 		migrate: m,
@@ -60,7 +64,15 @@ func OpenDB(
 	return &result, nil
 }
 
-func (db *db) Close() error {
+func (db *DB) Closed() bool {
+	if db == nil {
+		return true
+	}
+
+	return !db.active
+}
+
+func (db *DB) Close() error {
 	if db == nil {
 		return errDatabaseIsNil
 	}
@@ -74,4 +86,15 @@ func (db *db) Close() error {
 	}
 
 	return nil
+}
+
+func (db *DB) NewModel() (*model.Queries, error) {
+	if db == nil {
+		return nil, errDatabaseIsNil
+	}
+	if db.Closed() {
+		return nil, errDatabaseIsClosed
+	}
+
+	return model.New(db.db), nil
 }
