@@ -1,8 +1,8 @@
-module Api.WorkClock exposing (Activity, Model, WorkClock, init, subscriptionDecoder, Internal, mutationDecoder, queryDecoder, queryWorkClock, setWorkClockActive)
+module Api.WorkClock exposing (Activity, Model, WorkClock, init, subscriptionDecoder, Internal, mutationDecoder, queryDecoder, setWorkClockActive)
 
 {-| The work clock API section.
 
-@docs Activity, Model, WorkClock, init, subscriptionDecoder, Internal, mutationDecoder, queryDecoder, queryWorkClock, setWorkClockActive
+@docs Activity, Model, WorkClock, init, subscriptionDecoder, Internal, mutationDecoder, queryDecoder, setWorkClockActive
 
 -}
 
@@ -234,22 +234,6 @@ subscriptionDecoder model =
 
 
 -- COMMANDS
-
-
-{-| Query the work clock state.
-
-**Arguments**:
-
-  - `model` - The model of the work clock API section.
-
-**Returns**:
-
-    - A command to query the work clock state.
-
--}
-queryWorkClock : Model msg -> Cmd msg
-queryWorkClock model =
-    (unbox model.internal).workClockQuery workClockQuery
 
 
 {-| Set the work clock active state.
