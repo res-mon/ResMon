@@ -20,10 +20,15 @@ type alias Id =
     Graph.Scalar.Id
 
 
-codecs : Graph.Scalar.Codecs Any_ FieldSet_ Id
+type alias Timestamp =
+    Graph.Scalar.Timestamp
+
+
+codecs : Graph.Scalar.Codecs Any_ FieldSet_ Id Timestamp
 codecs =
     Graph.Scalar.defineCodecs
         { codecAny_ = defaultCodecs.codecAny_
         , codecFieldSet_ = defaultCodecs.codecFieldSet_
         , codecId = defaultCodecs.codecId
+        , codecTimestamp = defaultCodecs.codecTimestamp
         }

@@ -4,11 +4,11 @@
 
 module Graph.Mutation exposing (..)
 
+import Api.ScalarCodecs
 import Graph.InputObject
 import Graph.Interface
 import Graph.Object
 import Graph.Scalar
-import Graph.ScalarCodecs
 import Graph.Union
 import Graphql.Internal.Builder.Argument as Argument exposing (Argument)
 import Graphql.Internal.Builder.Object as Object

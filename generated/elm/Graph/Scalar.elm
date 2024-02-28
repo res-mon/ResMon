@@ -2,7 +2,7 @@
 -- https://github.com/dillonkearns/elm-graphql
 
 
-module Graph.Scalar exposing (Any_(..), Codecs, FieldSet_(..), Id(..), defaultCodecs, defineCodecs, unwrapCodecs, unwrapEncoder)
+module Graph.Scalar exposing (Any_(..), Codecs, FieldSet_(..), Id(..), Timestamp(..), defaultCodecs, defineCodecs, unwrapCodecs, unwrapEncoder)
 
 import Graphql.Codec exposing (Codec)
 import Graphql.Internal.Builder.Object as Object
@@ -23,48 +23,55 @@ type Id
     = Id String
 
 
+type Timestamp
+    = Timestamp String
+
+
 defineCodecs :
     { codecAny_ : Codec valueAny_
     , codecFieldSet_ : Codec valueFieldSet_
     , codecId : Codec valueId
+    , codecTimestamp : Codec valueTimestamp
     }
-    -> Codecs valueAny_ valueFieldSet_ valueId
+    -> Codecs valueAny_ valueFieldSet_ valueId valueTimestamp
 defineCodecs definitions =
     Codecs definitions
 
 
 unwrapCodecs :
-    Codecs valueAny_ valueFieldSet_ valueId
+    Codecs valueAny_ valueFieldSet_ valueId valueTimestamp
     ->
         { codecAny_ : Codec valueAny_
         , codecFieldSet_ : Codec valueFieldSet_
         , codecId : Codec valueId
+        , codecTimestamp : Codec valueTimestamp
         }
 unwrapCodecs (Codecs unwrappedCodecs) =
     unwrappedCodecs
 
 
 unwrapEncoder :
-    (RawCodecs valueAny_ valueFieldSet_ valueId -> Codec getterValue)
-    -> Codecs valueAny_ valueFieldSet_ valueId
+    (RawCodecs valueAny_ valueFieldSet_ valueId valueTimestamp -> Codec getterValue)
+    -> Codecs valueAny_ valueFieldSet_ valueId valueTimestamp
     -> getterValue
     -> Graphql.Internal.Encode.Value
 unwrapEncoder getter (Codecs unwrappedCodecs) =
     (unwrappedCodecs |> getter |> .encoder) >> Graphql.Internal.Encode.fromJson
 
 
-type Codecs valueAny_ valueFieldSet_ valueId
-    = Codecs (RawCodecs valueAny_ valueFieldSet_ valueId)
+type Codecs valueAny_ valueFieldSet_ valueId valueTimestamp
+    = Codecs (RawCodecs valueAny_ valueFieldSet_ valueId valueTimestamp)
 
 
-type alias RawCodecs valueAny_ valueFieldSet_ valueId =
+type alias RawCodecs valueAny_ valueFieldSet_ valueId valueTimestamp =
     { codecAny_ : Codec valueAny_
     , codecFieldSet_ : Codec valueFieldSet_
     , codecId : Codec valueId
+    , codecTimestamp : Codec valueTimestamp
     }
 
 
-defaultCodecs : RawCodecs Any_ FieldSet_ Id
+defaultCodecs : RawCodecs Any_ FieldSet_ Id Timestamp
 defaultCodecs =
     { codecAny_ =
         { encoder = \(Any_ raw) -> Encode.string raw
@@ -77,5 +84,9 @@ defaultCodecs =
     , codecId =
         { encoder = \(Id raw) -> Encode.string raw
         , decoder = Object.scalarDecoder |> Decode.map Id
+        }
+    , codecTimestamp =
+        { encoder = \(Timestamp raw) -> Encode.string raw
+        , decoder = Object.scalarDecoder |> Decode.map Timestamp
         }
     }

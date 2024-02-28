@@ -99,12 +99,13 @@ func main() {
 			"npx", "elm-graphql",
 			"http://127.0.0.1:8321/api",
 			"--base", "Graph",
-			"--output", "generated/elm")
+			"--output", "generated/elm",
+			"--scalar-codecs", "Api.ScalarCodecs")
 		out, err := cmdStruct.Output()
+		fmt.Println(string(out))
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(string(out))
 		shutdown()
 	}
 

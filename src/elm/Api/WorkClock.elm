@@ -9,7 +9,7 @@ module Api.WorkClock exposing (Activity, Model, WorkClock, init, subscriptionDec
 import Api.General exposing (State(..))
 import Graph.Mutation as Mut
 import Graph.Object
-import Graph.Object.ActivityMutation
+import Graph.Object.ActivityMutation exposing (SetActiveRequiredArguments)
 import Graph.Object.ActivityQuery
 import Graph.Object.WorkClockMutation
 import Graph.Object.WorkClockQuery
@@ -19,6 +19,7 @@ import Graphql.Document
 import Graphql.Operation exposing (RootMutation, RootQuery, RootSubscription)
 import Graphql.SelectionSet as SelectionSet exposing (SelectionSet, with)
 import Json.Decode
+import Time exposing (Posix)
 
 
 
@@ -29,11 +30,11 @@ import Json.Decode
 
 **Fields**:
 
-  - `acticity` - The activity of the work clock.
+  - `activity` - The activity of the work clock.
 
 -}
 type alias Model msg =
-    { acticity : State Activity
+    { activity : State Activity
     , internal : Internal msg
     }
 
@@ -75,7 +76,7 @@ init :
     -> (SelectionSet WorkClock RootMutation -> Cmd msg)
     -> ( Model msg, Cmd msg )
 init workClockSubscriptionHandler workClockQueryHandler workClockMutationHandler =
-    ( { acticity = Unknown
+    ( { activity = Unknown
       , internal =
             Internal
                 { workClockQuery = workClockQueryHandler
@@ -94,11 +95,11 @@ init workClockSubscriptionHandler workClockQueryHandler workClockMutationHandler
 
 **Fields**:
 
-  - `acticity` - The activity of the work clock.
+  - `activity` - The activity of the work clock.
 
 -}
 type alias WorkClock =
-    { acticity : Activity
+    { activity : Activity
     }
 
 
@@ -111,6 +112,7 @@ type alias WorkClock =
 -}
 type alias Activity =
     { active : Bool
+    , since : Posix
     }
 
 
@@ -119,9 +121,9 @@ workClockQuery =
     Query.workClock workClockSelection
 
 
-workClockMutation : WorkClock -> SelectionSet WorkClock RootMutation
-workClockMutation workClock =
-    Mut.workClock (workClockUpdate workClock)
+workClockMutation : SetActiveRequiredArguments -> SelectionSet WorkClock RootMutation
+workClockMutation args =
+    Mut.workClock (workClockUpdate args)
 
 
 workClockSubscription : SelectionSet WorkClock RootSubscription
@@ -129,31 +131,32 @@ workClockSubscription =
     Sub.workClock workClockSelection
 
 
-workClockUpdate : WorkClock -> SelectionSet WorkClock Graph.Object.WorkClockMutation
-workClockUpdate workClock =
-    SelectionSet.succeed (\acticity -> { acticity = acticity })
+workClockUpdate : SetActiveRequiredArguments -> SelectionSet WorkClock Graph.Object.WorkClockMutation
+workClockUpdate args =
+    SelectionSet.succeed (\activity -> { activity = activity })
         |> with
             (Graph.Object.WorkClockMutation.activity
-                (activityUpdate workClock.acticity)
+                (activityUpdate args)
             )
 
 
-activityUpdate : Activity -> SelectionSet Activity Graph.Object.ActivityMutation
-activityUpdate acticity =
-    SelectionSet.succeed (\active -> { active = active })
-        |> with (Graph.Object.ActivityMutation.setActive acticity)
+activityUpdate : SetActiveRequiredArguments -> SelectionSet Activity Graph.Object.ActivityMutation
+activityUpdate args =
+    SelectionSet.succeed (\activity -> activity)
+        |> with (Graph.Object.ActivityMutation.setActive args activitySelection)
 
 
 workClockSelection : SelectionSet WorkClock Graph.Object.WorkClockQuery
 workClockSelection =
-    SelectionSet.succeed (\acticity -> { acticity = acticity })
+    SelectionSet.succeed (\activity -> { activity = activity })
         |> with (Graph.Object.WorkClockQuery.activity activitySelection)
 
 
 activitySelection : SelectionSet Activity Graph.Object.ActivityQuery
 activitySelection =
-    SelectionSet.succeed (\active -> { active = active })
+    SelectionSet.succeed (\active since -> { active = active, since = since })
         |> with Graph.Object.ActivityQuery.active
+        |> with Graph.Object.ActivityQuery.since
 
 
 
@@ -177,7 +180,7 @@ queryDecoder model =
     Graphql.Document.decoder workClockQuery
         |> Json.Decode.map
             (\workClock ->
-                ( { model | acticity = Received workClock.acticity }
+                ( { model | activity = Received workClock.activity }
                 , Cmd.none
                 )
             )
@@ -197,10 +200,10 @@ This decoder is used to decode the mutation response of the work clock API secti
 -}
 mutationDecoder : Model msg -> Json.Decode.Decoder ( Model msg, Cmd msg )
 mutationDecoder model =
-    Graphql.Document.decoder (workClockMutation { acticity = { active = False } })
+    Graphql.Document.decoder (workClockMutation { active = False })
         |> Json.Decode.map
             (\workClock ->
-                ( { model | acticity = Received workClock.acticity }
+                ( { model | activity = Received workClock.activity }
                 , Cmd.none
                 )
             )
@@ -223,7 +226,7 @@ subscriptionDecoder model =
     Graphql.Document.decoder workClockSubscription
         |> Json.Decode.map
             (\workClock ->
-                ( { model | acticity = Received workClock.acticity }
+                ( { model | activity = Received workClock.activity }
                 , Cmd.none
                 )
             )
@@ -265,6 +268,5 @@ setWorkClockActive : Model msg -> Bool -> Cmd msg
 setWorkClockActive model active =
     (unbox model.internal).workClockMutation
         (workClockMutation
-            { acticity = { active = active }
-            }
+            { active = active }
         )

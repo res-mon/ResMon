@@ -17,6 +17,7 @@ import (
 	"github.com/99designs/gqlgen/plugin/federation/fedruntime"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/yerTools/ResMon/src/go/api/scalar"
 )
 
 // region    ************************** generated!.gotpl **************************
@@ -55,6 +56,7 @@ type ComplexityRoot struct {
 
 	ActivityQuery struct {
 		Active func(childComplexity int) int
+		Since  func(childComplexity int) int
 	}
 
 	RootMutation struct {
@@ -84,7 +86,7 @@ type ComplexityRoot struct {
 }
 
 type ActivityMutationResolver interface {
-	SetActive(ctx context.Context, obj *ActivityMutation, active bool) (bool, error)
+	SetActive(ctx context.Context, obj *ActivityMutation, active bool) (*ActivityQuery, error)
 }
 type RootMutationResolver interface {
 	WorkClock(ctx context.Context) (*WorkClockMutation, error)
@@ -133,6 +135,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ActivityQuery.Active(childComplexity), true
+
+	case "ActivityQuery.since":
+		if e.complexity.ActivityQuery.Since == nil {
+			break
+		}
+
+		return e.complexity.ActivityQuery.Since(childComplexity), true
 
 	case "RootMutation.workClock":
 		if e.complexity.RootMutation.WorkClock == nil {
@@ -304,6 +313,8 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
+	{Name: "../../../src/gql/scalars.gql", Input: `scalar Timestamp
+`, BuiltIn: false},
 	{Name: "../../../src/gql/schema.gql", Input: `schema {
     query: RootQuery
     mutation: RootMutation
@@ -324,6 +335,12 @@ type RootSubscription {
 `, BuiltIn: false},
 	{Name: "../../../src/gql/workclock/activity.gql", Input: `type ActivityQuery {
     """
+    The timestamp since the activity state was last changed.
+    Returns the timestamp since the activity state was last changed.
+    """
+    since: Timestamp!
+
+    """
     This indicates if the user is currently working or not.
     Returns the current activity state.
     """
@@ -334,9 +351,9 @@ type ActivityMutation {
     """
     Sets the current activity state.
     This indicates if the user is currently working or not.
-    Returns the new activity state.
+    Returns the timestamp since the user is active.
     """
-    setActive(active: Boolean!): Boolean!
+    setActive(active: Boolean!): ActivityQuery!
 }
 `, BuiltIn: false},
 	{Name: "../../../src/gql/workclock/schema.gql", Input: `type WorkClockQuery {
@@ -466,9 +483,9 @@ func (ec *executionContext) _ActivityMutation_setActive(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*ActivityQuery)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNActivityQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐActivityQuery(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ActivityMutation_setActive(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -478,7 +495,13 @@ func (ec *executionContext) fieldContext_ActivityMutation_setActive(ctx context.
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "since":
+				return ec.fieldContext_ActivityQuery_since(ctx, field)
+			case "active":
+				return ec.fieldContext_ActivityQuery_active(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ActivityQuery", field.Name)
 		},
 	}
 	defer func() {
@@ -491,6 +514,50 @@ func (ec *executionContext) fieldContext_ActivityMutation_setActive(ctx context.
 	if fc.Args, err = ec.field_ActivityMutation_setActive_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityQuery_since(ctx context.Context, field graphql.CollectedField, obj *ActivityQuery) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityQuery_since(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Since, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(scalar.Timestamp)
+	fc.Result = res
+	return ec.marshalNTimestamp2githubᚗcomᚋyerToolsᚋResMonᚋsrcᚋgoᚋapiᚋscalarᚐTimestamp(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityQuery_since(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityQuery",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Timestamp does not have child fields")
+		},
 	}
 	return fc, nil
 }
@@ -961,6 +1028,8 @@ func (ec *executionContext) fieldContext_WorkClockQuery_activity(ctx context.Con
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "since":
+				return ec.fieldContext_ActivityQuery_since(ctx, field)
 			case "active":
 				return ec.fieldContext_ActivityQuery_active(ctx, field)
 			}
@@ -2873,6 +2942,11 @@ func (ec *executionContext) _ActivityQuery(ctx context.Context, sel ast.Selectio
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ActivityQuery")
+		case "since":
+			out.Values[i] = ec._ActivityQuery_since(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "active":
 			out.Values[i] = ec._ActivityQuery_active(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -3514,6 +3588,10 @@ func (ec *executionContext) marshalNActivityMutation2ᚖgithubᚗcomᚋyerTools�
 	return ec._ActivityMutation(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNActivityQuery2githubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐActivityQuery(ctx context.Context, sel ast.SelectionSet, v ActivityQuery) graphql.Marshaler {
+	return ec._ActivityQuery(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNActivityQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐActivityQuery(ctx context.Context, sel ast.SelectionSet, v *ActivityQuery) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -3552,6 +3630,16 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNTimestamp2githubᚗcomᚋyerToolsᚋResMonᚋsrcᚋgoᚋapiᚋscalarᚐTimestamp(ctx context.Context, v interface{}) (scalar.Timestamp, error) {
+	var res scalar.Timestamp
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTimestamp2githubᚗcomᚋyerToolsᚋResMonᚋsrcᚋgoᚋapiᚋscalarᚐTimestamp(ctx context.Context, sel ast.SelectionSet, v scalar.Timestamp) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNWorkClockMutation2githubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐWorkClockMutation(ctx context.Context, sel ast.SelectionSet, v WorkClockMutation) graphql.Marshaler {

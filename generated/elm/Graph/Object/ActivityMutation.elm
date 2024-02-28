@@ -4,11 +4,11 @@
 
 module Graph.Object.ActivityMutation exposing (..)
 
+import Api.ScalarCodecs
 import Graph.InputObject
 import Graph.Interface
 import Graph.Object
 import Graph.Scalar
-import Graph.ScalarCodecs
 import Graph.Union
 import Graphql.Internal.Builder.Argument as Argument exposing (Argument)
 import Graphql.Internal.Builder.Object as Object
@@ -25,10 +25,11 @@ type alias SetActiveRequiredArguments =
 
 {-| Sets the current activity state.
 This indicates if the user is currently working or not.
-Returns the new activity state.
+Returns the timestamp since the user is active.
 -}
 setActive :
     SetActiveRequiredArguments
-    -> SelectionSet Bool Graph.Object.ActivityMutation
-setActive requiredArgs____ =
-    Object.selectionForField "Bool" "setActive" [ Argument.required "active" requiredArgs____.active Encode.bool ] Decode.bool
+    -> SelectionSet decodesTo Graph.Object.ActivityQuery
+    -> SelectionSet decodesTo Graph.Object.ActivityMutation
+setActive requiredArgs____ object____ =
+    Object.selectionForCompositeField "setActive" [ Argument.required "active" requiredArgs____.active Encode.bool ] object____ Basics.identity

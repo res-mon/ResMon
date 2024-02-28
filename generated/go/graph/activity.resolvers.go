@@ -9,7 +9,7 @@ import (
 	"fmt"
 )
 
-func (r *activityMutationResolver) SetActive(ctx context.Context, obj *ActivityMutation, active bool) (bool, error) {
+func (r *activityMutationResolver) SetActive(ctx context.Context, obj *ActivityMutation, active bool) (*ActivityQuery, error) {
 	panic(fmt.Errorf("not implemented: SetActive - setActive"))
 }
 

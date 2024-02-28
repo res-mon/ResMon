@@ -69,12 +69,12 @@ update msg shared model =
             ( shared
             , model
             , Api.WorkClock.setWorkClockActive shared.api.workClock
-                (case shared.api.workClock.acticity of
+                (case shared.api.workClock.activity of
                     Api.General.Unknown ->
                         True
 
-                    Api.General.Received acticity ->
-                        not acticity.active
+                    Api.General.Received activity ->
+                        not activity.active
                 )
             )
 
@@ -203,17 +203,12 @@ view shared model minimal body =
                     , Dom.div
                         [ Attr.css [ Tw.text_center ] ]
                         [ Dom.text "Stempeluhr: "
-                        , Dom.text <|
-                            case shared.api.workClock.acticity of
-                                Api.General.Unknown ->
-                                    "Unbekannt"
+                        , case shared.api.workClock.activity of
+                            Api.General.Unknown ->
+                                Dom.text "Unbekannt"
 
-                                Api.General.Received acticity ->
-                                    if acticity.active then
-                                        "Aktiv"
-
-                                    else
-                                        "Inaktiv"
+                            Api.General.Received activity ->
+                                workClockView shared activity
                         ]
                     , Dom.div []
                         [ Ui.btn Dom.button
@@ -280,6 +275,59 @@ navigation _ _ sidebarToggleId =
                 ]
                 [ Ico.list [ Tw.text_4xl ] ]
             ]
+        ]
+
+
+workClockView : SharedModel msg -> Api.WorkClock.Activity -> Dom.Html msg
+workClockView shared activity =
+    Dom.span []
+        [ Dom.text <|
+            if activity.active then
+                "Aktiv"
+
+            else
+                "Inaktiv"
+        , Dom.text " seit "
+        , Dom.span []
+            (case shared.time of
+                Just time ->
+                    let
+                        duration : Int
+                        duration =
+                            ((Time.posixToMillis time - Time.posixToMillis activity.since)
+                                |> toFloat
+                            )
+                                / 1000
+                                |> round
+
+                        hours : Int
+                        hours =
+                            duration // 3600
+
+                        minutes : Int
+                        minutes =
+                            modBy 60 (duration // 60)
+
+                        seconds : Int
+                        seconds =
+                            modBy 60 duration
+                    in
+                    [ Ui.countdown []
+                        [ Tw.duration_500 ]
+                        hours
+                    , Dom.text ":"
+                    , Ui.countdown []
+                        [ Tw.duration_500 ]
+                        minutes
+                    , Dom.text ":"
+                    , Ui.countdown []
+                        [ Tw.duration_500 ]
+                        seconds
+                    ]
+
+                _ ->
+                    [ Dom.text "Unbekannt" ]
+            )
         ]
 
 

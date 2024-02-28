@@ -2,14 +2,21 @@
 
 package graph
 
+import (
+	"github.com/yerTools/ResMon/src/go/api/scalar"
+)
+
 type ActivityMutation struct {
 	// Sets the current activity state.
 	// This indicates if the user is currently working or not.
-	// Returns the new activity state.
-	SetActive bool `json:"setActive"`
+	// Returns the timestamp since the user is active.
+	SetActive *ActivityQuery `json:"setActive"`
 }
 
 type ActivityQuery struct {
+	// The timestamp since the activity state was last changed.
+	// Returns the timestamp since the activity state was last changed.
+	Since scalar.Timestamp `json:"since"`
 	// This indicates if the user is currently working or not.
 	// Returns the current activity state.
 	Active bool `json:"active"`
