@@ -11,7 +11,7 @@ COPY generated/go/ /app/generated/go/
 RUN apt-get update && apt-get install -y gcc libc6-dev
 
 ENV CGO_ENABLED=1
-RUN go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions' -ldflags '-extldflags "-static"' -o res-mon
+RUN go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -ldflags '-extldflags "-static"' -o res-mon
 
 
 

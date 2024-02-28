@@ -10,7 +10,7 @@
             "env": {
                 "CGO_ENABLED": "1"
             },
-            "buildFlags": "-tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions'"
+            "buildFlags": "-tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable'"
         }
     ]
 }
