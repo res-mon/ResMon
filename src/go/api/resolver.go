@@ -2,10 +2,13 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/yerTools/ResMon/generated/go/graph"
+	"github.com/yerTools/ResMon/generated/go/model"
 	"github.com/yerTools/ResMon/src/go/api/scalar"
+	"github.com/yerTools/ResMon/src/go/database"
 	"github.com/yerTools/ResMon/src/go/utility"
 )
 
@@ -16,12 +19,86 @@ type rootQueryResolver graph.Resolver
 type rootSubscriptionResolver graph.Resolver
 type activityMutationResolver graph.Resolver
 
-var globalActive = utility.NewSubscribable(&graph.WorkClockQuery{
-	Activity: &graph.ActivityQuery{
-		Active: false,
-		Since:  scalar.TimestampFromTime(time.Now()),
-	},
-}, 16)
+var globalState state
+
+type state struct {
+	workingClock *utility.LazySubscribable[*graph.WorkClockQuery]
+}
+
+func initState(db *database.DB) (state, error) {
+	workingClock, err := utility.NewLazySubscribable(
+		func(ctx context.Context) (*graph.WorkClockQuery, error) {
+			mdl, err := db.NewModel()
+			if err != nil {
+				return nil, fmt.Errorf("could not create model: %w", err)
+			}
+			defer mdl.Close()
+
+			isActive, err := mdl.IsActive(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("could not get active state: %w", err)
+			}
+
+			var since time.Time
+			if isActive.Timestamp == 0 {
+				since = time.Now()
+			} else {
+				since = time.Unix(0, isActive.Timestamp)
+			}
+
+			return &graph.WorkClockQuery{
+				Activity: &graph.ActivityQuery{
+					Active: isActive.Active != 0,
+					Since:  scalar.TimestampFromTime(since),
+				},
+			}, nil
+		},
+		func(
+			ctx context.Context, oldValue, newValue *graph.WorkClockQuery,
+		) (*graph.WorkClockQuery, error) {
+			if oldValue.Activity.Active == newValue.Activity.Active {
+				return oldValue, nil
+			}
+
+			mdl, err := db.NewModel()
+			if err != nil {
+				return nil, fmt.Errorf("could not create model: %w", err)
+			}
+			defer mdl.Close()
+
+			var active int64
+			if newValue.Activity.Active {
+				active = 1
+			}
+
+			now := time.Now()
+
+			err = mdl.AddActivity(ctx, model.AddActivityParams{
+				Timestamp: now.UnixNano(),
+				Active:    active,
+			})
+			if err != nil {
+				return nil, fmt.Errorf("could not add activity: %w", err)
+			}
+
+			return &graph.WorkClockQuery{
+				Activity: &graph.ActivityQuery{
+					Active: newValue.Activity.Active,
+					Since:  scalar.TimestampFromTime(now),
+				},
+			}, nil
+		},
+		32,
+	)
+
+	if err != nil {
+		return state{}, fmt.Errorf("could not create working clock: %w", err)
+	}
+
+	return state{
+		workingClock: workingClock,
+	}, nil
+}
 
 func (r resolver) RootMutation() graph.RootMutationResolver {
 	return rootMutationResolver(r)
@@ -42,44 +119,68 @@ func (r resolver) ActivityMutation() graph.ActivityMutationResolver {
 func (activityMutationResolver) SetActive(
 	ctx context.Context, obj *graph.ActivityMutation, active bool,
 ) (*graph.ActivityQuery, error) {
-	current := globalActive.Current()
+	current, err := globalState.workingClock.Current(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not get current working clock state: %w", err)
+	}
 
 	if current.Activity.Active == active {
 		return current.Activity, nil
 
 	}
 
-	globalActive.Set(&graph.WorkClockQuery{
+	current, err = globalState.workingClock.Set(ctx, &graph.WorkClockQuery{
 		Activity: &graph.ActivityQuery{
 			Active: active,
-			Since:  scalar.TimestampFromTime(time.Now()),
 		},
 	})
+	if err != nil {
+		return nil, fmt.Errorf("could not set working clock state: %w", err)
+	}
 
-	return globalActive.Current().Activity, nil
+	return current.Activity, nil
 }
 
 func (rootMutationResolver) WorkClock(ctx context.Context) (*graph.WorkClockMutation, error) {
+	current, err := globalState.workingClock.Current(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not get current working clock state: %w", err)
+	}
+
 	return &graph.WorkClockMutation{
 		Activity: &graph.ActivityMutation{
-			SetActive: globalActive.Current().Activity,
+			SetActive: current.Activity,
 		},
 	}, nil
 }
 
 func (rootQueryResolver) WorkClock(ctx context.Context) (*graph.WorkClockQuery, error) {
+	current, err := globalState.workingClock.Current(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not get current working clock state: %w", err)
+	}
 
-	return &graph.WorkClockQuery{
-		Activity: globalActive.Current().Activity,
-	}, nil
+	return current, nil
 }
 
 func (rootSubscriptionResolver) WorkClock(ctx context.Context) (<-chan *graph.WorkClockQuery, error) {
-	return globalActive.Subscribe(ctx), nil
+	ch, err := globalState.workingClock.Subscribe(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not subscribe to working clock state: %w", err)
+	}
+
+	return ch, nil
 }
 
-func New() graph.Config {
+func New(db *database.DB) (graph.Config, error) {
+	state, err := initState(db)
+	if err != nil {
+		return graph.Config{}, fmt.Errorf("could not create state: %w", err)
+	}
+
+	globalState = state
+
 	return graph.Config{
 		Resolvers: resolver(graph.Resolver{}),
-	}
+	}, nil
 }

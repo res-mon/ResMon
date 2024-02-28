@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -14,11 +15,17 @@ import (
 
 	"github.com/yerTools/ResMon/generated/go/graph"
 	"github.com/yerTools/ResMon/src/go/api"
+	"github.com/yerTools/ResMon/src/go/database"
 )
 
-func startAPI(router *httprouter.Router) {
+func startAPI(db *database.DB, router *httprouter.Router) error {
+	cfg, err := api.New(db)
+	if err != nil {
+		return fmt.Errorf("could not create new API: %w", err)
+	}
+
 	srv := handler.New(
-		graph.NewExecutableSchema(api.New()))
+		graph.NewExecutableSchema(cfg))
 
 	srv.AddTransport(transport.Options{
 		AllowedMethods: []string{
@@ -78,4 +85,6 @@ func startAPI(router *httprouter.Router) {
 	router.Handler("PATCH", "/api/apollo", apolloHandler)
 	router.Handler("POST", "/api/apollo", apolloHandler)
 	router.Handler("PUT", "/api/apollo", apolloHandler)
+
+	return nil
 }

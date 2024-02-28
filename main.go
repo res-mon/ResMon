@@ -86,7 +86,7 @@ func main() {
 	wg.Add(1)
 
 	go (func() {
-		err := svr.Run(ctx, killCtx, shutdown)
+		err := svr.Run(ctx, killCtx, shutdown, db)
 
 		if err != nil {
 			panic(fmt.Sprintf("an error occurred: %v", err))

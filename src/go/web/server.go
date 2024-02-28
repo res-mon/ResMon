@@ -23,6 +23,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/julienschmidt/httprouter"
+	"github.com/yerTools/ResMon/src/go/database"
 )
 
 type server struct {
@@ -80,7 +81,7 @@ func getNetworkAddresses() ([]string, error) {
 	return result, nil
 }
 
-func (s *server) Run(ctx, killCtx context.Context, shutdown func()) error {
+func (s *server) Run(ctx, killCtx context.Context, shutdown func(), db *database.DB) error {
 	router := httprouter.New()
 
 	var err error
@@ -93,7 +94,10 @@ func (s *server) Run(ctx, killCtx context.Context, shutdown func()) error {
 		return fmt.Errorf("could not default route: %w", err)
 	}
 
-	startAPI(router)
+	err = startAPI(db, router)
+	if err != nil {
+		return fmt.Errorf("could not start API: %w", err)
+	}
 
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", s.port),
