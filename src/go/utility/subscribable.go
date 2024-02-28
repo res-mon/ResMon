@@ -81,12 +81,12 @@ type LazySubscribable[T any] struct {
 	Subscribable[T]
 	loaded       bool
 	loader       func(ctx context.Context) (T, error)
-	beforeUpdate func(ctx context.Context, oldValue T, newValue T) error
+	beforeUpdate func(ctx context.Context, oldValue T, newValue T) (T, error)
 }
 
 func NewLazySubscribable[T any](
 	loader func(ctx context.Context) (T, error),
-	beforeUpdate func(ctx context.Context, oldValue T, newValue T) error,
+	beforeUpdate func(ctx context.Context, oldValue T, newValue T) (T, error),
 	bufferSize int,
 ) (*LazySubscribable[T], error) {
 
@@ -136,7 +136,7 @@ func (s *LazySubscribable[T]) Set(ctx context.Context, value T) error {
 	}
 
 	if s.beforeUpdate != nil {
-		err := s.beforeUpdate(ctx, oldValue, value)
+		value, err = s.beforeUpdate(ctx, oldValue, value)
 		if err != nil {
 			return fmt.Errorf("before update failed: %w", err)
 		}
