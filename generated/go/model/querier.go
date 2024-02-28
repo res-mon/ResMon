@@ -26,20 +26,37 @@ type Querier interface {
 	//IsActive
 	//
 	//  SELECT
-	//    IFNULL(
-	//      (
-	//        SELECT
-	//          "active"
-	//        FROM
-	//          "activity_log"
-	//        ORDER BY
-	//          "timestamp" DESC
-	//        LIMIT
-	//          1
-	//      ),
-	//      0
-	//    ) AS "active"
-	IsActive(ctx context.Context) (interface{}, error)
+	//    CAST(
+	//      IFNULL(
+	//        (
+	//          SELECT
+	//            "active"
+	//          FROM
+	//            "activity_log"
+	//          ORDER BY
+	//            "timestamp" DESC
+	//          LIMIT
+	//            1
+	//        ),
+	//        0
+	//      ) AS INTEGER
+	//    ) AS "active",
+	//    CAST(
+	//      IFNULL(
+	//        (
+	//          SELECT
+	//            "timestamp"
+	//          FROM
+	//            "activity_log"
+	//          ORDER BY
+	//            "timestamp" DESC
+	//          LIMIT
+	//            1
+	//        ),
+	//        0
+	//      ) AS INTEGER
+	//    ) AS "timestamp"
+	IsActive(ctx context.Context) (IsActiveRow, error)
 	//MigrationScripts
 	//
 	//  SELECT

@@ -34,40 +34,79 @@ func (q *Queries) AddActivity(ctx context.Context, arg AddActivityParams) error 
 
 const isActive = `-- name: IsActive :one
 SELECT
-  IFNULL(
-    (
-      SELECT
-        "active"
-      FROM
-        "activity_log"
-      ORDER BY
-        "timestamp" DESC
-      LIMIT
-        1
-    ),
-    0
-  ) AS "active"
+  CAST(
+    IFNULL(
+      (
+        SELECT
+          "active"
+        FROM
+          "activity_log"
+        ORDER BY
+          "timestamp" DESC
+        LIMIT
+          1
+      ),
+      0
+    ) AS INTEGER
+  ) AS "active",
+  CAST(
+    IFNULL(
+      (
+        SELECT
+          "timestamp"
+        FROM
+          "activity_log"
+        ORDER BY
+          "timestamp" DESC
+        LIMIT
+          1
+      ),
+      0
+    ) AS INTEGER
+  ) AS "timestamp"
 `
+
+type IsActiveRow struct {
+	Active    int64 `db:"active" json:"active"`
+	Timestamp int64 `db:"timestamp" json:"timestamp"`
+}
 
 // IsActive
 //
 //	SELECT
-//	  IFNULL(
-//	    (
-//	      SELECT
-//	        "active"
-//	      FROM
-//	        "activity_log"
-//	      ORDER BY
-//	        "timestamp" DESC
-//	      LIMIT
-//	        1
-//	    ),
-//	    0
-//	  ) AS "active"
-func (q *Queries) IsActive(ctx context.Context) (interface{}, error) {
+//	  CAST(
+//	    IFNULL(
+//	      (
+//	        SELECT
+//	          "active"
+//	        FROM
+//	          "activity_log"
+//	        ORDER BY
+//	          "timestamp" DESC
+//	        LIMIT
+//	          1
+//	      ),
+//	      0
+//	    ) AS INTEGER
+//	  ) AS "active",
+//	  CAST(
+//	    IFNULL(
+//	      (
+//	        SELECT
+//	          "timestamp"
+//	        FROM
+//	          "activity_log"
+//	        ORDER BY
+//	          "timestamp" DESC
+//	        LIMIT
+//	          1
+//	      ),
+//	      0
+//	    ) AS INTEGER
+//	  ) AS "timestamp"
+func (q *Queries) IsActive(ctx context.Context) (IsActiveRow, error) {
 	row := q.queryRow(ctx, q.isActiveStmt, isActive)
-	var active interface{}
-	err := row.Scan(&active)
-	return active, err
+	var i IsActiveRow
+	err := row.Scan(&i.Active, &i.Timestamp)
+	return i, err
 }
