@@ -45,7 +45,6 @@ init toMsg _ =
 
 type Msg msg
     = RemoveAlert Int
-    | QueryWorkClock
     | ToggleWorkClock
 
 
@@ -58,12 +57,6 @@ update msg shared model =
     case msg of
         RemoveAlert number ->
             ( removeAlert shared number, model, Cmd.none )
-
-        QueryWorkClock ->
-            ( shared
-            , model
-            , Api.WorkClock.queryWorkClock shared.api.workClock
-            )
 
         ToggleWorkClock ->
             ( shared
@@ -200,6 +193,7 @@ view shared model minimal body =
                                 Api.Reconnecting ->
                                     "Verbindung wird wiederhergestellt"
                         ]
+                    , toggleView shared model
                     , Dom.div
                         [ Attr.css [ Tw.text_center ] ]
                         [ Dom.text "Stempeluhr: "
@@ -209,20 +203,6 @@ view shared model minimal body =
 
                             Api.General.Received activity ->
                                 workClockView shared activity
-                        ]
-                    , Dom.div []
-                        [ Ui.btn Dom.button
-                            [ Ui.modifiers [ Ui.BtnPrimary ]
-                            , onClick (model.toMsg QueryWorkClock) |> Ui.attribute
-                            ]
-                            [ Dom.text "Query" ]
-                        ]
-                    , Dom.div []
-                        [ Ui.btn Dom.button
-                            [ Ui.modifiers [ Ui.BtnPrimary ]
-                            , onClick (model.toMsg ToggleWorkClock) |> Ui.attribute
-                            ]
-                            [ Dom.text "Toggle" ]
                         ]
                     ]
                     :: map Dom.fromUnstyled body.body
@@ -299,6 +279,7 @@ workClockView shared activity =
                             )
                                 / 1000
                                 |> round
+                                |> max 0
 
                         hours : Int
                         hours =
@@ -329,6 +310,35 @@ workClockView shared activity =
                     [ Dom.text "Unbekannt" ]
             )
         ]
+
+
+toggleView : SharedModel msg -> Model msg -> Dom.Html msg
+toggleView shared model =
+    Dom.div [ Attr.css [ Tw.text_center, Tw.m_4 ] ]
+        (case shared.api.workClock.activity of
+            Api.General.Unknown ->
+                []
+
+            Api.General.Received activity ->
+                [ Ui.btn Dom.button
+                    [ Ui.modifiers
+                        [ if activity.active then
+                            Ui.BtnError
+
+                          else
+                            Ui.BtnSuccess
+                        ]
+                    , onClick (model.toMsg ToggleWorkClock) |> Ui.attribute
+                    ]
+                    [ Dom.text <|
+                        if activity.active then
+                            "Abstempeln"
+
+                        else
+                            "Einstempeln"
+                    ]
+                ]
+        )
 
 
 resMonLogo : String -> SharedModel msg -> Dom.Html msg
