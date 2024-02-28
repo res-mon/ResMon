@@ -7,44 +7,44 @@ import (
 	"sync"
 )
 
-type subscribable[T any] struct {
+type Subscribable[T any] struct {
 	value       T
 	subscribers []chan T
 	bufferSize  int
 	mutex       sync.Mutex
 }
 
-func initSubscribable[T any](value T, bufferSize int) subscribable[T] {
-	return subscribable[T]{
+func initSubscribable[T any](value T, bufferSize int) Subscribable[T] {
+	return Subscribable[T]{
 		value:      value,
 		bufferSize: bufferSize,
 	}
 }
 
-func NewSubscribable[T any](value T, bufferSize int) *subscribable[T] {
+func NewSubscribable[T any](value T, bufferSize int) *Subscribable[T] {
 	res := initSubscribable(value, bufferSize)
 	return &res
 }
 
-func (s *subscribable[T]) Current() T {
+func (s *Subscribable[T]) Current() T {
 	return s.value
 }
 
-func (s *subscribable[T]) setUnlocked(value T) {
+func (s *Subscribable[T]) setUnlocked(value T) {
 	s.value = value
 	for _, c := range s.subscribers {
 		c <- value
 	}
 }
 
-func (s *subscribable[T]) Set(value T) {
+func (s *Subscribable[T]) Set(value T) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
 	s.setUnlocked(value)
 }
 
-func (s *subscribable[T]) subscribeUnlocked(ctx context.Context) <-chan T {
+func (s *Subscribable[T]) subscribeUnlocked(ctx context.Context) <-chan T {
 	ch := make(chan T, s.bufferSize)
 	s.subscribers = append(s.subscribers, ch)
 
@@ -70,15 +70,15 @@ func (s *subscribable[T]) subscribeUnlocked(ctx context.Context) <-chan T {
 	return ch
 }
 
-func (s *subscribable[T]) Subscribe(ctx context.Context) <-chan T {
+func (s *Subscribable[T]) Subscribe(ctx context.Context) <-chan T {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
 	return s.subscribeUnlocked(ctx)
 }
 
-type lazySubscribable[T any] struct {
-	subscribable[T]
+type LazySubscribable[T any] struct {
+	Subscribable[T]
 	loaded       bool
 	loader       func(ctx context.Context) (T, error)
 	beforeUpdate func(ctx context.Context, oldValue T, newValue T) error
@@ -88,7 +88,7 @@ func NewLazySubscribable[T any](
 	loader func(ctx context.Context) (T, error),
 	beforeUpdate func(ctx context.Context, oldValue T, newValue T) error,
 	bufferSize int,
-) (*lazySubscribable[T], error) {
+) (*LazySubscribable[T], error) {
 
 	if loader == nil {
 		return nil, errors.New("loader is required for new lazy subscribable")
@@ -96,14 +96,14 @@ func NewLazySubscribable[T any](
 
 	var value T
 
-	return &lazySubscribable[T]{
+	return &LazySubscribable[T]{
 		loader:       loader,
 		beforeUpdate: beforeUpdate,
-		subscribable: initSubscribable(value, bufferSize),
+		Subscribable: initSubscribable(value, bufferSize),
 	}, nil
 }
 
-func (s *lazySubscribable[T]) currentUnlocked(ctx context.Context) (T, error) {
+func (s *LazySubscribable[T]) currentUnlocked(ctx context.Context) (T, error) {
 	if s.loaded {
 		return s.value, nil
 	}
@@ -119,14 +119,14 @@ func (s *lazySubscribable[T]) currentUnlocked(ctx context.Context) (T, error) {
 	return value, nil
 }
 
-func (s *lazySubscribable[T]) Current(ctx context.Context) (T, error) {
+func (s *LazySubscribable[T]) Current(ctx context.Context) (T, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
 	return s.currentUnlocked(ctx)
 }
 
-func (s *lazySubscribable[T]) Set(ctx context.Context, value T) error {
+func (s *LazySubscribable[T]) Set(ctx context.Context, value T) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -147,7 +147,7 @@ func (s *lazySubscribable[T]) Set(ctx context.Context, value T) error {
 	return nil
 }
 
-func (s *lazySubscribable[T]) Subscribe(ctx context.Context) (<-chan T, error) {
+func (s *LazySubscribable[T]) Subscribe(ctx context.Context) (<-chan T, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
