@@ -30,18 +30,20 @@ func (s *Subscribable[T]) Current() T {
 	return s.value
 }
 
-func (s *Subscribable[T]) setUnlocked(value T) {
+func (s *Subscribable[T]) setUnlocked(value T) T {
 	s.value = value
 	for _, c := range s.subscribers {
 		c <- value
 	}
+
+	return value
 }
 
-func (s *Subscribable[T]) Set(value T) {
+func (s *Subscribable[T]) Set(value T) T {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	s.setUnlocked(value)
+	return s.setUnlocked(value)
 }
 
 func (s *Subscribable[T]) subscribeUnlocked(ctx context.Context) <-chan T {
@@ -126,25 +128,23 @@ func (s *LazySubscribable[T]) Current(ctx context.Context) (T, error) {
 	return s.currentUnlocked(ctx)
 }
 
-func (s *LazySubscribable[T]) Set(ctx context.Context, value T) error {
+func (s *LazySubscribable[T]) Set(ctx context.Context, value T) (T, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
 	oldValue, err := s.currentUnlocked(ctx)
 	if err != nil {
-		return fmt.Errorf("could not get current value: %w", err)
+		return oldValue, fmt.Errorf("could not get current value: %w", err)
 	}
 
 	if s.beforeUpdate != nil {
 		value, err = s.beforeUpdate(ctx, oldValue, value)
 		if err != nil {
-			return fmt.Errorf("before update failed: %w", err)
+			return value, fmt.Errorf("before update failed: %w", err)
 		}
 	}
 
-	s.setUnlocked(value)
-
-	return nil
+	return s.setUnlocked(value), nil
 }
 
 func (s *LazySubscribable[T]) Subscribe(ctx context.Context) (<-chan T, error) {
