@@ -1,4 +1,4 @@
-module Api.General exposing (GeneralModel, GeneralTime, Model, init, mutationDecoder, queryDecoder, subscriptionDecoder)
+port module Api.General exposing (GeneralModel, GeneralTime, Model, init, mutationDecoder, queryDecoder, subscriptionDecoder)
 
 {-| The general API section.
 
@@ -15,7 +15,8 @@ import Graphql.Document
 import Graphql.Operation exposing (RootSubscription)
 import Graphql.SelectionSet as SelectionSet exposing (SelectionSet, with)
 import Json.Decode
-import Time exposing (Posix)
+import Json.Encode
+import Time exposing (Posix, posixToMillis)
 
 
 
@@ -158,6 +159,16 @@ subscriptionDecoder model =
         |> Json.Decode.map
             (\generalModel ->
                 ( { model | time = Received generalModel.time }
-                , Cmd.none
+                , currentServerTimeReceived
+                    (posixToMillis generalModel.time.current
+                        |> Json.Encode.int
+                    )
                 )
             )
+
+
+
+-- PORTS
+
+
+port currentServerTimeReceived : Json.Encode.Value -> Cmd msg

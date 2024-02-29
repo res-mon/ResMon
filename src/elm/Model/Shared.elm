@@ -17,12 +17,12 @@ import Api
 import Browser.Navigation exposing (Key, replaceUrl)
 import Extension.Time exposing (fixVariationFloored)
 import Html.Styled as Dom
-import Json.Decode as D exposing (Value)
+import Json.Decode as D exposing (Value, value)
 import Json.Encode
 import LocalStorage as Ls
 import Model.User exposing (User, decodeUser)
 import Task
-import Time exposing (Zone)
+import Time exposing (Zone, millisToPosix)
 import Url exposing (Url, toString)
 
 
@@ -328,7 +328,19 @@ setDarkModeMessage model darkMode =
 subscriptions : SharedModel msg -> Sub msg
 subscriptions model =
     Sub.batch
-        [ Time.every (toFloat clockInterval) ((unpackInternal model).toMsg << Tick)
+        [ clockTicked
+            (\value ->
+                case D.decodeValue D.int value of
+                    Ok time ->
+                        (unpackInternal model).toMsg (Tick <| millisToPosix time)
+
+                    Err err ->
+                        (unpackInternal model).toMsg
+                            (AlertAdded AlertError
+                                [ Dom.text "Unexpected value from clock ticked port" ]
+                                [ D.errorToString err |> Dom.text ]
+                            )
+            )
         , darkModeChanged
             (\value ->
                 case D.decodeValue D.bool value of
@@ -354,3 +366,6 @@ port darkModeChanged : (Value -> msg) -> Sub msg
 
 
 port setDarkMode : Json.Encode.Value -> Cmd msg
+
+
+port clockTicked : (Value -> msg) -> Sub msg

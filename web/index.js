@@ -92,6 +92,11 @@ app.ports.setDarkMode.subscribe(function (darkModeActive) {
     localStorage.setItem("darkModeActive", JSON.stringify(darkModeActive));
 });
 
+let timeOffset = 0;
+app.ports.currentServerTimeReceived.subscribe(function (now) {
+    timeOffset = now - new Date().getTime();
+});
+
 require("../lib/js/PortFunnel/PortFunnel.js");
 PortFunnel.subscribe(app);
 require("../lib/js/PortFunnel/LocalStorage.js");
@@ -127,3 +132,20 @@ client.on("error", (error) => {
     console.error("Error from server", error);
     app.ports.socketStatusReconnecting.send(error);
 });
+
+let lastTime = new Date().getTime() + timeOffset;
+const getCurrentTimeInterval = 100;
+function getCurrentTime() {
+    const now = new Date().getTime() + timeOffset;
+
+    if (Math.floor(now / 1000) !== Math.floor(lastTime / 1000)) {
+        app.ports.clockTicked.send(now);
+    }
+
+    lastTime = now;
+
+    const timeout = getCurrentTimeInterval - (now % getCurrentTimeInterval);
+    setTimeout(getCurrentTime, timeout);
+}
+
+getCurrentTime();
