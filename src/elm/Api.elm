@@ -13,7 +13,9 @@ API requests are sent to the server through a websocket connection.
 
 -}
 
+import Api.General
 import Api.WorkClock
+import Graph.Subscription exposing (general)
 import Graphql.Document
 import Graphql.Operation exposing (RootMutation, RootQuery, RootSubscription)
 import Graphql.SelectionSet exposing (SelectionSet)
@@ -51,6 +53,7 @@ type alias Model msg =
     { toMsg : Msg msg -> msg
     , status : SubscriptionStatus
     , workClock : Api.WorkClock.Model msg
+    , general : Api.General.Model
     }
 
 
@@ -70,6 +73,10 @@ starts the subscriptions to the server.
 init : (Msg msg -> msg) -> ( Model msg, Cmd msg )
 init toMsg =
     let
+        ( general, generalCmd ) =
+            Api.General.init
+                (subscribe GeneralModule)
+
         ( workClock, workClockCmd ) =
             Api.WorkClock.init
                 (subscribe WorkClockModule)
@@ -79,8 +86,12 @@ init toMsg =
     ( { toMsg = toMsg
       , status = NotConnected
       , workClock = workClock
+      , general = general
       }
-    , workClockCmd
+    , Cmd.batch
+        [ workClockCmd
+        , generalCmd
+        ]
     )
 
 
@@ -96,6 +107,7 @@ type Msg msg
 
 type ApiModule
     = WorkClockModule
+    | GeneralModule
 
 
 moduleEncoder : ApiModule -> Json.Encode.Value
@@ -106,6 +118,9 @@ moduleEncoder apiModule =
             case apiModule of
                 WorkClockModule ->
                     "WorkClock"
+
+                GeneralModule ->
+                    "General"
     in
     Json.Encode.string string
 
@@ -116,6 +131,9 @@ moduleDecoder =
         |> Json.Decode.andThen
             (\string ->
                 case string of
+                    "General" ->
+                        Json.Decode.succeed GeneralModule
+
                     "WorkClock" ->
                         Json.Decode.succeed WorkClockModule
 
@@ -167,6 +185,15 @@ subscriptionsDecoder model ( apiModule, data ) =
                                 , cmd
                                 )
                             )
+
+                GeneralModule ->
+                    Api.General.subscriptionDecoder model.general
+                        |> Json.Decode.map
+                            (\( general, cmd ) ->
+                                ( { model | general = general }
+                                , cmd
+                                )
+                            )
     in
     Json.Decode.decodeValue result data
 
@@ -188,6 +215,15 @@ queryDecoder model ( apiModule, data ) =
                                 , cmd
                                 )
                             )
+
+                GeneralModule ->
+                    Api.General.queryDecoder model.general
+                        |> Json.Decode.map
+                            (\( general, cmd ) ->
+                                ( { model | general = general }
+                                , cmd
+                                )
+                            )
     in
     Json.Decode.decodeValue result data
 
@@ -206,6 +242,15 @@ mutationDecoder model ( apiModule, data ) =
                         |> Json.Decode.map
                             (\( workClock, cmd ) ->
                                 ( { model | workClock = workClock }
+                                , cmd
+                                )
+                            )
+
+                GeneralModule ->
+                    Api.General.mutationDecoder model.general
+                        |> Json.Decode.map
+                            (\( general, cmd ) ->
+                                ( { model | general = general }
                                 , cmd
                                 )
                             )
