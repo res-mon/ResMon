@@ -60,13 +60,27 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-buildx-
 
+            - name: Prepare docker tags
+              id: prepare_docker_tags
+              run: |
+                BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | sed 's/[^a-zA-Z0-9]/-/g')
+                SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+                echo "::set-output name=branch_tag::yertools/res-mon:$BRANCH_NAME"
+                echo "::set-output name=commit_tag::yertools/res-mon:$BRANCH_NAME-$SHORT_SHA"
+                if [[ "$BRANCH_NAME" == "main" ]]; then
+                  echo "::set-output name=latest_tag::yertools/res-mon:latest"
+                fi
+
             - name: Build and push Docker image
               uses: docker/build-push-action@v3
               with:
                   context: .
                   file: ./docker/Release.Dockerfile
                   push: true
-                  tags: yertools/res-mon:latest
+                  tags: |
+                    ${{ steps.prepare_docker_tags.outputs.commit_tag }}
+                    ${{ steps.prepare_docker_tags.outputs.branch_tag }}
+                    ${{ steps.prepare_docker_tags.outputs.latest_tag }}
                   labels: yertools/res-mon
                   builder: ${{ steps.buildx.outputs.name }}
                   platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
