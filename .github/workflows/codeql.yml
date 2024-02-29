@@ -50,6 +50,26 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+          go-version: "1.22"
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+          node-version: 20.x
+          cache: "npm"
+
+    - name: Create empty file in webroot
+      run: mkdir -p webroot && touch webroot/empty
+
+    - name: Install go dependencies
+      run: go install
+
+    - name: Install npm dependencies
+      run: npm ci
+
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
@@ -77,26 +97,6 @@ jobs:
     # - run: |
     #     echo "Run, Build Application using script"
     #     ./location_of_script_within_repo/buildscript.sh
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-          go-version: "1.22"
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-          node-version: 20.x
-          cache: "npm"
-
-    - name: Create empty file in webroot
-      run: mkdir -p webroot && touch webroot/empty
-
-    - name: Install go dependencies
-      run: go install
-
-    - name: Install npm dependencies
-      run: npm ci
 
     - name: Build project
       run: npm run build
