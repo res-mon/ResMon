@@ -28,7 +28,11 @@ func NewSubscribable[T any](value T, bufferSize int) *Subscribable[T] {
 }
 
 func (s *Subscribable[T]) Current() T {
-	return s.value
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	result := s.value
+	return result
 }
 
 func (s *Subscribable[T]) setUnlocked(value T) T {
@@ -54,7 +58,7 @@ func (s *Subscribable[T]) subscribeUnlocked(ctx context.Context) <-chan T {
 	go func() {
 		defer close(ch)
 
-		ch <- s.value
+		ch <- s.Current()
 		<-ctx.Done()
 
 		s.mutex.Lock()
