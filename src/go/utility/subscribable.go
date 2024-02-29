@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 )
 
 type Subscribable[T any] struct {
@@ -152,6 +153,83 @@ func (s *LazySubscribable[T]) Subscribe(ctx context.Context) (<-chan T, error) {
 	defer s.mutex.Unlock()
 
 	_, err := s.currentUnlocked(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not get current value: %w", err)
+	}
+
+	return s.subscribeUnlocked(ctx), nil
+}
+
+type ComputedSubscribable[T any] struct {
+	Subscribable[T]
+	compute  func(ctx context.Context) (T, error)
+	interval time.Duration
+}
+
+func NewComputedSubscribable[T any](
+	ctx context.Context,
+	compute func(ctx context.Context) (T, error),
+	interval time.Duration,
+	bufferSize int,
+) (*ComputedSubscribable[T], error) {
+
+	if compute == nil {
+		return nil, errors.New("compute is required for new computed subscribable")
+	}
+
+	value, err := compute(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not compute initial value: %w", err)
+	}
+
+	result := &ComputedSubscribable[T]{
+		compute:      compute,
+		interval:     interval,
+		Subscribable: initSubscribable(value, bufferSize),
+	}
+
+	if interval > 0 {
+		go func() {
+			ticker := time.NewTicker(interval)
+			defer ticker.Stop()
+
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case <-ticker.C:
+					result.SetCurrent(ctx)
+				}
+			}
+		}()
+	}
+
+	return result, nil
+}
+
+func (s *ComputedSubscribable[T]) setCurrentUnlocked(ctx context.Context) (T, error) {
+	value, err := s.compute(ctx)
+	if err != nil {
+		return value, fmt.Errorf("could not compute value: %w", err)
+	}
+
+	s.setUnlocked(value)
+
+	return value, nil
+}
+
+func (s *ComputedSubscribable[T]) SetCurrent(ctx context.Context) (T, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	return s.setCurrentUnlocked(ctx)
+}
+
+func (s *ComputedSubscribable[T]) Subscribe(ctx context.Context) (<-chan T, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	_, err := s.setCurrentUnlocked(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("could not get current value: %w", err)
 	}
