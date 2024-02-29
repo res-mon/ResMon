@@ -1,7 +1,7 @@
 module Page.Layout exposing (Model, Msg, init, update, view)
 
 import Api
-import Api.General
+import Api.Shared
 import Api.WorkClock
 import Browser exposing (Document)
 import Component.DaisyUi as Ui
@@ -63,10 +63,10 @@ update msg shared model =
             , model
             , Api.WorkClock.setWorkClockActive shared.api.workClock
                 (case shared.api.workClock.activity of
-                    Api.General.Unknown ->
+                    Api.Shared.Unknown ->
                         True
 
-                    Api.General.Received activity ->
+                    Api.Shared.Received activity ->
                         not activity.active
                 )
             )
@@ -198,10 +198,10 @@ view shared model minimal body =
                         [ Attr.css [ Tw.text_center ] ]
                         [ Dom.text "Stempeluhr: "
                         , case shared.api.workClock.activity of
-                            Api.General.Unknown ->
+                            Api.Shared.Unknown ->
                                 Dom.text "Unbekannt"
 
-                            Api.General.Received activity ->
+                            Api.Shared.Received activity ->
                                 workClockView shared activity
                         ]
                     ]
@@ -316,10 +316,10 @@ toggleView : SharedModel msg -> Model msg -> Dom.Html msg
 toggleView shared model =
     Dom.div [ Attr.css [ Tw.text_center, Tw.m_4 ] ]
         (case shared.api.workClock.activity of
-            Api.General.Unknown ->
+            Api.Shared.Unknown ->
                 []
 
-            Api.General.Received activity ->
+            Api.Shared.Received activity ->
                 [ Ui.btn Dom.button
                     [ Ui.modifiers
                         [ if activity.active then

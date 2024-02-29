@@ -6,7 +6,7 @@ module Api.WorkClock exposing (Activity, Model, WorkClock, init, subscriptionDec
 
 -}
 
-import Api.General exposing (State(..))
+import Api.Shared exposing (State(..))
 import Graph.Mutation as Mut
 import Graph.Object
 import Graph.Object.ActivityMutation exposing (SetActiveRequiredArguments)

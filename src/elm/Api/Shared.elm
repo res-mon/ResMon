@@ -1,4 +1,4 @@
-module Api.General exposing (State(..))
+module Api.Shared exposing (State(..))
 
 {-| This module contains the general types and functions that are used by all
 APIs.
