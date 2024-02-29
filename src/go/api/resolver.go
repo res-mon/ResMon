@@ -23,9 +23,10 @@ var globalState state
 
 type state struct {
 	workingClock *utility.LazySubscribable[*graph.WorkClockQuery]
+	general      *utility.ComputedSubscribable[*graph.GeneralQuery]
 }
 
-func initState(db *database.DB) (state, error) {
+func initState(ctx context.Context, db *database.DB) (state, error) {
 	workingClock, err := utility.NewLazySubscribable(
 		func(ctx context.Context) (*graph.WorkClockQuery, error) {
 			mdl, err := db.NewModel()
@@ -95,8 +96,25 @@ func initState(db *database.DB) (state, error) {
 		return state{}, fmt.Errorf("could not create working clock: %w", err)
 	}
 
+	general, err := utility.NewComputedSubscribable(
+		ctx,
+		func(ctx context.Context) (*graph.GeneralQuery, error) {
+			return &graph.GeneralQuery{
+				Time: &graph.GeneralTimeQuery{
+					Current: scalar.TimestampFromTime(time.Now()),
+				},
+			}, nil
+		},
+		10*time.Second,
+		32,
+	)
+	if err != nil {
+		return state{}, fmt.Errorf("could not create general: %w", err)
+	}
+
 	return state{
 		workingClock: workingClock,
+		general:      general,
 	}, nil
 }
 
@@ -172,8 +190,17 @@ func (rootSubscriptionResolver) WorkClock(ctx context.Context) (<-chan *graph.Wo
 	return ch, nil
 }
 
-func New(db *database.DB) (graph.Config, error) {
-	state, err := initState(db)
+func (rootSubscriptionResolver) General(ctx context.Context) (<-chan *graph.GeneralQuery, error) {
+	ch, err := globalState.general.Subscribe(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not subscribe to working clock state: %w", err)
+	}
+
+	return ch, nil
+}
+
+func New(ctx context.Context, db *database.DB) (graph.Config, error) {
+	state, err := initState(ctx, db)
 	if err != nil {
 		return graph.Config{}, fmt.Errorf("could not create state: %w", err)
 	}

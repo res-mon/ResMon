@@ -94,7 +94,7 @@ func (s *server) Run(ctx, killCtx context.Context, shutdown func(), db *database
 		return fmt.Errorf("could not default route: %w", err)
 	}
 
-	err = startAPI(db, router)
+	err = startAPI(ctx, db, router)
 	if err != nil {
 		return fmt.Errorf("could not start API: %w", err)
 	}

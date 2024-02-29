@@ -22,6 +22,14 @@ type ActivityQuery struct {
 	Active bool `json:"active"`
 }
 
+type GeneralQuery struct {
+	Time *GeneralTimeQuery `json:"time"`
+}
+
+type GeneralTimeQuery struct {
+	Current scalar.Timestamp `json:"current"`
+}
+
 type RootMutation struct {
 }
 

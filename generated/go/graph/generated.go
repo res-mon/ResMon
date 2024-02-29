@@ -59,6 +59,14 @@ type ComplexityRoot struct {
 		Since  func(childComplexity int) int
 	}
 
+	GeneralQuery struct {
+		Time func(childComplexity int) int
+	}
+
+	GeneralTimeQuery struct {
+		Current func(childComplexity int) int
+	}
+
 	RootMutation struct {
 		WorkClock func(childComplexity int) int
 	}
@@ -69,6 +77,7 @@ type ComplexityRoot struct {
 	}
 
 	RootSubscription struct {
+		General   func(childComplexity int) int
 		WorkClock func(childComplexity int) int
 	}
 
@@ -96,6 +105,7 @@ type RootQueryResolver interface {
 }
 type RootSubscriptionResolver interface {
 	WorkClock(ctx context.Context) (<-chan *WorkClockQuery, error)
+	General(ctx context.Context) (<-chan *GeneralQuery, error)
 }
 
 type executableSchema struct {
@@ -143,6 +153,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ActivityQuery.Since(childComplexity), true
 
+	case "GeneralQuery.time":
+		if e.complexity.GeneralQuery.Time == nil {
+			break
+		}
+
+		return e.complexity.GeneralQuery.Time(childComplexity), true
+
+	case "GeneralTimeQuery.current":
+		if e.complexity.GeneralTimeQuery.Current == nil {
+			break
+		}
+
+		return e.complexity.GeneralTimeQuery.Current(childComplexity), true
+
 	case "RootMutation.workClock":
 		if e.complexity.RootMutation.WorkClock == nil {
 			break
@@ -163,6 +187,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.RootQuery.__resolve__service(childComplexity), true
+
+	case "RootSubscription.general":
+		if e.complexity.RootSubscription.General == nil {
+			break
+		}
+
+		return e.complexity.RootSubscription.General(childComplexity), true
 
 	case "RootSubscription.workClock":
 		if e.complexity.RootSubscription.WorkClock == nil {
@@ -313,6 +344,14 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
+	{Name: "../../../src/gql/general/schema.gql", Input: `type GeneralQuery {
+    time: GeneralTimeQuery!
+}
+`, BuiltIn: false},
+	{Name: "../../../src/gql/general/time.gql", Input: `type GeneralTimeQuery {
+    current: Timestamp!
+}
+`, BuiltIn: false},
 	{Name: "../../../src/gql/scalars.gql", Input: `scalar Timestamp
 `, BuiltIn: false},
 	{Name: "../../../src/gql/schema.gql", Input: `schema {
@@ -331,6 +370,7 @@ type RootMutation {
 
 type RootSubscription {
     workClock: WorkClockQuery!
+    general: GeneralQuery!
 }
 `, BuiltIn: false},
 	{Name: "../../../src/gql/workclock/activity.gql", Input: `type ActivityQuery {
@@ -601,6 +641,98 @@ func (ec *executionContext) fieldContext_ActivityQuery_active(ctx context.Contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GeneralQuery_time(ctx context.Context, field graphql.CollectedField, obj *GeneralQuery) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GeneralQuery_time(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Time, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*GeneralTimeQuery)
+	fc.Result = res
+	return ec.marshalNGeneralTimeQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐGeneralTimeQuery(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GeneralQuery_time(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GeneralQuery",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "current":
+				return ec.fieldContext_GeneralTimeQuery_current(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GeneralTimeQuery", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GeneralTimeQuery_current(ctx context.Context, field graphql.CollectedField, obj *GeneralTimeQuery) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GeneralTimeQuery_current(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Current, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(scalar.Timestamp)
+	fc.Result = res
+	return ec.marshalNTimestamp2githubᚗcomᚋyerToolsᚋResMonᚋsrcᚋgoᚋapiᚋscalarᚐTimestamp(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GeneralTimeQuery_current(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GeneralTimeQuery",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Timestamp does not have child fields")
 		},
 	}
 	return fc, nil
@@ -936,6 +1068,68 @@ func (ec *executionContext) fieldContext_RootSubscription_workClock(ctx context.
 				return ec.fieldContext_WorkClockQuery_activity(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type WorkClockQuery", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RootSubscription_general(ctx context.Context, field graphql.CollectedField) (ret func(ctx context.Context) graphql.Marshaler) {
+	fc, err := ec.fieldContext_RootSubscription_general(ctx, field)
+	if err != nil {
+		return nil
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = nil
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.RootSubscription().General(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return nil
+	}
+	return func(ctx context.Context) graphql.Marshaler {
+		select {
+		case res, ok := <-resTmp.(<-chan *GeneralQuery):
+			if !ok {
+				return nil
+			}
+			return graphql.WriterFunc(func(w io.Writer) {
+				w.Write([]byte{'{'})
+				graphql.MarshalString(field.Alias).MarshalGQL(w)
+				w.Write([]byte{':'})
+				ec.marshalNGeneralQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐGeneralQuery(ctx, field.Selections, res).MarshalGQL(w)
+				w.Write([]byte{'}'})
+			})
+		case <-ctx.Done():
+			return nil
+		}
+	}
+}
+
+func (ec *executionContext) fieldContext_RootSubscription_general(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RootSubscription",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "time":
+				return ec.fieldContext_GeneralQuery_time(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GeneralQuery", field.Name)
 		},
 	}
 	return fc, nil
@@ -2975,6 +3169,84 @@ func (ec *executionContext) _ActivityQuery(ctx context.Context, sel ast.Selectio
 	return out
 }
 
+var generalQueryImplementors = []string{"GeneralQuery"}
+
+func (ec *executionContext) _GeneralQuery(ctx context.Context, sel ast.SelectionSet, obj *GeneralQuery) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, generalQueryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GeneralQuery")
+		case "time":
+			out.Values[i] = ec._GeneralQuery_time(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var generalTimeQueryImplementors = []string{"GeneralTimeQuery"}
+
+func (ec *executionContext) _GeneralTimeQuery(ctx context.Context, sel ast.SelectionSet, obj *GeneralTimeQuery) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, generalTimeQueryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GeneralTimeQuery")
+		case "current":
+			out.Values[i] = ec._GeneralTimeQuery_current(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var rootMutationImplementors = []string{"RootMutation"}
 
 func (ec *executionContext) _RootMutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3133,6 +3405,8 @@ func (ec *executionContext) _RootSubscription(ctx context.Context, sel ast.Selec
 	switch fields[0].Name {
 	case "workClock":
 		return ec._RootSubscription_workClock(ctx, fields[0])
+	case "general":
+		return ec._RootSubscription_general(ctx, fields[0])
 	default:
 		panic("unknown field " + strconv.Quote(fields[0].Name))
 	}
@@ -3615,6 +3889,30 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNGeneralQuery2githubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐGeneralQuery(ctx context.Context, sel ast.SelectionSet, v GeneralQuery) graphql.Marshaler {
+	return ec._GeneralQuery(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGeneralQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐGeneralQuery(ctx context.Context, sel ast.SelectionSet, v *GeneralQuery) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GeneralQuery(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNGeneralTimeQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐGeneralTimeQuery(ctx context.Context, sel ast.SelectionSet, v *GeneralTimeQuery) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GeneralTimeQuery(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

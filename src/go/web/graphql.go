@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
@@ -18,8 +19,8 @@ import (
 	"github.com/yerTools/ResMon/src/go/database"
 )
 
-func startAPI(db *database.DB, router *httprouter.Router) error {
-	cfg, err := api.New(db)
+func startAPI(ctx context.Context, db *database.DB, router *httprouter.Router) error {
+	cfg, err := api.New(ctx, db)
 	if err != nil {
 		return fmt.Errorf("could not create new API: %w", err)
 	}

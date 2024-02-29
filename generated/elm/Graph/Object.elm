@@ -13,6 +13,14 @@ type ActivityQuery
     = ActivityQuery
 
 
+type GeneralQuery
+    = GeneralQuery
+
+
+type GeneralTimeQuery
+    = GeneralTimeQuery
+
+
 type Service_
     = Service_
 

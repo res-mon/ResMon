@@ -2,7 +2,7 @@
 -- https://github.com/dillonkearns/elm-graphql
 
 
-module Graph.Subscription exposing (..)
+module Graph.Object.GeneralQuery exposing (..)
 
 import Api.ScalarCodecs
 import Graph.InputObject
@@ -16,18 +16,11 @@ import Graphql.Internal.Encode as Encode exposing (Value)
 import Graphql.Operation exposing (RootMutation, RootQuery, RootSubscription)
 import Graphql.OptionalArgument exposing (OptionalArgument(..))
 import Graphql.SelectionSet exposing (SelectionSet)
-import Json.Decode as Decode exposing (Decoder)
+import Json.Decode as Decode
 
 
-workClock :
-    SelectionSet decodesTo Graph.Object.WorkClockQuery
-    -> SelectionSet decodesTo RootSubscription
-workClock object____ =
-    Object.selectionForCompositeField "workClock" [] object____ Basics.identity
-
-
-general :
-    SelectionSet decodesTo Graph.Object.GeneralQuery
-    -> SelectionSet decodesTo RootSubscription
-general object____ =
-    Object.selectionForCompositeField "general" [] object____ Basics.identity
+time :
+    SelectionSet decodesTo Graph.Object.GeneralTimeQuery
+    -> SelectionSet decodesTo Graph.Object.GeneralQuery
+time object____ =
+    Object.selectionForCompositeField "time" [] object____ Basics.identity

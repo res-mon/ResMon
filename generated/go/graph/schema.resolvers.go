@@ -21,6 +21,10 @@ func (r *rootSubscriptionResolver) WorkClock(ctx context.Context) (<-chan *WorkC
 	panic(fmt.Errorf("not implemented: WorkClock - workClock"))
 }
 
+func (r *rootSubscriptionResolver) General(ctx context.Context) (<-chan *GeneralQuery, error) {
+	panic(fmt.Errorf("not implemented: General - general"))
+}
+
 func (r *Resolver) RootMutation() RootMutationResolver { return &rootMutationResolver{r} }
 
 func (r *Resolver) RootQuery() RootQueryResolver { return &rootQueryResolver{r} }
