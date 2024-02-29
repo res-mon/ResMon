@@ -108,6 +108,7 @@ type alias WorkClock =
 **Fields**:
 
   - `active` - Determines if the work clock is active or not.
+  - `since` - The time when the work clock was last changed.
 
 -}
 type alias Activity =
@@ -172,7 +173,7 @@ This decoder is used to decode the query response of the work clock API section.
 
 **Returns**:
 
-  - A decoder to update the work clock API section.
+  - A decoder to update the work clock API section model.
 
 -}
 queryDecoder : Model msg -> Json.Decode.Decoder ( Model msg, Cmd msg )
@@ -195,7 +196,7 @@ This decoder is used to decode the mutation response of the work clock API secti
 
 **Returns**:
 
-    - A decoder to update the work clock API section.
+    - A decoder to update the work clock API section model.
 
 -}
 mutationDecoder : Model msg -> Json.Decode.Decoder ( Model msg, Cmd msg )
@@ -218,7 +219,7 @@ This decoder is used to decode the subscription response of the work clock API s
 
 **Returns**:
 
-      - A decoder to update the work clock API section.
+  - A decoder to update the work clock API section model.
 
 -}
 subscriptionDecoder : Model msg -> Json.Decode.Decoder ( Model msg, Cmd msg )
