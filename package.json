@@ -42,7 +42,7 @@
         "copy-webpack-plugin": "^12.0.2",
         "css-loader": "^6.8.1",
         "css-minimizer-webpack-plugin": "^6.0.0",
-        "daisyui": "^4.6.0",
+        "daisyui": "^4.7.2",
         "elm-format": "^0.8.7",
         "elm-reloader": "^1.0.0",
         "elm-review": "^2.10.3",
