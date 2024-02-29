@@ -81,7 +81,7 @@ func (s *Subscribable[T]) Subscribe(ctx context.Context) <-chan T {
 }
 
 type LazySubscribable[T any] struct {
-	Subscribable[T]
+	subscribable Subscribable[T]
 	loaded       bool
 	loader       func(ctx context.Context) (T, error)
 	beforeUpdate func(ctx context.Context, oldValue T, newValue T) (T, error)
@@ -102,13 +102,13 @@ func NewLazySubscribable[T any](
 	return &LazySubscribable[T]{
 		loader:       loader,
 		beforeUpdate: beforeUpdate,
-		Subscribable: initSubscribable(value, bufferSize),
+		subscribable: initSubscribable(value, bufferSize),
 	}, nil
 }
 
 func (s *LazySubscribable[T]) currentUnlocked(ctx context.Context) (T, error) {
 	if s.loaded {
-		return s.value, nil
+		return s.subscribable.value, nil
 	}
 
 	value, err := s.loader(ctx)
@@ -116,22 +116,22 @@ func (s *LazySubscribable[T]) currentUnlocked(ctx context.Context) (T, error) {
 		return value, fmt.Errorf("could not load value: %w", err)
 	}
 
-	s.value = value
+	s.subscribable.value = value
 	s.loaded = true
 
 	return value, nil
 }
 
 func (s *LazySubscribable[T]) Current(ctx context.Context) (T, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.subscribable.mutex.Lock()
+	defer s.subscribable.mutex.Unlock()
 
 	return s.currentUnlocked(ctx)
 }
 
 func (s *LazySubscribable[T]) Set(ctx context.Context, value T) (T, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.subscribable.mutex.Lock()
+	defer s.subscribable.mutex.Unlock()
 
 	oldValue, err := s.currentUnlocked(ctx)
 	if err != nil {
@@ -145,25 +145,25 @@ func (s *LazySubscribable[T]) Set(ctx context.Context, value T) (T, error) {
 		}
 	}
 
-	return s.setUnlocked(value), nil
+	return s.subscribable.setUnlocked(value), nil
 }
 
 func (s *LazySubscribable[T]) Subscribe(ctx context.Context) (<-chan T, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.subscribable.mutex.Lock()
+	defer s.subscribable.mutex.Unlock()
 
 	_, err := s.currentUnlocked(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("could not get current value: %w", err)
 	}
 
-	return s.subscribeUnlocked(ctx), nil
+	return s.subscribable.subscribeUnlocked(ctx), nil
 }
 
 type ComputedSubscribable[T any] struct {
-	Subscribable[T]
-	compute  func(ctx context.Context) (T, error)
-	interval time.Duration
+	subscribable Subscribable[T]
+	compute      func(ctx context.Context) (T, error)
+	interval     time.Duration
 }
 
 func NewComputedSubscribable[T any](
@@ -185,7 +185,7 @@ func NewComputedSubscribable[T any](
 	result := &ComputedSubscribable[T]{
 		compute:      compute,
 		interval:     interval,
-		Subscribable: initSubscribable(value, bufferSize),
+		subscribable: initSubscribable(value, bufferSize),
 	}
 
 	if interval > 0 {
@@ -213,26 +213,26 @@ func (s *ComputedSubscribable[T]) setCurrentUnlocked(ctx context.Context) (T, er
 		return value, fmt.Errorf("could not compute value: %w", err)
 	}
 
-	s.setUnlocked(value)
+	s.subscribable.setUnlocked(value)
 
 	return value, nil
 }
 
 func (s *ComputedSubscribable[T]) SetCurrent(ctx context.Context) (T, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.subscribable.mutex.Lock()
+	defer s.subscribable.mutex.Unlock()
 
 	return s.setCurrentUnlocked(ctx)
 }
 
 func (s *ComputedSubscribable[T]) Subscribe(ctx context.Context) (<-chan T, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.subscribable.mutex.Lock()
+	defer s.subscribable.mutex.Unlock()
 
 	_, err := s.setCurrentUnlocked(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("could not get current value: %w", err)
 	}
 
-	return s.subscribeUnlocked(ctx), nil
+	return s.subscribable.subscribeUnlocked(ctx), nil
 }
