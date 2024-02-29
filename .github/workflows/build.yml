@@ -20,12 +20,12 @@ jobs:
             - name: Set up Go
               uses: actions/setup-go@v4
               with:
-                  go-version: "1.21"
+                  go-version: "1.22"
 
             - name: Set up Node.js
               uses: actions/setup-node@v3
               with:
-                  node-version: 18.x
+                  node-version: 20.x
                   cache: "npm"
 
             - name: Create empty file in webroot
