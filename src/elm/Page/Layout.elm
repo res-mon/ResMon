@@ -380,12 +380,6 @@ footer shared _ =
                     [ Dom.text "GitHub-Projekt" ]
                 ]
             , Ui.menuItem [] [ resMonLogo "https://resmon.de" shared ]
-            , Ui.menuItem []
-                [ Dom.a
-                    [ Attr.href "https://docs.resmon.de/packages/yertools/res-mon/latest/"
-                    ]
-                    [ Dom.text "Dokumentation" ]
-                ]
             ]
         ]
 
