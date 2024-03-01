@@ -456,6 +456,7 @@ globalStyles =
     , Css.Global.selector ".drawer-toggle:checked ~ .drawer-side"
         [ Css.property "pointer-events" "auto"
         , Css.property "visibility" "visible"
+        , Css.property "overflow-y" "auto"
         ]
     , Css.Global.selector ".drawer-toggle:checked ~ .drawer-side > *:not(.drawer-overlay)"
         [ Css.property "transform" "translateX(0%)"
@@ -600,14 +601,14 @@ globalStyles =
             ]
         ]
     , Css.Global.mediaQuery [ "(hover: hover)" ]
-        [ Css.Global.selector ":where(.menu li:not(.menu-title):not(.disabled) > *:not(ul):not(details):not(.menu-title)):not(.active):hover, :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover"
+        [ Css.Global.selector ":where(.menu li:not(.menu-title, .disabled) > *:not(ul, details, .menu-title)):not(.active, .btn):hover, :where(.menu li:not(.menu-title, .disabled) > details > summary:not(.menu-title)):not(.active, .btn):hover"
             [ Css.property "cursor" "pointer"
             , Css.property "outline" "2px solid transparent"
             , Css.property "outline-offset" "2px"
             ]
         ]
     , Css.Global.mediaQuery [ "(hover: hover)" ]
-        [ Css.Global.selector ":where(.menu li:not(.menu-title):not(.disabled) > *:not(ul):not(details):not(.menu-title)):not(.active):hover, :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover"
+        [ Css.Global.selector ":where(.menu li:not(.menu-title, .disabled) > *:not(ul, details, .menu-title)):not(.active, .btn):hover, :where(.menu li:not(.menu-title, .disabled) > details > summary:not(.menu-title)):not(.active, .btn):hover"
             [ Css.property "background-color" "var(--fallback-bc,oklch(var(--bc)/0.1))"
             ]
         ]
@@ -620,6 +621,26 @@ globalStyles =
         ]
     , Css.Global.selector ".dropdown:is(details) summary::-webkit-details-marker"
         [ Css.property "display" "none"
+        ]
+    , Css.Global.selector ".input[type=\"number\"]::-webkit-inner-spin-button,\n.input-md[type=\"number\"]::-webkit-inner-spin-button"
+        [ Css.property "margin-top" "-1rem"
+        , Css.property "margin-bottom" "-1rem"
+        , Css.property "margin-inline-end" "-1rem"
+        ]
+    , Css.Global.selector ".input-xs[type=\"number\"]::-webkit-inner-spin-button"
+        [ Css.property "margin-top" "-0.25rem"
+        , Css.property "margin-bottom" "-0.25rem"
+        , Css.property "margin-inline-end" "-0px"
+        ]
+    , Css.Global.selector ".input-sm[type=\"number\"]::-webkit-inner-spin-button"
+        [ Css.property "margin-top" "0px"
+        , Css.property "margin-bottom" "0px"
+        , Css.property "margin-inline-end" "-0px"
+        ]
+    , Css.Global.selector ".input-lg[type=\"number\"]::-webkit-inner-spin-button"
+        [ Css.property "margin-top" "-1.5rem"
+        , Css.property "margin-bottom" "-1.5rem"
+        , Css.property "margin-inline-end" "-1.5rem"
         ]
     , Css.Global.selector ":where(.join *:has(.join-item))"
         [ Css.property "border-radius" "inherit"
@@ -652,7 +673,7 @@ globalStyles =
     , Css.Global.selector ":root:has(:is(.modal-open, .modal:target, .modal-toggle:checked + .modal, .modal[open]))"
         [ Css.property "overflow" "hidden"
         ]
-    , Css.Global.selector ":where(.navbar > *)"
+    , Css.Global.selector ":where(.navbar > *:not(script, style))"
         [ Css.property "display" "inline-flex"
         , Css.property "align-items" "center"
         ]
@@ -1013,7 +1034,7 @@ globalStyles =
         , Css.property "margin" "0.5rem 1rem"
         , Css.property "height" "1px"
         ]
-    , Css.Global.selector ":where(.menu li:not(.menu-title):not(.disabled) > *:not(ul):not(details):not(.menu-title)):not(summary):not(.active).focus,\n  :where(.menu li:not(.menu-title):not(.disabled) > *:not(ul):not(details):not(.menu-title)):not(summary):not(.active):focus,\n  :where(.menu li:not(.menu-title):not(.disabled) > *:not(ul):not(details):not(.menu-title)):is(summary):not(.active):focus-visible,\n  :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(summary):not(.active).focus,\n  :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(summary):not(.active):focus,\n  :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):is(summary):not(.active):focus-visible"
+    , Css.Global.selector ":where(.menu li:not(.menu-title, .disabled) > *:not(ul, details, .menu-title)):not(summary, .active, .btn).focus, :where(.menu li:not(.menu-title, .disabled) > *:not(ul, details, .menu-title)):not(summary, .active, .btn):focus, :where(.menu li:not(.menu-title, .disabled) > *:not(ul, details, .menu-title)):is(summary):not(.active, .btn):focus-visible, :where(.menu li:not(.menu-title, .disabled) > details > summary:not(.menu-title)):not(summary, .active, .btn).focus, :where(.menu li:not(.menu-title, .disabled) > details > summary:not(.menu-title)):not(summary, .active, .btn):focus, :where(.menu li:not(.menu-title, .disabled) > details > summary:not(.menu-title)):is(summary):not(.active, .btn):focus-visible"
         [ Css.property "cursor" "pointer"
         , Css.property "background-color" "var(--fallback-bc,oklch(var(--bc)/0.1))"
         , Css.property "--tw-text-opacity" "1"
@@ -1102,6 +1123,7 @@ globalStyles =
         , Css.property "border-color" "var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity)))"
         , Css.property "--tw-bg-opacity" "1"
         , Css.property "background-color" "var(--fallback-b2,oklch(var(--b2)/var(--tw-bg-opacity)))"
+        , Css.property "color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)))"
         , Css.property "--tw-text-opacity" "0.2"
         ]
     , Css.Global.selector ".select-disabled::placeholder,\n  .select:disabled::placeholder,\n  .select[disabled]::placeholder"
@@ -1384,6 +1406,14 @@ globalStyles =
         ]
     , Css.Global.selector "[dir=\"rtl\"] .drawer-open > .drawer-toggle ~ .drawer-side > *:not(.drawer-overlay)"
         [ Css.property "transform" "translateX(0%)"
+        ]
+    , Css.Global.selector "html:has(.drawer-toggle:checked)"
+        [ Css.property "overflow-y" "hidden"
+        , Css.property "scrollbar-gutter" "stable"
+        ]
+    , Css.Global.selector "html:has(.drawer-open.drawer-open)"
+        [ Css.property "overflow-y" "auto"
+        , Css.property "scrollbar-gutter" "auto"
         ]
     , Css.Global.selector ":is([dir=\"rtl\"] .indicator :where(.indicator-item))"
         [ Css.property "--tw-translate-x" "-50%"
@@ -10876,6 +10906,11 @@ drawer_open =
                 ]
             ]
         , Css.Global.children
+            [ Css.Global.selector ".drawer-side"
+                [ Css.property "overflow-y" "auto"
+                ]
+            ]
+        , Css.Global.children
             [ Css.Global.selector ".drawer-toggle:checked ~ .drawer-side"
                 [ Css.property "pointer-events" "auto"
                 , Css.property "visibility" "visible"
@@ -10919,7 +10954,8 @@ drawer_side =
         , Css.property "grid-template-rows" "repeat(1, minmax(0, 1fr))"
         , Css.property "align-items" "flex-start"
         , Css.property "justify-items" "start"
-        , Css.property "overflow-y" "auto"
+        , Css.property "overflow-x" "hidden"
+        , Css.property "overflow-y" "hidden"
         , Css.property "overscroll-behavior" "contain"
         , Css.property "height" "100vh"
         , Css.property "height" "100dvh"
@@ -13747,6 +13783,13 @@ input =
             [ Css.Global.selector "input:focus"
                 [ Css.property "outline" "2px solid transparent"
                 , Css.property "outline-offset" "2px"
+                ]
+            ]
+        , Css.Global.descendants
+            [ Css.Global.selector "input"
+                [ Css.property "--tw-bg-opacity" "1"
+                , Css.property "background-color" "var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity)))"
+                , Css.property "background-color" "transparent"
                 ]
             ]
         ]
@@ -17038,7 +17081,7 @@ menu =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector "li > *:not(ul):not(.menu-title):not(details).active"
+            [ Css.Global.selector "li > *:not(ul, .menu-title, details, .btn).active"
                 [ Css.property "--tw-bg-opacity" "1"
                 , Css.property "background-color" "var(--fallback-n,oklch(var(--n)/var(--tw-bg-opacity)))"
                 , Css.property "--tw-text-opacity" "1"
@@ -17046,7 +17089,7 @@ menu =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector "li > *:not(ul):not(.menu-title):not(details):active"
+            [ Css.Global.selector "li > *:not(ul, .menu-title, details, .btn):active"
                 [ Css.property "--tw-bg-opacity" "1"
                 , Css.property "background-color" "var(--fallback-n,oklch(var(--n)/var(--tw-bg-opacity)))"
                 , Css.property "--tw-text-opacity" "1"
@@ -17101,7 +17144,7 @@ menu =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(li:not(.menu-title) > *:not(ul):not(details):not(.menu-title))"
+            [ Css.Global.selector ":where(li:not(.menu-title) > *:not(ul, details, .menu-title, .btn))"
                 [ Css.property "display" "grid"
                 , Css.property "grid-auto-flow" "column"
                 , Css.property "align-content" "flex-start"
@@ -17142,7 +17185,7 @@ menu =
             ]
         , Css.Media.withMediaQuery [ "(hover:hover)" ]
             [ Css.Global.descendants
-                [ Css.Global.selector "li > *:not(ul):not(.menu-title):not(details).active"
+                [ Css.Global.selector "li > *:not(ul, .menu-title, details, .btn).active"
                     [ Css.property "--tw-bg-opacity" "1"
                     , Css.property "background-color" "var(--fallback-n,oklch(var(--n)/var(--tw-bg-opacity)))"
                     , Css.property "--tw-text-opacity" "1"
@@ -17152,7 +17195,7 @@ menu =
             ]
         , Css.Media.withMediaQuery [ "(hover:hover)" ]
             [ Css.Global.descendants
-                [ Css.Global.selector "li > *:not(ul):not(.menu-title):not(details):active"
+                [ Css.Global.selector "li > *:not(ul, .menu-title, details, .btn):active"
                     [ Css.property "--tw-bg-opacity" "1"
                     , Css.property "background-color" "var(--fallback-n,oklch(var(--n)/var(--tw-bg-opacity)))"
                     , Css.property "--tw-text-opacity" "1"
@@ -17209,7 +17252,7 @@ menu_lg =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(li:not(.menu-title) > *:not(ul):not(details):not(.menu-title))"
+            [ Css.Global.selector ":where(li:not(.menu-title) > *:not(ul, details, .menu-title))"
                 [ Css.property "border-radius" "var(--rounded-btn, 0.5rem)"
                 , Css.property "padding-left" "1.5rem"
                 , Css.property "padding-right" "1.5rem"
@@ -17245,7 +17288,7 @@ menu_md =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(li:not(.menu-title) > *:not(ul):not(details):not(.menu-title))"
+            [ Css.Global.selector ":where(li:not(.menu-title) > *:not(ul, details, .menu-title))"
                 [ Css.property "border-radius" "var(--rounded-btn, 0.5rem)"
                 , Css.property "padding-left" "1rem"
                 , Css.property "padding-right" "1rem"
@@ -17281,7 +17324,7 @@ menu_sm =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(li:not(.menu-title) > *:not(ul):not(details):not(.menu-title))"
+            [ Css.Global.selector ":where(li:not(.menu-title) > *:not(ul, details, .menu-title))"
                 [ Css.property "border-radius" "var(--rounded-btn, 0.5rem)"
                 , Css.property "padding-left" "0.75rem"
                 , Css.property "padding-right" "0.75rem"
@@ -17349,7 +17392,7 @@ menu_xs =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(li:not(.menu-title) > *:not(ul):not(details):not(.menu-title))"
+            [ Css.Global.selector ":where(li:not(.menu-title) > *:not(ul, details, .menu-title))"
                 [ Css.property "border-radius" "0.25rem"
                 , Css.property "padding-left" "0.5rem"
                 , Css.property "padding-right" "0.5rem"
