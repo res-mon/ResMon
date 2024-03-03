@@ -56,7 +56,7 @@ func startAPI(ctx context.Context, db *database.DB, mux *http.ServeMux) error {
 		if r.Header.Get("Upgrade") == "" &&
 			strings.Contains(strings.ToLower(
 				r.Header.Get("Accept")), "text/html",
-			) {
+			) && r.URL.RawQuery == "" {
 			http.Redirect(w, r, "/api/apollo", http.StatusFound)
 			return
 		}
