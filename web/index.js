@@ -133,19 +133,16 @@ client.on("error", (error) => {
     app.ports.socketStatusReconnecting.send(error);
 });
 
-let lastTime = new Date().getTime() + timeOffset;
-const getCurrentTimeInterval = 100;
+let lastTime = 0;
 function getCurrentTime() {
     const now = new Date().getTime() + timeOffset;
+    const nowFloored = Math.floor(now / 1000);
 
-    if (Math.floor(now / 1000) !== Math.floor(lastTime / 1000)) {
+    if (nowFloored !== lastTime) {
         app.ports.clockTicked.send(now);
     }
 
-    lastTime = now;
-
-    const timeout = getCurrentTimeInterval - (now % getCurrentTimeInterval);
-    setTimeout(getCurrentTime, timeout);
+    lastTime = nowFloored;
+    window.requestAnimationFrame(getCurrentTime);
 }
-
 getCurrentTime();
