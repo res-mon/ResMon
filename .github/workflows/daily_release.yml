@@ -10,9 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
+
+    
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
         
     - name: Calculate Version
       id: calc_version
@@ -23,6 +26,7 @@ jobs:
         NEW_TAG="v$YEAR.$MONTH.$COUNT"
         echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
         echo "New version: $NEW_TAG"
+
         
     - name: Check for changes
       run: |
@@ -47,6 +51,12 @@ jobs:
         fi
 
 
+    - name: Set up GitHub CLI
+      run: gh auth setup-git
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        
     - name: Create Release
       run: |
         if [ "${{ env.CHANGES_EXIST }}" = "true" ]; then
@@ -54,3 +64,5 @@ jobs:
         else
           echo "No changes detected, skipping release."
         fi
+      env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
