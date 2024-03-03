@@ -54,7 +54,7 @@ jobs:
     - name: Set up GitHub CLI
       run: gh auth setup-git
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.DAILY_RELEASE_ACCESS_TOKEN }}
 
         
     - name: Create Release
@@ -65,4 +65,4 @@ jobs:
           echo "No changes detected, skipping release."
         fi
       env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.DAILY_RELEASE_ACCESS_TOKEN }}
