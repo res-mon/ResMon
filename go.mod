@@ -4,7 +4,6 @@ go 1.22.0
 
 require (
 	github.com/gorilla/websocket v1.5.1
-	github.com/julienschmidt/httprouter v1.3.0
 	github.com/sqlc-dev/sqlc v1.25.0
 	github.com/vektah/gqlparser/v2 v2.5.11
 )

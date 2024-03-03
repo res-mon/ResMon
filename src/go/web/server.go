@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/julienschmidt/httprouter"
 	"github.com/yerTools/ResMon/src/go/database"
 )
 
@@ -82,19 +81,19 @@ func getNetworkAddresses() ([]string, error) {
 }
 
 func (s *server) Run(ctx, killCtx context.Context, shutdown func(), db *database.DB) error {
-	router := httprouter.New()
+	mux := http.NewServeMux()
 
 	var err error
 	if s.devMode {
-		err = s.handleDefaultDev(router)
+		err = s.handleDefaultDev(mux)
 	} else {
-		err = s.handleDefaultProd(router)
+		err = s.handleDefaultProd(mux)
 	}
 	if err != nil {
 		return fmt.Errorf("could not default route: %w", err)
 	}
 
-	err = startAPI(ctx, db, router)
+	err = startAPI(ctx, db, mux)
 	if err != nil {
 		return fmt.Errorf("could not start API: %w", err)
 	}
@@ -105,7 +104,7 @@ func (s *server) Run(ctx, killCtx context.Context, shutdown func(), db *database
 		WriteTimeout:      300 * time.Second,
 		IdleTimeout:       300 * time.Second,
 		ReadHeaderTimeout: 300 * time.Second,
-		Handler:           router,
+		Handler:           mux,
 	}
 
 	var wg sync.WaitGroup
@@ -172,22 +171,22 @@ func openURL(url string) error {
 	return exec.Command(cmd, args...).Start()
 }
 
-func (s *server) handleDefaultDev(router *httprouter.Router) error {
+func (s *server) handleDefaultDev(mux *http.ServeMux) error {
 	url, err := url.Parse(devDestination)
 	if err != nil {
 		return fmt.Errorf("could not parse reverse proxy url: %w", err)
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(url)
-	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/{path...}", func(w http.ResponseWriter, r *http.Request) {
 		proxy.ServeHTTP(w, r)
 	})
-	router.GET("/ws", webSocketDevProxyHandler)
+	mux.HandleFunc("GET /ws", webSocketDevProxyHandler)
 
 	return nil
 }
 
-func (s *server) handleDefaultProd(router *httprouter.Router) error {
+func (s *server) handleDefaultProd(mux *http.ServeMux) error {
 	root, err := fs.Sub(s.embeddedRoot, s.rootPath)
 	if err != nil {
 		return fmt.Errorf("embedded root directory not found: %w", err)
@@ -210,11 +209,11 @@ func (s *server) handleDefaultProd(router *httprouter.Router) error {
 		return nil
 	})
 
-	router.NotFound = http.HandlerFunc(func(
+	mux.HandleFunc("/{path...}", func(
 		w http.ResponseWriter, r *http.Request,
 	) {
 		s.withErr(func(
-			w http.ResponseWriter, r *http.Request, p httprouter.Params,
+			w http.ResponseWriter, r *http.Request,
 		) error {
 			var path string
 			if r.URL != nil {
@@ -298,13 +297,13 @@ func (s *server) handleDefaultProd(router *httprouter.Router) error {
 			}
 
 			return nil
-		})(w, r, nil)
+		})(w, r)
 	})
 
 	return nil
 }
 
-func webSocketDevProxyHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func webSocketDevProxyHandler(w http.ResponseWriter, r *http.Request) {
 	srcConn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Printf("could not upgrade web socket dev proxy: %v\n", err)
@@ -347,10 +346,10 @@ func webSocketDevProxyHandler(w http.ResponseWriter, r *http.Request, _ httprout
 }
 
 func (s *server) withErr(h func(
-	w http.ResponseWriter, r *http.Request, p httprouter.Params,
-) error) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		err := h(w, r, p)
+	w http.ResponseWriter, r *http.Request,
+) error) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := h(w, r)
 		if err == nil {
 			return
 		}

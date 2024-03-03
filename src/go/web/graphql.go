@@ -12,14 +12,13 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gorilla/websocket"
-	"github.com/julienschmidt/httprouter"
 
 	"github.com/yerTools/ResMon/generated/go/graph"
 	"github.com/yerTools/ResMon/src/go/api"
 	"github.com/yerTools/ResMon/src/go/database"
 )
 
-func startAPI(ctx context.Context, db *database.DB, router *httprouter.Router) error {
+func startAPI(ctx context.Context, db *database.DB, mux *http.ServeMux) error {
 	cfg, err := api.New(ctx, db)
 	if err != nil {
 		return fmt.Errorf("could not create new API: %w", err)
@@ -50,18 +49,9 @@ func startAPI(ctx context.Context, db *database.DB, router *httprouter.Router) e
 
 	srv.Use(extension.Introspection{})
 
-	handle := func(
+	mux.HandleFunc("GET /api", func(
 		w http.ResponseWriter,
 		r *http.Request,
-		_ httprouter.Params,
-	) {
-		srv.ServeHTTP(w, r)
-	}
-
-	router.GET("/api", func(
-		w http.ResponseWriter,
-		r *http.Request,
-		_ httprouter.Params,
 	) {
 		if r.Header.Get("Upgrade") == "" &&
 			strings.Contains(strings.ToLower(
@@ -74,18 +64,13 @@ func startAPI(ctx context.Context, db *database.DB, router *httprouter.Router) e
 		srv.ServeHTTP(w, r)
 	})
 
-	router.POST("/api", handle)
-	router.OPTIONS("/api", handle)
+	mux.HandleFunc("POST /api", srv.ServeHTTP)
+	mux.HandleFunc("OPTIONS /api", srv.ServeHTTP)
 
 	apolloHandler := playground.ApolloSandboxHandler(
 		"ResMon - Apollo GraphQL Sandbox", "/api")
 
-	router.Handler("DELETE", "/api/apollo", apolloHandler)
-	router.Handler("GET", "/api/apollo", apolloHandler)
-	router.Handler("HEAD", "/api/apollo", apolloHandler)
-	router.Handler("PATCH", "/api/apollo", apolloHandler)
-	router.Handler("POST", "/api/apollo", apolloHandler)
-	router.Handler("PUT", "/api/apollo", apolloHandler)
+	mux.HandleFunc("/api/apollo", apolloHandler)
 
 	return nil
 }
