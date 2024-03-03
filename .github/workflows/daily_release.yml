@@ -8,6 +8,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
     - uses: actions/checkout@v4
       with:
@@ -25,15 +26,26 @@ jobs:
         
     - name: Check for changes
       run: |
-        LAST_TAG=$(git describe --tags --abbrev=0)
-        CHANGES=$(git diff --name-only $LAST_TAG..HEAD)
-        if [ -z "$CHANGES" ]; then
-          echo "No changes since last tag."
-          echo "CHANGES_EXIST=false" >> $GITHUB_ENV
+        if git rev-parse --verify --quiet "refs/tags"; then
+          LAST_TAG=$(git describe --tags --abbrev=0)
         else
-          echo "Changes detected."
+          LAST_TAG=""
+        fi
+        
+        if [ -n "$LAST_TAG" ]; then
+          CHANGES=$(git diff --name-only $LAST_TAG..HEAD)
+          if [ -z "$CHANGES" ]; then
+            echo "No changes since last tag."
+            echo "CHANGES_EXIST=false" >> $GITHUB_ENV
+          else
+            echo "Changes detected."
+            echo "CHANGES_EXIST=true" >> $GITHUB_ENV
+          fi
+        else
+          echo "No tags found, assuming changes."
           echo "CHANGES_EXIST=true" >> $GITHUB_ENV
         fi
+
 
     - name: Create Release
       run: |
