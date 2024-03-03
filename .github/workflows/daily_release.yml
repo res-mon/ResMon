@@ -1,0 +1,34 @@
+name: Daily Release
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Check for changes
+      run: |
+        LAST_TAG=$(git describe --tags --abbrev=0)
+        CHANGES=$(git diff --name-only $LAST_TAG..HEAD)
+        if [ -z "$CHANGES" ]; then
+          echo "No changes since last tag."
+          echo "CHANGES_EXIST=false" >> $GITHUB_ENV
+        else
+          echo "Changes detected."
+          echo "CHANGES_EXIST=true" >> $GITHUB_ENV
+        fi
+
+    - name: Create Release
+      run: |
+        if [ "${{ env.CHANGES_EXIST }}" = "true" ]; then
+          TAG=$(date +v%Y.%m.%d)
+          gh release create $TAG --generate-notes
+        else
+          echo "No changes detected, skipping release."
+        fi
