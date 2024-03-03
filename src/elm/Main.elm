@@ -6,6 +6,7 @@ import LocalStorage as Ls
 import Model.Shared exposing (Route(..), SharedModel)
 import Page.Layout as Layout
 import Page.NotFound as NotFound
+import Page.WorkClock as WorkClock
 import Routing
 import Url exposing (Url)
 
@@ -33,6 +34,7 @@ main =
 type alias Model =
     { shared : SharedModel Msg
     , layout : Layout.Model Msg
+    , workClock : WorkClock.Model Msg
     }
 
 
@@ -43,11 +45,14 @@ init () url key =
             Routing.init ()
 
         ( layoutModel, layoutCmd ) =
-            Layout.init Layout shared
+            Layout.init LayoutMsg shared
 
         model : Model
         model =
-            { shared = shared, layout = layoutModel }
+            { shared = shared
+            , layout = layoutModel
+            , workClock = workClockModel
+            }
 
         ( route, routeCmd ) =
             Routing.update initialRoute url key
@@ -59,6 +64,9 @@ init () url key =
                 url
                 key
                 (Ls.init LocalStorageMsg)
+
+        ( workClockModel, workClockCmd ) =
+            WorkClock.init WorkClockMsg shared
     in
     ( model
     , Cmd.batch
@@ -66,6 +74,7 @@ init () url key =
         , layoutCmd
         , routeCmd
         , initialRouteCmd
+        , workClockCmd
         ]
     )
 
@@ -80,7 +89,8 @@ type Msg
     | UpdateRoute
     | SharedMsg (Model.Shared.Msg Msg)
     | LocalStorageMsg (Ls.Msg Msg)
-    | Layout (Layout.Msg Msg)
+    | LayoutMsg (Layout.Msg Msg)
+    | WorkClockMsg (WorkClock.Msg Msg)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -167,12 +177,21 @@ update msg model =
                             , Cmd.none
                             )
 
-                Layout inner ->
+                LayoutMsg inner ->
                     let
                         ( shared, layout, cmd ) =
                             Layout.update inner model.shared model.layout
                     in
                     ( { model | shared = shared, layout = layout }
+                    , cmd
+                    )
+
+                WorkClockMsg inner ->
+                    let
+                        ( shared, workClock, cmd ) =
+                            WorkClock.update inner model.shared model.workClock
+                    in
+                    ( { model | shared = shared, workClock = workClock }
                     , cmd
                     )
 
@@ -206,7 +225,9 @@ view model =
                     )
 
                 WorkClock ->
-                    ( False, { title = "Stempeluhr", body = [] } )
+                    ( False
+                    , WorkClock.view model.shared model.workClock
+                    )
     in
     layout minimal page
 

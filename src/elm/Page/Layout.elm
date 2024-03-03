@@ -1,8 +1,5 @@
 module Page.Layout exposing (Model, Msg, init, update, view)
 
-import Api
-import Api.Shared
-import Api.WorkClock
 import Browser exposing (Document)
 import Component.DaisyUi as Ui
 import Component.Icon as Ico
@@ -22,7 +19,6 @@ import Tailwind.Breakpoints as Br
 import Tailwind.Classes as Cls
 import Tailwind.Theme as Color
 import Tailwind.Utilities as Tw
-import Time
 
 
 
@@ -45,7 +41,6 @@ init toMsg _ =
 
 type Msg msg
     = RemoveAlert Int
-    | ToggleWorkClock
 
 
 update :
@@ -57,19 +52,6 @@ update msg shared model =
     case msg of
         RemoveAlert number ->
             ( removeAlert shared number, model, Cmd.none )
-
-        ToggleWorkClock ->
-            ( shared
-            , model
-            , Api.WorkClock.setWorkClockActive shared.api.workClock
-                (case shared.api.workClock.activity of
-                    Api.Shared.Unknown ->
-                        True
-
-                    Api.Shared.Received activity ->
-                        not activity.active
-                )
-            )
 
 
 
@@ -147,66 +129,10 @@ view shared model minimal body =
                     [ Tw.p_16
                     , Tw.bg_color Color.base_100
                     , Tw.text_color Color.base_content
-                    , Tw.grid
                     , Tw.flex_1
-                    , Tw.place_items_center
                     ]
                 ]
-                (Dom.div []
-                    [ Dom.div
-                        [ Attr.css
-                            [ Tw.text_5xl
-                            , Tw.font_mono
-                            , Br.xl [ Tw.text_9xl ]
-                            , Br.sm [ Tw.text_8xl ]
-                            ]
-                        ]
-                        [ Ui.countdown []
-                            [ Tw.duration_500 ]
-                            (Maybe.map2 Time.toHour shared.timeZone shared.time
-                                |> Maybe.withDefault 0
-                            )
-                        , Dom.text ":"
-                        , Ui.countdown []
-                            [ Tw.duration_500 ]
-                            (Maybe.map2 Time.toMinute shared.timeZone shared.time
-                                |> Maybe.withDefault 0
-                            )
-                        , Dom.text ":"
-                        , Ui.countdown []
-                            [ Tw.duration_500 ]
-                            (Maybe.map2 Time.toSecond shared.timeZone shared.time
-                                |> Maybe.withDefault 0
-                            )
-                        ]
-                    , Dom.div
-                        [ Attr.css [ Tw.text_center ] ]
-                        [ Dom.text "API Status: "
-                        , Dom.text <|
-                            case shared.api.status of
-                                Api.NotConnected ->
-                                    "Nicht verbunden"
-
-                                Api.Connected ->
-                                    "Verbunden"
-
-                                Api.Reconnecting ->
-                                    "Verbindung wird wiederhergestellt"
-                        ]
-                    , toggleView shared model
-                    , Dom.div
-                        [ Attr.css [ Tw.text_center ] ]
-                        [ Dom.text "Stempeluhr: "
-                        , case shared.api.workClock.activity of
-                            Api.Shared.Unknown ->
-                                Dom.text "Unbekannt"
-
-                            Api.Shared.Received activity ->
-                                workClockView shared activity
-                        ]
-                    ]
-                    :: map Dom.fromUnstyled body.body
-                )
+                (map Dom.fromUnstyled body.body)
     in
     { title = body.title ++ " - ResMon"
     , body =
@@ -256,89 +182,6 @@ navigation _ _ sidebarToggleId =
                 [ Ico.list [ Tw.text_4xl ] ]
             ]
         ]
-
-
-workClockView : SharedModel msg -> Api.WorkClock.Activity -> Dom.Html msg
-workClockView shared activity =
-    Dom.span []
-        [ Dom.text <|
-            if activity.active then
-                "Aktiv"
-
-            else
-                "Inaktiv"
-        , Dom.text " seit "
-        , Dom.span []
-            (case shared.time of
-                Just time ->
-                    let
-                        duration : Int
-                        duration =
-                            ((Time.posixToMillis time - Time.posixToMillis activity.since)
-                                |> toFloat
-                            )
-                                / 1000
-                                |> round
-                                |> max 0
-
-                        hours : Int
-                        hours =
-                            duration // 3600
-
-                        minutes : Int
-                        minutes =
-                            modBy 60 (duration // 60)
-
-                        seconds : Int
-                        seconds =
-                            modBy 60 duration
-                    in
-                    [ Ui.countdown []
-                        [ Tw.duration_500 ]
-                        hours
-                    , Dom.text ":"
-                    , Ui.countdown []
-                        [ Tw.duration_500 ]
-                        minutes
-                    , Dom.text ":"
-                    , Ui.countdown []
-                        [ Tw.duration_500 ]
-                        seconds
-                    ]
-
-                _ ->
-                    [ Dom.text "Unbekannt" ]
-            )
-        ]
-
-
-toggleView : SharedModel msg -> Model msg -> Dom.Html msg
-toggleView shared model =
-    Dom.div [ Attr.css [ Tw.text_center, Tw.m_4 ] ]
-        (case shared.api.workClock.activity of
-            Api.Shared.Unknown ->
-                []
-
-            Api.Shared.Received activity ->
-                [ Ui.btn Dom.button
-                    [ Ui.modifiers
-                        [ if activity.active then
-                            Ui.BtnError
-
-                          else
-                            Ui.BtnSuccess
-                        ]
-                    , onClick (model.toMsg ToggleWorkClock) |> Ui.attribute
-                    ]
-                    [ Dom.text <|
-                        if activity.active then
-                            "Abstempeln"
-
-                        else
-                            "Einstempeln"
-                    ]
-                ]
-        )
 
 
 resMonLogo : String -> SharedModel msg -> Dom.Html msg
