@@ -66,6 +66,11 @@ jobs:
           cache: "npm"
 
 
+    - name: Install C dependencies
+      if: env.CHANGES_EXIST == 'true'
+      run: sudo apt-get update && sudo apt-get install -y gcc libc6-dev mingw-w64 gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
+
+
     - name: Create empty file in webroot
       if: env.CHANGES_EXIST == 'true'
       run: mkdir -p webroot && touch webroot/empty
@@ -94,6 +99,14 @@ jobs:
     - name: Build project
       if: env.CHANGES_EXIST == 'true'
       run: npm run build
+
+
+    - name: Build application
+      run: |
+        GOOS=linux GOARCH=amd64 CGO_ENABLED=1 CC=gcc go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -o res-mon-linux-amd64
+        GOOS=linux GOARCH=arm64 CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -o res-mon-linux-arm64
+        GOOS=linux GOARCH=arm GOARM=7 CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -o res-mon-linux-armv7
+        GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -o res-mon-windows-amd64.exe
 
 
     - name: Set up Docker Buildx
@@ -147,6 +160,6 @@ jobs:
 
     - name: Create release
       if: env.CHANGES_EXIST == 'true'
-      run: gh release create $NEW_TAG --generate-notes
+      run: gh release create $NEW_TAG res-mon-linux-amd64 res-mon-linux-arm64 res-mon-linux-armv7 res-mon-windows-amd64.exe --generate-notes
       env:
           GH_TOKEN: ${{ secrets.DAILY_RELEASE_ACCESS_TOKEN }}
