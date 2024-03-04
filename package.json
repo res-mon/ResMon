@@ -17,7 +17,7 @@
         "generate:graph:elm": "npm run touch:webroot && go run main.go --generate-elm-graphql-schema",
         "generate:graph:go": "go run github.com/99designs/gqlgen",
         "generate:model": "go run github.com/sqlc-dev/sqlc/cmd/sqlc@latest generate --file ./src/sql/sqlc.yaml",
-        "prepare": "husky",
+        "prepare": "npx husky",
         "review": "npm run review:elm && npm run review:go && npm run review:model",
         "review:elm": "npx elm-review",
         "review:go": "npm run build:frontend && go vet -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable'",
