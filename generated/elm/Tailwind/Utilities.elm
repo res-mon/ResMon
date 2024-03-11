@@ -8495,6 +8495,15 @@ carousel_item =
         ]
 
 
+carousel_start : Css.Style
+carousel_start =
+    Css.Global.descendants
+        [ Css.Global.selector ".carousel-item"
+            [ Css.property "scroll-snap-align" "start"
+            ]
+        ]
+
+
 carousel_vertical : Css.Style
 carousel_vertical =
     Css.batch

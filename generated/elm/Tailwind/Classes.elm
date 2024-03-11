@@ -5996,6 +5996,13 @@ carousel_item =
     )
 
 
+carousel_start : ( List Css.Style, List String )
+carousel_start =
+    ( [ Tw.carousel_start ]
+    , [ "carousel-start" ]
+    )
+
+
 carousel_vertical : ( List Css.Style, List String )
 carousel_vertical =
     ( [ Tw.carousel_vertical ]
