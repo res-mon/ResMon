@@ -1,0 +1,56 @@
+name: Code generation and cleanup on pull
+
+on:
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    generate-and-commit-code:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Go
+              uses: actions/setup-go@v5
+              with:
+                  go-version: "1.22"
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
+                  cache: "npm"
+
+            - name: Create empty file in webroot
+              run: mkdir -p webroot && touch webroot/empty
+
+            - name: Install go dependencies
+              run: go install
+
+            - name: Install npm dependencies
+              run: npm ci
+
+            - name: Run generate
+              run: npm run generate
+
+            - name: Run cleanup
+              run: npm run cleanup
+
+            - name: Run tests
+              run: npm run test
+
+            - name: Build project
+              run: npm run build
+
+            - name: Run cleanup
+              run: npm run cleanup
+
+            - name: Commit and Push Generated Code
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+                  git add .
+                  git commit -m "Update generated code and cleanup" -a || echo "No changes to commit"
+                  git push
