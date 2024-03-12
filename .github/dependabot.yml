@@ -5,44 +5,44 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "daily"
-      time: "03:33"
-    open-pull-requests-limit: 25
+    - package-ecosystem: "npm"
+      directory: "/"
+      schedule:
+          interval: "daily"
+          time: "03:33"
+      open-pull-requests-limit: 25
 
-  - package-ecosystem: "gomod"
-    directory: "/"
-    schedule:
-      interval: "daily"
-      time: "03:33"
-    open-pull-requests-limit: 25
+    - package-ecosystem: "gomod"
+      directory: "/"
+      schedule:
+          interval: "daily"
+          time: "03:33"
+      open-pull-requests-limit: 25
 
-  - package-ecosystem: "elm"
-    directory: "/"
-    schedule:
-      interval: "daily"
-      time: "03:33"
-    open-pull-requests-limit: 25
-    
-  - package-ecosystem: "elm"
-    directory: "/review/"
-    schedule:
-      interval: "daily"
-      time: "03:33"
-    open-pull-requests-limit: 25
+    - package-ecosystem: "elm"
+      directory: "/"
+      schedule:
+          interval: "daily"
+          time: "03:33"
+      open-pull-requests-limit: 25
 
-  - package-ecosystem: "docker"
-    directory: "/docker/"
-    schedule:
-      interval: "daily"
-      time: "03:33"
-    open-pull-requests-limit: 25
+    - package-ecosystem: "elm"
+      directory: "/review/"
+      schedule:
+          interval: "daily"
+          time: "03:33"
+      open-pull-requests-limit: 25
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "daily"
-      time: "03:33"
-    open-pull-requests-limit: 25
+    - package-ecosystem: "docker"
+      directory: "/docker/"
+      schedule:
+          interval: "daily"
+          time: "03:33"
+      open-pull-requests-limit: 25
+
+    - package-ecosystem: "github-actions"
+      directory: "/"
+      schedule:
+          interval: "daily"
+          time: "03:33"
+      open-pull-requests-limit: 25

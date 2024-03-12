@@ -6,12 +6,12 @@ module Component.Markdown exposing
     , markdownConfiguration
     )
 
+import Component.DaisyUi as Ui
 import Html.Styled as Dom
 import Markdown
 import Tailwind.Breakpoints as Br
 import Tailwind.Classes as Cls
 import Tailwind.Utilities as Tw
-import Component.DaisyUi as Ui
 
 
 

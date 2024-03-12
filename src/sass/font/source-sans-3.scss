@@ -3,23 +3,33 @@ $source-sans-3-font-base-woff-path: "#{$source-sans-3-font-base-path}/WOFF";
 $source-sans-3-font-base-woff2-path: "#{$source-sans-3-font-base-path}/WOFF2";
 
 @font-face {
-  font-family: "Source Sans 3";
-  font-style: italic;
-  font-weight: 200 900;
-  font-display: swap;
-  src: url("#{$source-sans-3-font-base-woff2-path}/VF/SourceSans3VF-Italic.otf.woff2") format("woff2"),
-  url("#{$source-sans-3-font-base-woff2-path}/VF/SourceSans3VF-Italic.ttf.woff2") format("woff2"),
-  url("#{$source-sans-3-font-base-woff-path}/VF/SourceSans3VF-Italic.otf.woff") format("woff"),
-  url("#{$source-sans-3-font-base-woff-path}/VF/SourceSans3VF-Italic.ttf.woff") format("woff");
+	font-family: "Source Sans 3";
+	font-style: italic;
+	font-weight: 200 900;
+	font-display: swap;
+	src:
+		url("#{$source-sans-3-font-base-woff2-path}/VF/SourceSans3VF-Italic.otf.woff2")
+			format("woff2"),
+		url("#{$source-sans-3-font-base-woff2-path}/VF/SourceSans3VF-Italic.ttf.woff2")
+			format("woff2"),
+		url("#{$source-sans-3-font-base-woff-path}/VF/SourceSans3VF-Italic.otf.woff")
+			format("woff"),
+		url("#{$source-sans-3-font-base-woff-path}/VF/SourceSans3VF-Italic.ttf.woff")
+			format("woff");
 }
 
 @font-face {
-  font-family: "Source Sans 3";
-  font-style: normal;
-  font-weight: 200 900;
-  font-display: swap;
-  src: url("#{$source-sans-3-font-base-woff2-path}/VF/SourceSans3VF-Upright.otf.woff2") format("woff2"),
-  url("#{$source-sans-3-font-base-woff2-path}/VF/SourceSans3VF-Upright.ttf.woff2") format("woff2"),
-  url("#{$source-sans-3-font-base-woff-path}/VF/SourceSans3VF-Upright.otf.woff") format("woff"),
-  url("#{$source-sans-3-font-base-woff-path}/VF/SourceSans3VF-Upright.ttf.woff") format("woff");
+	font-family: "Source Sans 3";
+	font-style: normal;
+	font-weight: 200 900;
+	font-display: swap;
+	src:
+		url("#{$source-sans-3-font-base-woff2-path}/VF/SourceSans3VF-Upright.otf.woff2")
+			format("woff2"),
+		url("#{$source-sans-3-font-base-woff2-path}/VF/SourceSans3VF-Upright.ttf.woff2")
+			format("woff2"),
+		url("#{$source-sans-3-font-base-woff-path}/VF/SourceSans3VF-Upright.otf.woff")
+			format("woff"),
+		url("#{$source-sans-3-font-base-woff-path}/VF/SourceSans3VF-Upright.ttf.woff")
+			format("woff");
 }

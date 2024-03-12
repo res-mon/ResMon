@@ -1,3 +1,3 @@
 type GeneralTimeQuery {
-    current: Timestamp!
+	current: Timestamp!
 }

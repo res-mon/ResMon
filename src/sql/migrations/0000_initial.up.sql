@@ -1,19 +1,19 @@
 -- TABLES
 CREATE TABLE IF NOT EXISTS
-  "migration_script" (
-    "version" INTEGER PRIMARY KEY,
-    "identifier" TEXT NOT NULL   ,
-    "up" TEXT NOT NULL           ,
-    "down" TEXT NOT NULL
-  );
+    "migration_script" (
+        "version" INTEGER PRIMARY KEY,
+        "identifier" TEXT NOT NULL   ,
+        "up" TEXT NOT NULL           ,
+        "down" TEXT NOT NULL
+    );
 
 
 CREATE TABLE IF NOT EXISTS
-  "activity_log" (
-    "timestamp" INTEGER NOT NULL,
-    "active" INTEGER NOT NULL   ,
-    PRIMARY KEY ("timestamp")
-  );
+    "activity_log" (
+        "timestamp" INTEGER NOT NULL,
+        "active" INTEGER NOT NULL   ,
+        PRIMARY KEY ("timestamp")
+    );
 
 
 -- INDEXES

@@ -123,7 +123,7 @@ config =
         , ( "Html.Styled", "Dom" )
         , ( "Html.Styled.Attributes", "Attr" )
         , ( "LocalStorage", "Ls" )
-        , ( "Tailwind.Breakpoints", "Br")
+        , ( "Tailwind.Breakpoints", "Br" )
         , ( "Tailwind.Classes", "Cls" )
         , ( "Tailwind.Theme", "Color" )
         , ( "Tailwind.Utilities", "Tw" )

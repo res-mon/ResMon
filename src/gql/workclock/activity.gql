@@ -1,22 +1,22 @@
 type ActivityQuery {
-    """
-    The timestamp since the activity state was last changed.
-    Returns the timestamp since the activity state was last changed.
-    """
-    since: Timestamp!
+	"""
+	The timestamp since the activity state was last changed.
+	Returns the timestamp since the activity state was last changed.
+	"""
+	since: Timestamp!
 
-    """
-    This indicates if the user is currently working or not.
-    Returns the current activity state.
-    """
-    active: Boolean!
+	"""
+	This indicates if the user is currently working or not.
+	Returns the current activity state.
+	"""
+	active: Boolean!
 }
 
 type ActivityMutation {
-    """
-    Sets the current activity state.
-    This indicates if the user is currently working or not.
-    Returns the timestamp since the user is active.
-    """
-    setActive(active: Boolean!): ActivityQuery!
+	"""
+	Sets the current activity state.
+	This indicates if the user is currently working or not.
+	Returns the timestamp since the user is active.
+	"""
+	setActive(active: Boolean!): ActivityQuery!
 }
