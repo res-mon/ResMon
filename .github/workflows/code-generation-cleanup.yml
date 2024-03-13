@@ -48,9 +48,10 @@ jobs:
               run: npm run cleanup
 
             - name: Commit and Push Generated Code
-              run: |
-                  git config --local user.email "action@github.com"
-                  git config --local user.name "GitHub Action"
-                  git add .
-                  git commit -m "Update generated code and cleanup" -a || echo "No changes to commit"
-                  git push
+              uses: actions/checkout@v4
+              with:
+                repository: ${{ github.event.pull_request.head.repo.full_name }}
+                ref: ${{ github.event.pull_request.head.ref }}
+                message: Update generated code and cleanup
+                committer_name: GitHub Actions
+                committer_email: actions@github.com
