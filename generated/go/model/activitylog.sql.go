@@ -11,9 +11,9 @@ import (
 
 const addActivity = `-- name: AddActivity :exec
 INSERT INTO
-  "activity_log" ("timestamp", "active")
+    "activity_log" ("timestamp", "active")
 VALUES
-  (?1, ?2)
+    (?1, ?2)
 `
 
 type AddActivityParams struct {
@@ -24,9 +24,9 @@ type AddActivityParams struct {
 // AddActivity
 //
 //	INSERT INTO
-//	  "activity_log" ("timestamp", "active")
+//	    "activity_log" ("timestamp", "active")
 //	VALUES
-//	  (?1, ?2)
+//	    (?1, ?2)
 func (q *Queries) AddActivity(ctx context.Context, arg AddActivityParams) error {
 	_, err := q.exec(ctx, q.addActivityStmt, addActivity, arg.Timestamp, arg.Active)
 	return err
@@ -34,36 +34,36 @@ func (q *Queries) AddActivity(ctx context.Context, arg AddActivityParams) error 
 
 const isActive = `-- name: IsActive :one
 SELECT
-  CAST(
-    IFNULL(
-      (
-        SELECT
-          "active"
-        FROM
-          "activity_log"
-        ORDER BY
-          "timestamp" DESC
-        LIMIT
-          1
-      ),
-      0
-    ) AS INTEGER
-  ) AS "active",
-  CAST(
-    IFNULL(
-      (
-        SELECT
-          "timestamp"
-        FROM
-          "activity_log"
-        ORDER BY
-          "timestamp" DESC
-        LIMIT
-          1
-      ),
-      0
-    ) AS INTEGER
-  ) AS "timestamp"
+    CAST(
+        IFNULL(
+            (
+                SELECT
+                    "active"
+                FROM
+                    "activity_log"
+                ORDER BY
+                    "timestamp" DESC
+                LIMIT
+                    1
+            ),
+            0
+        ) AS INTEGER
+    ) AS "active",
+    CAST(
+        IFNULL(
+            (
+                SELECT
+                    "timestamp"
+                FROM
+                    "activity_log"
+                ORDER BY
+                    "timestamp" DESC
+                LIMIT
+                    1
+            ),
+            0
+        ) AS INTEGER
+    ) AS "timestamp"
 `
 
 type IsActiveRow struct {
@@ -74,36 +74,36 @@ type IsActiveRow struct {
 // IsActive
 //
 //	SELECT
-//	  CAST(
-//	    IFNULL(
-//	      (
-//	        SELECT
-//	          "active"
-//	        FROM
-//	          "activity_log"
-//	        ORDER BY
-//	          "timestamp" DESC
-//	        LIMIT
-//	          1
-//	      ),
-//	      0
-//	    ) AS INTEGER
-//	  ) AS "active",
-//	  CAST(
-//	    IFNULL(
-//	      (
-//	        SELECT
-//	          "timestamp"
-//	        FROM
-//	          "activity_log"
-//	        ORDER BY
-//	          "timestamp" DESC
-//	        LIMIT
-//	          1
-//	      ),
-//	      0
-//	    ) AS INTEGER
-//	  ) AS "timestamp"
+//	    CAST(
+//	        IFNULL(
+//	            (
+//	                SELECT
+//	                    "active"
+//	                FROM
+//	                    "activity_log"
+//	                ORDER BY
+//	                    "timestamp" DESC
+//	                LIMIT
+//	                    1
+//	            ),
+//	            0
+//	        ) AS INTEGER
+//	    ) AS "active",
+//	    CAST(
+//	        IFNULL(
+//	            (
+//	                SELECT
+//	                    "timestamp"
+//	                FROM
+//	                    "activity_log"
+//	                ORDER BY
+//	                    "timestamp" DESC
+//	                LIMIT
+//	                    1
+//	            ),
+//	            0
+//	        ) AS INTEGER
+//	    ) AS "timestamp"
 func (q *Queries) IsActive(ctx context.Context) (IsActiveRow, error) {
 	row := q.queryRow(ctx, q.isActiveStmt, isActive)
 	var i IsActiveRow
