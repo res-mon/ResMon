@@ -11,6 +11,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v4
+              with:
+                repository: ${{ github.event.pull_request.head.repo.full_name }}
+                ref: ${{ github.event.pull_request.head.ref }}
 
             - name: Set up Go
               uses: actions/setup-go@v5
@@ -48,10 +51,8 @@ jobs:
               run: npm run cleanup
 
             - name: Commit and Push Generated Code
-              uses: actions/checkout@v4
+              uses: EndBug/add-and-commit@v9
               with:
-                repository: ${{ github.event.pull_request.head.repo.full_name }}
-                ref: ${{ github.event.pull_request.head.ref }}
                 message: Update generated code and cleanup
                 committer_name: GitHub Actions
                 committer_email: actions@github.com
