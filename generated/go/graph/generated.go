@@ -345,63 +345,63 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "../../../src/gql/general/schema.gql", Input: `type GeneralQuery {
-    time: GeneralTimeQuery!
+	time: GeneralTimeQuery!
 }
 `, BuiltIn: false},
 	{Name: "../../../src/gql/general/time.gql", Input: `type GeneralTimeQuery {
-    current: Timestamp!
+	current: Timestamp!
 }
 `, BuiltIn: false},
 	{Name: "../../../src/gql/scalars.gql", Input: `scalar Timestamp
 `, BuiltIn: false},
 	{Name: "../../../src/gql/schema.gql", Input: `schema {
-    query: RootQuery
-    mutation: RootMutation
-    subscription: RootSubscription
+	query: RootQuery
+	mutation: RootMutation
+	subscription: RootSubscription
 }
 
 type RootQuery {
-    workClock: WorkClockQuery!
+	workClock: WorkClockQuery!
 }
 
 type RootMutation {
-    workClock: WorkClockMutation!
+	workClock: WorkClockMutation!
 }
 
 type RootSubscription {
-    workClock: WorkClockQuery!
-    general: GeneralQuery!
+	workClock: WorkClockQuery!
+	general: GeneralQuery!
 }
 `, BuiltIn: false},
 	{Name: "../../../src/gql/workclock/activity.gql", Input: `type ActivityQuery {
-    """
-    The timestamp since the activity state was last changed.
-    Returns the timestamp since the activity state was last changed.
-    """
-    since: Timestamp!
+	"""
+	The timestamp since the activity state was last changed.
+	Returns the timestamp since the activity state was last changed.
+	"""
+	since: Timestamp!
 
-    """
-    This indicates if the user is currently working or not.
-    Returns the current activity state.
-    """
-    active: Boolean!
+	"""
+	This indicates if the user is currently working or not.
+	Returns the current activity state.
+	"""
+	active: Boolean!
 }
 
 type ActivityMutation {
-    """
-    Sets the current activity state.
-    This indicates if the user is currently working or not.
-    Returns the timestamp since the user is active.
-    """
-    setActive(active: Boolean!): ActivityQuery!
+	"""
+	Sets the current activity state.
+	This indicates if the user is currently working or not.
+	Returns the timestamp since the user is active.
+	"""
+	setActive(active: Boolean!): ActivityQuery!
 }
 `, BuiltIn: false},
 	{Name: "../../../src/gql/workclock/schema.gql", Input: `type WorkClockQuery {
-    activity: ActivityQuery!
+	activity: ActivityQuery!
 }
 
 type WorkClockMutation {
-    activity: ActivityMutation!
+	activity: ActivityMutation!
 }
 `, BuiltIn: false},
 	{Name: "../../../federation/directives.graphql", Input: `

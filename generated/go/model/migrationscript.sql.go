@@ -11,9 +11,9 @@ import (
 
 const insertMigrationScript = `-- name: InsertMigrationScript :exec
 INSERT OR IGNORE INTO
-  "migration_script" ("version", "identifier", "up", "down")
+    "migration_script" ("version", "identifier", "up", "down")
 VALUES
-  (?1, ?2, ?3, ?4)
+    (?1, ?2, ?3, ?4)
 `
 
 type InsertMigrationScriptParams struct {
@@ -26,9 +26,9 @@ type InsertMigrationScriptParams struct {
 // InsertMigrationScript
 //
 //	INSERT OR IGNORE INTO
-//	  "migration_script" ("version", "identifier", "up", "down")
+//	    "migration_script" ("version", "identifier", "up", "down")
 //	VALUES
-//	  (?1, ?2, ?3, ?4)
+//	    (?1, ?2, ?3, ?4)
 func (q *Queries) InsertMigrationScript(ctx context.Context, arg InsertMigrationScriptParams) error {
 	_, err := q.exec(ctx, q.insertMigrationScriptStmt, insertMigrationScript,
 		arg.Version,
@@ -41,23 +41,23 @@ func (q *Queries) InsertMigrationScript(ctx context.Context, arg InsertMigration
 
 const migrationScripts = `-- name: MigrationScripts :many
 SELECT
-  "version"   ,
-  "identifier",
-  "up"        ,
-  "down"
+    "version"   ,
+    "identifier",
+    "up"        ,
+    "down"
 FROM
-  "migration_script"
+    "migration_script"
 `
 
 // MigrationScripts
 //
 //	SELECT
-//	  "version"   ,
-//	  "identifier",
-//	  "up"        ,
-//	  "down"
+//	    "version"   ,
+//	    "identifier",
+//	    "up"        ,
+//	    "down"
 //	FROM
-//	  "migration_script"
+//	    "migration_script"
 func (q *Queries) MigrationScripts(ctx context.Context) ([]MigrationScript, error) {
 	rows, err := q.query(ctx, q.migrationScriptsStmt, migrationScripts)
 	if err != nil {
