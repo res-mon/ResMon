@@ -50,9 +50,11 @@ jobs:
             - name: Run cleanup
               run: npm run cleanup
 
+
             - name: Commit and Push Generated Code
-              uses: EndBug/add-and-commit@v9
-              with:
-                message: Update generated code and cleanup
-                committer_name: GitHub Actions
-                committer_email: actions@github.com
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+                  git add .
+                  git commit -m "Update generated code and cleanup" -a || echo "No changes to commit"
+                  git push
