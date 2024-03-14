@@ -30,6 +30,34 @@ type GeneralTimeQuery struct {
 	Current scalar.Timestamp `json:"current"`
 }
 
+type HistoryItem struct {
+	// The timestamp when the activity started.
+	Start scalar.Timestamp `json:"start"`
+	// The timestamp when the activity ended.
+	// If the activity is still ongoing, this field is null.
+	End *scalar.Timestamp `json:"end,omitempty"`
+}
+
+type HistoryQuery struct {
+	// Returns the history of the user's activity.
+	//
+	// `limit` can be used to limit the number of history items returned.
+	// If `limit` is not provided, no limit will be applied.
+	//
+	// When neither `from` nor `to` is provided, the fist entry will be the newest one.
+	// All entries will be sorted by the `start` timestamp in descending order.
+	//
+	// When only `from` is provided, entries with the same, a later or no `end` timestamp will be returned.
+	// This time they are sorted by the `start` timestamp in ascending order.
+	//
+	// When only `to` is provided, entries with the same or an earlier start timestamp will be returned.
+	// This time they are sorted by the `start` timestamp in descending order.
+	//
+	// When both `from` and `to` are provided, entries which overlap the range will be returned.
+	// This time they are sorted by the `start` timestamp in ascending order.
+	HistoryItems []*HistoryItem `json:"historyItems"`
+}
+
 type RootMutation struct {
 }
 
@@ -41,8 +69,10 @@ type RootSubscription struct {
 
 type WorkClockMutation struct {
 	Activity *ActivityMutation `json:"activity"`
+	History  *HistoryQuery     `json:"history"`
 }
 
 type WorkClockQuery struct {
 	Activity *ActivityQuery `json:"activity"`
+	History  *HistoryQuery  `json:"history"`
 }

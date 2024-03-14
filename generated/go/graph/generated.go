@@ -67,6 +67,15 @@ type ComplexityRoot struct {
 		Current func(childComplexity int) int
 	}
 
+	HistoryItem struct {
+		End   func(childComplexity int) int
+		Start func(childComplexity int) int
+	}
+
+	HistoryQuery struct {
+		HistoryItems func(childComplexity int, from *scalar.Timestamp, to *scalar.Timestamp, limit *int) int
+	}
+
 	RootMutation struct {
 		WorkClock func(childComplexity int) int
 	}
@@ -83,10 +92,12 @@ type ComplexityRoot struct {
 
 	WorkClockMutation struct {
 		Activity func(childComplexity int) int
+		History  func(childComplexity int) int
 	}
 
 	WorkClockQuery struct {
 		Activity func(childComplexity int) int
+		History  func(childComplexity int) int
 	}
 
 	_Service struct {
@@ -167,6 +178,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GeneralTimeQuery.Current(childComplexity), true
 
+	case "HistoryItem.end":
+		if e.complexity.HistoryItem.End == nil {
+			break
+		}
+
+		return e.complexity.HistoryItem.End(childComplexity), true
+
+	case "HistoryItem.start":
+		if e.complexity.HistoryItem.Start == nil {
+			break
+		}
+
+		return e.complexity.HistoryItem.Start(childComplexity), true
+
+	case "HistoryQuery.historyItems":
+		if e.complexity.HistoryQuery.HistoryItems == nil {
+			break
+		}
+
+		args, err := ec.field_HistoryQuery_historyItems_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.HistoryQuery.HistoryItems(childComplexity, args["from"].(*scalar.Timestamp), args["to"].(*scalar.Timestamp), args["limit"].(*int)), true
+
 	case "RootMutation.workClock":
 		if e.complexity.RootMutation.WorkClock == nil {
 			break
@@ -209,12 +246,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.WorkClockMutation.Activity(childComplexity), true
 
+	case "WorkClockMutation.history":
+		if e.complexity.WorkClockMutation.History == nil {
+			break
+		}
+
+		return e.complexity.WorkClockMutation.History(childComplexity), true
+
 	case "WorkClockQuery.activity":
 		if e.complexity.WorkClockQuery.Activity == nil {
 			break
 		}
 
 		return e.complexity.WorkClockQuery.Activity(childComplexity), true
+
+	case "WorkClockQuery.history":
+		if e.complexity.WorkClockQuery.History == nil {
+			break
+		}
+
+		return e.complexity.WorkClockQuery.History(childComplexity), true
 
 	case "_Service.sdl":
 		if e.complexity._Service.SDL == nil {
@@ -396,12 +447,49 @@ type ActivityMutation {
 	setActive(active: Boolean!): ActivityQuery!
 }
 `, BuiltIn: false},
+	{Name: "../../../src/gql/workclock/history.gql", Input: `type HistoryItem {
+	"""
+	The timestamp when the activity started.
+	"""
+	start: Timestamp!
+
+	"""
+	The timestamp when the activity ended.
+	If the activity is still ongoing, this field is null.
+	"""
+	end: Timestamp
+}
+
+type HistoryQuery {
+	"""
+	Returns the history of the user's activity.
+
+	` + "`" + `limit` + "`" + ` can be used to limit the number of history items returned.
+	If ` + "`" + `limit` + "`" + ` is not provided, no limit will be applied.
+
+	When neither ` + "`" + `from` + "`" + ` nor ` + "`" + `to` + "`" + ` is provided, the fist entry will be the newest one.
+	All entries will be sorted by the ` + "`" + `start` + "`" + ` timestamp in descending order.
+
+	When only ` + "`" + `from` + "`" + ` is provided, entries with the same, a later or no ` + "`" + `end` + "`" + ` timestamp will be returned.
+	This time they are sorted by the ` + "`" + `start` + "`" + ` timestamp in ascending order.
+
+	When only ` + "`" + `to` + "`" + ` is provided, entries with the same or an earlier start timestamp will be returned.
+	This time they are sorted by the ` + "`" + `start` + "`" + ` timestamp in descending order.
+
+	When both ` + "`" + `from` + "`" + ` and ` + "`" + `to` + "`" + ` are provided, entries which overlap the range will be returned.
+	This time they are sorted by the ` + "`" + `start` + "`" + ` timestamp in ascending order.
+	"""
+	historyItems(from: Timestamp, to: Timestamp, limit: Int): [HistoryItem!]!
+}
+`, BuiltIn: false},
 	{Name: "../../../src/gql/workclock/schema.gql", Input: `type WorkClockQuery {
 	activity: ActivityQuery!
+	history: HistoryQuery!
 }
 
 type WorkClockMutation {
 	activity: ActivityMutation!
+	history: HistoryQuery!
 }
 `, BuiltIn: false},
 	{Name: "../../../federation/directives.graphql", Input: `
@@ -441,6 +529,39 @@ func (ec *executionContext) field_ActivityMutation_setActive_args(ctx context.Co
 		}
 	}
 	args["active"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_HistoryQuery_historyItems_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *scalar.Timestamp
+	if tmp, ok := rawArgs["from"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("from"))
+		arg0, err = ec.unmarshalOTimestamp2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋsrcᚋgoᚋapiᚋscalarᚐTimestamp(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["from"] = arg0
+	var arg1 *scalar.Timestamp
+	if tmp, ok := rawArgs["to"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
+		arg1, err = ec.unmarshalOTimestamp2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋsrcᚋgoᚋapiᚋscalarᚐTimestamp(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["to"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg2
 	return args, nil
 }
 
@@ -738,6 +859,152 @@ func (ec *executionContext) fieldContext_GeneralTimeQuery_current(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _HistoryItem_start(ctx context.Context, field graphql.CollectedField, obj *HistoryItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_HistoryItem_start(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Start, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(scalar.Timestamp)
+	fc.Result = res
+	return ec.marshalNTimestamp2githubᚗcomᚋyerToolsᚋResMonᚋsrcᚋgoᚋapiᚋscalarᚐTimestamp(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_HistoryItem_start(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "HistoryItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Timestamp does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _HistoryItem_end(ctx context.Context, field graphql.CollectedField, obj *HistoryItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_HistoryItem_end(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.End, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*scalar.Timestamp)
+	fc.Result = res
+	return ec.marshalOTimestamp2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋsrcᚋgoᚋapiᚋscalarᚐTimestamp(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_HistoryItem_end(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "HistoryItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Timestamp does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _HistoryQuery_historyItems(ctx context.Context, field graphql.CollectedField, obj *HistoryQuery) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_HistoryQuery_historyItems(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HistoryItems, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*HistoryItem)
+	fc.Result = res
+	return ec.marshalNHistoryItem2ᚕᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐHistoryItemᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_HistoryQuery_historyItems(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "HistoryQuery",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "start":
+				return ec.fieldContext_HistoryItem_start(ctx, field)
+			case "end":
+				return ec.fieldContext_HistoryItem_end(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type HistoryItem", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_HistoryQuery_historyItems_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _RootMutation_workClock(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_RootMutation_workClock(ctx, field)
 	if err != nil {
@@ -779,6 +1046,8 @@ func (ec *executionContext) fieldContext_RootMutation_workClock(ctx context.Cont
 			switch field.Name {
 			case "activity":
 				return ec.fieldContext_WorkClockMutation_activity(ctx, field)
+			case "history":
+				return ec.fieldContext_WorkClockMutation_history(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type WorkClockMutation", field.Name)
 		},
@@ -827,6 +1096,8 @@ func (ec *executionContext) fieldContext_RootQuery_workClock(ctx context.Context
 			switch field.Name {
 			case "activity":
 				return ec.fieldContext_WorkClockQuery_activity(ctx, field)
+			case "history":
+				return ec.fieldContext_WorkClockQuery_history(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type WorkClockQuery", field.Name)
 		},
@@ -1066,6 +1337,8 @@ func (ec *executionContext) fieldContext_RootSubscription_workClock(ctx context.
 			switch field.Name {
 			case "activity":
 				return ec.fieldContext_WorkClockQuery_activity(ctx, field)
+			case "history":
+				return ec.fieldContext_WorkClockQuery_history(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type WorkClockQuery", field.Name)
 		},
@@ -1183,6 +1456,54 @@ func (ec *executionContext) fieldContext_WorkClockMutation_activity(ctx context.
 	return fc, nil
 }
 
+func (ec *executionContext) _WorkClockMutation_history(ctx context.Context, field graphql.CollectedField, obj *WorkClockMutation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WorkClockMutation_history(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.History, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*HistoryQuery)
+	fc.Result = res
+	return ec.marshalNHistoryQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐHistoryQuery(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_WorkClockMutation_history(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkClockMutation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "historyItems":
+				return ec.fieldContext_HistoryQuery_historyItems(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type HistoryQuery", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _WorkClockQuery_activity(ctx context.Context, field graphql.CollectedField, obj *WorkClockQuery) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_WorkClockQuery_activity(ctx, field)
 	if err != nil {
@@ -1228,6 +1549,54 @@ func (ec *executionContext) fieldContext_WorkClockQuery_activity(ctx context.Con
 				return ec.fieldContext_ActivityQuery_active(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ActivityQuery", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkClockQuery_history(ctx context.Context, field graphql.CollectedField, obj *WorkClockQuery) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WorkClockQuery_history(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.History, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*HistoryQuery)
+	fc.Result = res
+	return ec.marshalNHistoryQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐHistoryQuery(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_WorkClockQuery_history(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkClockQuery",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "historyItems":
+				return ec.fieldContext_HistoryQuery_historyItems(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type HistoryQuery", field.Name)
 		},
 	}
 	return fc, nil
@@ -3247,6 +3616,86 @@ func (ec *executionContext) _GeneralTimeQuery(ctx context.Context, sel ast.Selec
 	return out
 }
 
+var historyItemImplementors = []string{"HistoryItem"}
+
+func (ec *executionContext) _HistoryItem(ctx context.Context, sel ast.SelectionSet, obj *HistoryItem) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, historyItemImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HistoryItem")
+		case "start":
+			out.Values[i] = ec._HistoryItem_start(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "end":
+			out.Values[i] = ec._HistoryItem_end(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var historyQueryImplementors = []string{"HistoryQuery"}
+
+func (ec *executionContext) _HistoryQuery(ctx context.Context, sel ast.SelectionSet, obj *HistoryQuery) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, historyQueryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HistoryQuery")
+		case "historyItems":
+			out.Values[i] = ec._HistoryQuery_historyItems(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var rootMutationImplementors = []string{"RootMutation"}
 
 func (ec *executionContext) _RootMutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3428,6 +3877,11 @@ func (ec *executionContext) _WorkClockMutation(ctx context.Context, sel ast.Sele
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "history":
+			out.Values[i] = ec._WorkClockMutation_history(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3464,6 +3918,11 @@ func (ec *executionContext) _WorkClockQuery(ctx context.Context, sel ast.Selecti
 			out.Values[i] = graphql.MarshalString("WorkClockQuery")
 		case "activity":
 			out.Values[i] = ec._WorkClockQuery_activity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "history":
+			out.Values[i] = ec._WorkClockQuery_history(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3915,6 +4374,70 @@ func (ec *executionContext) marshalNGeneralTimeQuery2ᚖgithubᚗcomᚋyerTools�
 	return ec._GeneralTimeQuery(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNHistoryItem2ᚕᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐHistoryItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*HistoryItem) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNHistoryItem2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐHistoryItem(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNHistoryItem2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐHistoryItem(ctx context.Context, sel ast.SelectionSet, v *HistoryItem) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._HistoryItem(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNHistoryQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐHistoryQuery(ctx context.Context, sel ast.SelectionSet, v *HistoryQuery) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._HistoryQuery(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4266,6 +4789,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
+}
+
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4290,6 +4829,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOTimestamp2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋsrcᚋgoᚋapiᚋscalarᚐTimestamp(ctx context.Context, v interface{}) (*scalar.Timestamp, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(scalar.Timestamp)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTimestamp2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋsrcᚋgoᚋapiᚋscalarᚐTimestamp(ctx context.Context, sel ast.SelectionSet, v *scalar.Timestamp) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

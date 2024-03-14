@@ -21,6 +21,14 @@ type GeneralTimeQuery
     = GeneralTimeQuery
 
 
+type HistoryItem
+    = HistoryItem
+
+
+type HistoryQuery
+    = HistoryQuery
+
+
 type Service_
     = Service_
 
