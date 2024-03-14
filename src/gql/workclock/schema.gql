@@ -5,5 +5,4 @@ type WorkClockQuery {
 
 type WorkClockMutation {
 	activity: ActivityMutation!
-	history: HistoryQuery!
 }
