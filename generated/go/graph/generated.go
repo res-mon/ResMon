@@ -92,7 +92,6 @@ type ComplexityRoot struct {
 
 	WorkClockMutation struct {
 		Activity func(childComplexity int) int
-		History  func(childComplexity int) int
 	}
 
 	WorkClockQuery struct {
@@ -245,13 +244,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.WorkClockMutation.Activity(childComplexity), true
-
-	case "WorkClockMutation.history":
-		if e.complexity.WorkClockMutation.History == nil {
-			break
-		}
-
-		return e.complexity.WorkClockMutation.History(childComplexity), true
 
 	case "WorkClockQuery.activity":
 		if e.complexity.WorkClockQuery.Activity == nil {
@@ -489,7 +481,6 @@ type HistoryQuery {
 
 type WorkClockMutation {
 	activity: ActivityMutation!
-	history: HistoryQuery!
 }
 `, BuiltIn: false},
 	{Name: "../../../federation/directives.graphql", Input: `
@@ -1046,8 +1037,6 @@ func (ec *executionContext) fieldContext_RootMutation_workClock(ctx context.Cont
 			switch field.Name {
 			case "activity":
 				return ec.fieldContext_WorkClockMutation_activity(ctx, field)
-			case "history":
-				return ec.fieldContext_WorkClockMutation_history(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type WorkClockMutation", field.Name)
 		},
@@ -1451,54 +1440,6 @@ func (ec *executionContext) fieldContext_WorkClockMutation_activity(ctx context.
 				return ec.fieldContext_ActivityMutation_setActive(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ActivityMutation", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _WorkClockMutation_history(ctx context.Context, field graphql.CollectedField, obj *WorkClockMutation) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkClockMutation_history(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.History, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*HistoryQuery)
-	fc.Result = res
-	return ec.marshalNHistoryQuery2ᚖgithubᚗcomᚋyerToolsᚋResMonᚋgeneratedᚋgoᚋgraphᚐHistoryQuery(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_WorkClockMutation_history(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "WorkClockMutation",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "historyItems":
-				return ec.fieldContext_HistoryQuery_historyItems(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type HistoryQuery", field.Name)
 		},
 	}
 	return fc, nil
@@ -3874,11 +3815,6 @@ func (ec *executionContext) _WorkClockMutation(ctx context.Context, sel ast.Sele
 			out.Values[i] = graphql.MarshalString("WorkClockMutation")
 		case "activity":
 			out.Values[i] = ec._WorkClockMutation_activity(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "history":
-			out.Values[i] = ec._WorkClockMutation_history(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

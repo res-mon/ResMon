@@ -24,10 +24,3 @@ activity :
     -> SelectionSet decodesTo Graph.Object.WorkClockMutation
 activity object____ =
     Object.selectionForCompositeField "activity" [] object____ Basics.identity
-
-
-history :
-    SelectionSet decodesTo Graph.Object.HistoryQuery
-    -> SelectionSet decodesTo Graph.Object.WorkClockMutation
-history object____ =
-    Object.selectionForCompositeField "history" [] object____ Basics.identity

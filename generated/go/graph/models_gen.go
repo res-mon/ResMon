@@ -69,7 +69,6 @@ type RootSubscription struct {
 
 type WorkClockMutation struct {
 	Activity *ActivityMutation `json:"activity"`
-	History  *HistoryQuery     `json:"history"`
 }
 
 type WorkClockQuery struct {
