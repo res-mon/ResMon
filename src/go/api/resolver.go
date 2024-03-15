@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/yerTools/ResMon/generated/go/graph"
@@ -18,12 +19,41 @@ type rootMutationResolver graph.Resolver
 type rootQueryResolver graph.Resolver
 type rootSubscriptionResolver graph.Resolver
 type activityMutationResolver graph.Resolver
+type historyQueryResolver graph.Resolver
 
 var globalState state
 
 type state struct {
 	workingClock *utility.LazySubscribable[*graph.WorkClockQuery]
 	general      *utility.ComputedSubscribable[*graph.GeneralQuery]
+}
+
+func getHistoryItems(ctx context.Context, mdl *model.Queries) ([]*graph.HistoryItem, error) {
+	durations, err := mdl.ActiveDurations(ctx)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"could not get active durations: %w", err)
+	}
+
+	historyItems := make([]*graph.HistoryItem, len(durations))
+	for i, duration := range durations {
+		var end *scalar.Timestamp
+		if duration.EndTime != nil {
+			if value, ok := duration.EndTime.(int64); ok {
+				timestamp := scalar.TimestampFromTime(
+					time.Unix(0, value))
+				end = &timestamp
+			}
+		}
+
+		historyItems[i] = &graph.HistoryItem{
+			Start: scalar.TimestampFromTime(
+				time.Unix(0, duration.StartTime)),
+			End: end,
+		}
+	}
+
+	return historyItems, nil
 }
 
 func initState(ctx context.Context, db *database.DB) (state, error) {
@@ -40,6 +70,11 @@ func initState(ctx context.Context, db *database.DB) (state, error) {
 				return nil, fmt.Errorf("could not get active state: %w", err)
 			}
 
+			historyItems, err := getHistoryItems(ctx, mdl)
+			if err != nil {
+				return nil, fmt.Errorf("could not get history items: %w", err)
+			}
+
 			var since time.Time
 			if isActive.Timestamp == 0 {
 				since = time.Now()
@@ -51,6 +86,9 @@ func initState(ctx context.Context, db *database.DB) (state, error) {
 				Activity: &graph.ActivityQuery{
 					Active: isActive.Active != 0,
 					Since:  scalar.TimestampFromTime(since),
+				},
+				History: &graph.HistoryQuery{
+					HistoryItems: historyItems,
 				},
 			}, nil
 		},
@@ -82,10 +120,18 @@ func initState(ctx context.Context, db *database.DB) (state, error) {
 				return nil, fmt.Errorf("could not add activity: %w", err)
 			}
 
+			historyItems, err := getHistoryItems(ctx, mdl)
+			if err != nil {
+				return nil, fmt.Errorf("could not get history items: %w", err)
+			}
+
 			return &graph.WorkClockQuery{
 				Activity: &graph.ActivityQuery{
 					Active: newValue.Activity.Active,
 					Since:  scalar.TimestampFromTime(now),
+				},
+				History: &graph.HistoryQuery{
+					HistoryItems: historyItems,
 				},
 			}, nil
 		},
@@ -115,6 +161,7 @@ func initState(ctx context.Context, db *database.DB) (state, error) {
 	return state{
 		workingClock: workingClock,
 		general:      general,
+		//history:      history,
 	}, nil
 }
 
@@ -132,6 +179,10 @@ func (r resolver) RootSubscription() graph.RootSubscriptionResolver {
 
 func (r resolver) ActivityMutation() graph.ActivityMutationResolver {
 	return activityMutationResolver(r)
+}
+
+func (r resolver) HistoryQuery() graph.HistoryQueryResolver {
+	return historyQueryResolver(r)
 }
 
 func (activityMutationResolver) SetActive(
@@ -170,6 +221,50 @@ func (rootMutationResolver) WorkClock(ctx context.Context) (*graph.WorkClockMuta
 			SetActive: current.Activity,
 		},
 	}, nil
+}
+
+func (historyQueryResolver) HistoryItems(
+	ctx context.Context, obj *graph.HistoryQuery,
+	from *scalar.Timestamp, to *scalar.Timestamp, limit *int,
+) ([]*graph.HistoryItem, error) {
+	current, err := globalState.workingClock.Current(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not get current working clock state: %w", err)
+	}
+
+	filter := func(
+		items []*graph.HistoryItem,
+		keep func(item *graph.HistoryItem) bool,
+	) []*graph.HistoryItem {
+		result := make([]*graph.HistoryItem, 0, len(items))
+		for _, item := range items {
+			if keep(item) {
+				result = append(result, item)
+			}
+		}
+		return result
+	}
+
+	result := current.History.HistoryItems
+	if from != nil {
+		result = filter(result, func(item *graph.HistoryItem) bool {
+			return item.End == nil || *item.End >= *from
+		})
+
+		slices.Reverse(result)
+	}
+
+	if to != nil {
+		result = filter(result, func(item *graph.HistoryItem) bool {
+			return item.Start <= *to
+		})
+	}
+
+	if limit != nil && *limit > 0 {
+		result = result[:*limit]
+	}
+
+	return result, nil
 }
 
 func (rootQueryResolver) WorkClock(ctx context.Context) (*graph.WorkClockQuery, error) {

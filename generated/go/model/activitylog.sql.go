@@ -9,6 +9,73 @@ import (
 	"context"
 )
 
+const activeDurations = `-- name: ActiveDurations :many
+SELECT
+    "outer"."timestamp" AS "start_time",
+    (
+        SELECT
+            MIN("inner"."timestamp")
+        FROM
+            "activity_log" "inner"
+        WHERE
+            "inner"."timestamp" > "outer"."timestamp" AND
+            "inner"."active" = 0
+    ) AS "end_time"
+FROM
+    "activity_log" "outer"
+WHERE
+    "outer"."active" = 1
+ORDER BY
+    "start_time" DESC
+`
+
+type ActiveDurationsRow struct {
+	StartTime int64       `db:"start_time" json:"startTime"`
+	EndTime   interface{} `db:"end_time" json:"endTime"`
+}
+
+// ActiveDurations
+//
+//	SELECT
+//	    "outer"."timestamp" AS "start_time",
+//	    (
+//	        SELECT
+//	            MIN("inner"."timestamp")
+//	        FROM
+//	            "activity_log" "inner"
+//	        WHERE
+//	            "inner"."timestamp" > "outer"."timestamp" AND
+//	            "inner"."active" = 0
+//	    ) AS "end_time"
+//	FROM
+//	    "activity_log" "outer"
+//	WHERE
+//	    "outer"."active" = 1
+//	ORDER BY
+//	    "start_time" DESC
+func (q *Queries) ActiveDurations(ctx context.Context) ([]ActiveDurationsRow, error) {
+	rows, err := q.query(ctx, q.activeDurationsStmt, activeDurations)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ActiveDurationsRow
+	for rows.Next() {
+		var i ActiveDurationsRow
+		if err := rows.Scan(&i.StartTime, &i.EndTime); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const addActivity = `-- name: AddActivity :exec
 INSERT INTO
     "activity_log" ("timestamp", "active")
