@@ -18,6 +18,7 @@
             "elm/time": "1.0.0",
             "elm/url": "1.0.0",
             "elm-community/basics-extra": "4.1.0",
+            "elm-community/dict-extra": "2.4.0",
             "elm-explorations/markdown": "1.0.0",
             "matheus23/elm-tailwind-modules-base": "1.0.0",
             "rtfeldman/elm-css": "18.0.0"
@@ -29,7 +30,6 @@
             "elm/http": "2.0.0",
             "elm/regex": "1.0.0",
             "elm/virtual-dom": "1.0.3",
-            "elm-community/dict-extra": "2.4.0",
             "elm-community/list-extra": "8.7.0",
             "j-maas/elm-ordered-containers": "1.0.0",
             "lukewestby/elm-string-interpolate": "1.0.4",
