@@ -130,6 +130,7 @@ view shared model minimal body =
                     , Tw.bg_color Color.base_100
                     , Tw.text_color Color.base_content
                     , Tw.flex_1
+                    , Tw.overflow_auto
                     , Br.xxl [ Tw.p_16 ]
                     , Br.xl [ Tw.p_10 ]
                     , Br.md [ Tw.p_6 ]
