@@ -20,7 +20,7 @@ SELECT
         WHERE
             "inner"."timestamp" > "outer"."timestamp" AND
             "inner"."active" = 0
-    ) AS "end_time" -- sqlc:type: *int64
+    ) AS "end_time"
 FROM
     "activity_log" "outer"
 WHERE
@@ -46,7 +46,7 @@ type ActiveDurationsRow struct {
 //	        WHERE
 //	            "inner"."timestamp" > "outer"."timestamp" AND
 //	            "inner"."active" = 0
-//	    ) AS "end_time" -- sqlc:type: *int64
+//	    ) AS "end_time"
 //	FROM
 //	    "activity_log" "outer"
 //	WHERE
