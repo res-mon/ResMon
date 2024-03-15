@@ -276,9 +276,7 @@ historyView zone now history =
         ]
         [ Ui.table
             [ Ui.modifiers
-                [ Ui.TableZebra
-                , Ui.TablePinRows
-                ]
+                [ Ui.TableZebra ]
             ]
             [ Dom.text "Datum"
             , Dom.text "Start-Zeit"
