@@ -1,5 +1,7 @@
 FROM golang:1.22.1-alpine3.19 as builder
 
+RUN apk add --no-cache gcc musl-dev sqlite-dev build-base
+
 ENV GOPATH=/go
 ENV GOCACHE=/root/.cache/go-build
 
@@ -14,15 +16,12 @@ COPY src/sql/ /app/src/sql/
 COPY src/go/ /app/src/go/
 COPY generated/go/ /app/generated/go/
 
-RUN apk add --no-cache gcc musl-dev sqlite-dev build-base
-
 ENV CGO_ENABLED=1
 RUN go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -ldflags '-extldflags "-static"' -o res-mon
 
 
 
 FROM alpine:3.19
-
 
 RUN mkdir /app && addgroup -S appuser && adduser -S -G appuser -h /app appuser && chown appuser:appuser /app && chmod 500 /app
 
