@@ -9,7 +9,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Set env variables
+            - name: Set environment variables
               run: |
                   echo "GOPATH=$GITHUB_WORKSPACE/.go-path" >> $GITHUB_ENV
                   echo "GOCACHE=$GITHUB_WORKSPACE/.go-cache" >> $GITHUB_ENV
