@@ -17,7 +17,7 @@ jobs:
               with:
                   path: |
                       ~/.cache/go-build
-                      ~/go/pkg/mod
+                      ~/go
                   key: go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
                   restore-keys: |
                       go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
