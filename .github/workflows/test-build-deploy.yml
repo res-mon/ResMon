@@ -5,8 +5,8 @@ on:
         branches: []
 
 env:
-    GOPATH: ${{ '${GITHUB_WORKSPACE}' }}/.go-path
-    GOCACHE: ${{ '${GITHUB_WORKSPACE}' }}/.go-cache
+    GOPATH: ${{ 'echo $GITHUB_WORKSPACE' }}/.go-path
+    GOCACHE: ${{ 'echo $GITHUB_WORKSPACE' }}/.go-cache
 
 jobs:
     build:
