@@ -69,8 +69,7 @@ jobs:
               with:
                   path: /tmp/.buildx-cache
                   key: ${{ runner.os }}-buildx-${{hashFiles('ResMon')}}
-                  restore-keys: |
-                      ${{ runner.os }}-buildx-
+                  restore-keys: ${{ runner.os }}-buildx-
 
             - name: Prepare docker tags
               run: |
@@ -94,7 +93,7 @@ jobs:
                   context: .
                   file: ./docker/Release.Dockerfile
                   push: true
-                  tags:
+                  tags: >
                       ${{ env.COMMIT_TAG }},${{ env.BRANCH_TAG }},
                       ${{env.LATEST_TAG }},${{ env.GIT_TAG_NAME }}
                   labels: yertools/res-mon
