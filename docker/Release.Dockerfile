@@ -8,7 +8,7 @@ COPY src/sql/ /app/src/sql/
 COPY src/go/ /app/src/go/
 COPY generated/go/ /app/generated/go/
 
-RUN apk add --no-cache gcc musl-dev sqlite-dev
+RUN apk add --no-cache gcc musl-dev sqlite-dev build-base
 
 ENV CGO_ENABLED=1
 RUN go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -ldflags '-extldflags "-static"' -o res-mon
@@ -31,5 +31,5 @@ COPY docker/entrypoint.sh /app/entrypoint.sh
 #RUN chown root:root /app/entrypoint.sh && chmod 500 /app/entrypoint.sh && apk add --no-cache ca-certificates wget gosu
 RUN chown root:root /app/entrypoint.sh
 RUN chmod 500 /app/entrypoint.sh
-RUN apk add --no-cache ca-certificates wget gosu
+RUN apk add --no-cache ca-certificates wget su-exec
 COPY --from=builder /app/res-mon .
