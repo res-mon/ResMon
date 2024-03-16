@@ -28,8 +28,5 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 HEALTHCHECK --interval=1m --timeout=15s --start-period=30s --retries=5 CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:8321/ || exit 1
 
 COPY docker/entrypoint.sh /app/entrypoint.sh
-#RUN chown root:root /app/entrypoint.sh && chmod 500 /app/entrypoint.sh && apk add --no-cache ca-certificates wget gosu
-RUN chown root:root /app/entrypoint.sh
-RUN chmod 500 /app/entrypoint.sh
-RUN apk add --no-cache ca-certificates wget su-exec
+RUN chown root:root /app/entrypoint.sh && chmod 500 /app/entrypoint.sh && apk add --no-cache ca-certificates wget su-exec
 COPY --from=builder /app/res-mon .
