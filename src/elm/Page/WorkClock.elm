@@ -12,10 +12,14 @@ import Api.WorkClock
 import Browser exposing (Document)
 import Component.DaisyUi as Ui
 import Component.Time
+import Dict
+import Dict.Extra
+import Extension.Time exposing (monthToInt, sameDay)
 import Html.Styled as Dom exposing (toUnstyled)
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events exposing (onClick)
 import List exposing (map)
+import Maybe exposing (withDefault)
 import Model.Shared
     exposing
         ( SharedModel
@@ -164,6 +168,18 @@ view shared model =
                 Api.Shared.Received activity ->
                     workClockView shared activity
             ]
+        , Dom.div
+            []
+            [ case shared.api.workClock.history of
+                Api.Shared.Unknown ->
+                    Dom.text "Lade Stempeluhrhistorie..."
+
+                Api.Shared.Received history ->
+                    historyView
+                        shared.timeZone
+                        shared.time
+                        history.historyItems
+            ]
         ]
             |> map toUnstyled
     }
@@ -182,40 +198,9 @@ workClockView shared activity =
         , Dom.span []
             (case shared.time of
                 Just time ->
-                    let
-                        duration : Int
-                        duration =
-                            ((Time.posixToMillis time - Time.posixToMillis activity.since)
-                                |> toFloat
-                            )
-                                / 1000
-                                |> round
-                                |> max 0
-
-                        hours : Int
-                        hours =
-                            duration // 3600
-
-                        minutes : Int
-                        minutes =
-                            modBy 60 (duration // 60)
-
-                        seconds : Int
-                        seconds =
-                            modBy 60 duration
-                    in
-                    [ Ui.countdown []
-                        [ Tw.duration_500 ]
-                        hours
-                    , Dom.text ":"
-                    , Ui.countdown []
-                        [ Tw.duration_500 ]
-                        minutes
-                    , Dom.text ":"
-                    , Ui.countdown []
-                        [ Tw.duration_500 ]
-                        seconds
-                    ]
+                    Component.Time.deltaClock
+                        (Just activity.since)
+                        (Just time)
 
                 _ ->
                     [ Dom.text "Unbekannt" ]
@@ -255,3 +240,159 @@ toggleView shared model =
                     ]
                 ]
         )
+
+
+historyView :
+    Maybe Time.Zone
+    -> Maybe Time.Posix
+    -> List Api.WorkClock.HistoryItem
+    -> Dom.Html msg
+historyView zone now history =
+    let
+        groupedHistory : List (List Api.WorkClock.HistoryItem)
+        groupedHistory =
+            groupHistoryItemsByDay zone history
+                |> map (List.sortBy (\item -> Time.posixToMillis item.start))
+
+        itemView : List Api.WorkClock.HistoryItem -> List (Dom.Html msg)
+        itemView items =
+            let
+                maybeFirst : Maybe Api.WorkClock.HistoryItem
+                maybeFirst =
+                    List.head items
+            in
+            case maybeFirst of
+                Just first ->
+                    historyItemGroupView zone now first items
+
+                Nothing ->
+                    []
+    in
+    Dom.div
+        [ Attr.css
+            [ Tw.my_8
+            , Tw.overflow_x_auto
+            ]
+        ]
+        [ Ui.table
+            [ Ui.modifiers
+                [ Ui.TableZebra ]
+            ]
+            [ Dom.text "Datum"
+            , Dom.text "Start-Zeit"
+            , Dom.text "End-Zeit"
+            , Dom.text "Dauer"
+            ]
+            (map itemView groupedHistory)
+            []
+        ]
+
+
+historyItemGroupView :
+    Maybe Time.Zone
+    -> Maybe Time.Posix
+    -> Api.WorkClock.HistoryItem
+    -> List Api.WorkClock.HistoryItem
+    -> List (Dom.Html msg)
+historyItemGroupView zone now first items =
+    let
+        itemEnd : Api.WorkClock.HistoryItem -> Maybe Time.Posix
+        itemEnd item =
+            case item.end of
+                Just e ->
+                    Just e
+
+                Nothing ->
+                    now
+
+        itemStart : Api.WorkClock.HistoryItem -> Maybe Time.Posix
+        itemStart item =
+            Just item.start
+    in
+    [ Dom.div [] (Component.Time.date zone (Just first.start))
+    , Dom.div []
+        (map
+            (\item ->
+                Dom.div []
+                    (Component.Time.clock zone (itemStart item))
+            )
+            items
+        )
+    , Dom.div []
+        (map
+            (\item ->
+                Dom.div []
+                    (List.concat
+                        [ if
+                            Maybe.map3 sameDay
+                                zone
+                                (itemStart item)
+                                (itemEnd item)
+                                |> withDefault False
+                          then
+                            []
+
+                          else
+                            List.concat
+                                [ Component.Time.date zone (itemEnd item)
+                                , [ Dom.text ", " ]
+                                ]
+                        , Component.Time.clock zone (itemEnd item)
+                        ]
+                    )
+            )
+            items
+        )
+    , Dom.div []
+        (Component.Time.durationClock
+            (map
+                (\item ->
+                    (Maybe.map Time.posixToMillis
+                        (itemEnd item)
+                        |> withDefault 0
+                    )
+                        - (Maybe.map Time.posixToMillis
+                            (itemStart item)
+                            |> withDefault 0
+                          )
+                )
+                items
+                |> List.sum
+            )
+        )
+    ]
+
+
+groupHistoryItemsByDay : Maybe Time.Zone -> List Api.WorkClock.HistoryItem -> List (List Api.WorkClock.HistoryItem)
+groupHistoryItemsByDay zone items =
+    Dict.Extra.groupBy
+        (\item ->
+            let
+                day : Int
+                day =
+                    Maybe.map2 Time.toDay zone (Just item.start)
+                        |> withDefault 0
+
+                month : Int
+                month =
+                    Maybe.map2
+                        (\z t ->
+                            Time.toMonth z t
+                                |> monthToInt
+                        )
+                        zone
+                        (Just item.start)
+                        |> withDefault 0
+
+                year : Int
+                year =
+                    Maybe.map2 Time.toYear zone (Just item.start)
+                        |> withDefault 0
+            in
+            year * 10000 + month * 100 + day
+        )
+        items
+        |> Dict.toList
+        |> List.sortBy Tuple.first
+        |> map Tuple.second
+        |> List.reverse

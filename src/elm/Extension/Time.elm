@@ -1,8 +1,8 @@
-module Extension.Time exposing (fixVariationFloored, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString)
+module Extension.Time exposing (fixVariationFloored, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString, sameDay)
 
 {-| This module provides utility functions for working with Time.
 
-@docs fixVariationFloored, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString
+@docs fixVariationFloored, floorTo, groupBy, monthToInt, monthToString, roundTo, toDateString, sameDay
 
 -}
 
@@ -35,6 +35,18 @@ toDateString zone posix =
         , "."
         , String.fromInt year
         ]
+
+
+{-| Checks if two times are on the same day for a given time zone.
+-}
+sameDay : Time.Zone -> Time.Posix -> Time.Posix -> Bool
+sameDay zone a b =
+    Time.toYear zone a
+        == Time.toYear zone b
+        && Time.toMonth zone a
+        == Time.toMonth zone b
+        && Time.toDay zone a
+        == Time.toDay zone b
 
 
 {-| Converts a month to an integer.

@@ -126,10 +126,15 @@ view shared model minimal body =
         mainElement =
             Dom.main_
                 [ Attr.css
-                    [ Tw.p_16
+                    [ Tw.p_1
                     , Tw.bg_color Color.base_100
                     , Tw.text_color Color.base_content
                     , Tw.flex_1
+                    , Tw.overflow_auto
+                    , Br.xxl [ Tw.p_16 ]
+                    , Br.xl [ Tw.p_10 ]
+                    , Br.md [ Tw.p_6 ]
+                    , Br.sm [ Tw.p_4 ]
                     ]
                 ]
                 (map Dom.fromUnstyled body.body)

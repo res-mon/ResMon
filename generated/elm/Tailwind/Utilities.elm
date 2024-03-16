@@ -7907,8 +7907,6 @@ btn =
                 , Css.property "background-color" "var(--fallback-b3,oklch(var(--b3)/var(--tw-bg-opacity)))"
                 , Css.property "background-color" "color-mix(\n            in oklab,\n            oklch(var(--btn-color, var(--b2)) / var(--tw-bg-opacity, 1)) 90%,\n            black\n          )"
                 , Css.property "border-color" "color-mix(\n            in oklab,\n            oklch(var(--btn-color, var(--b2)) / var(--tw-border-opacity, 1)) 90%,\n            black\n          )"
-                , Css.property "background-color" "var(--btn-color, var(--fallback-b2))"
-                , Css.property "border-color" "var(--btn-color, var(--fallback-b2))"
                 ]
             ]
         , Css.pseudoClass "is"
@@ -15656,8 +15654,10 @@ link_accent =
     Css.batch
         [ Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-a,oklch(var(--a)/var(--tw-text-opacity)))"
-        , Css.pseudoClass "hover"
-            [ Css.property "color" "color-mix(in oklab,var(--fallback-a,oklch(var(--a)/1)) 80%,black)"
+        , Css.Media.withMediaQuery [ "(hover:hover)" ]
+            [ Css.pseudoClass "hover"
+                [ Css.property "color" "color-mix(in oklab,var(--fallback-a,oklch(var(--a)/1)) 80%,black)"
+                ]
             ]
         ]
 
@@ -15667,8 +15667,10 @@ link_error =
     Css.batch
         [ Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-er,oklch(var(--er)/var(--tw-text-opacity)))"
-        , Css.pseudoClass "hover"
-            [ Css.property "color" "color-mix(in oklab,var(--fallback-er,oklch(var(--er)/1)) 80%,black)"
+        , Css.Media.withMediaQuery [ "(hover:hover)" ]
+            [ Css.pseudoClass "hover"
+                [ Css.property "color" "color-mix(in oklab,var(--fallback-er,oklch(var(--er)/1)) 80%,black)"
+                ]
             ]
         ]
 
@@ -15690,8 +15692,10 @@ link_info =
     Css.batch
         [ Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-in,oklch(var(--in)/var(--tw-text-opacity)))"
-        , Css.pseudoClass "hover"
-            [ Css.property "color" "color-mix(in oklab,var(--fallback-in,oklch(var(--in)/1)) 80%,black)"
+        , Css.Media.withMediaQuery [ "(hover:hover)" ]
+            [ Css.pseudoClass "hover"
+                [ Css.property "color" "color-mix(in oklab,var(--fallback-in,oklch(var(--in)/1)) 80%,black)"
+                ]
             ]
         ]
 
@@ -15701,8 +15705,10 @@ link_neutral =
     Css.batch
         [ Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-n,oklch(var(--n)/var(--tw-text-opacity)))"
-        , Css.pseudoClass "hover"
-            [ Css.property "color" "color-mix(in oklab,var(--fallback-n,oklch(var(--n)/1)) 80%,black)"
+        , Css.Media.withMediaQuery [ "(hover:hover)" ]
+            [ Css.pseudoClass "hover"
+                [ Css.property "color" "color-mix(in oklab,var(--fallback-n,oklch(var(--n)/1)) 80%,black)"
+                ]
             ]
         ]
 
@@ -15712,8 +15718,10 @@ link_primary =
     Css.batch
         [ Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-p,oklch(var(--p)/var(--tw-text-opacity)))"
-        , Css.pseudoClass "hover"
-            [ Css.property "color" "color-mix(in oklab,var(--fallback-p,oklch(var(--p)/1)) 80%,black)"
+        , Css.Media.withMediaQuery [ "(hover:hover)" ]
+            [ Css.pseudoClass "hover"
+                [ Css.property "color" "color-mix(in oklab,var(--fallback-p,oklch(var(--p)/1)) 80%,black)"
+                ]
             ]
         ]
 
@@ -15723,8 +15731,10 @@ link_secondary =
     Css.batch
         [ Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-s,oklch(var(--s)/var(--tw-text-opacity)))"
-        , Css.pseudoClass "hover"
-            [ Css.property "color" "color-mix(in oklab,var(--fallback-s,oklch(var(--s)/1)) 80%,black)"
+        , Css.Media.withMediaQuery [ "(hover:hover)" ]
+            [ Css.pseudoClass "hover"
+                [ Css.property "color" "color-mix(in oklab,var(--fallback-s,oklch(var(--s)/1)) 80%,black)"
+                ]
             ]
         ]
 
@@ -15734,8 +15744,10 @@ link_success =
     Css.batch
         [ Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-su,oklch(var(--su)/var(--tw-text-opacity)))"
-        , Css.pseudoClass "hover"
-            [ Css.property "color" "color-mix(in oklab,var(--fallback-su,oklch(var(--su)/1)) 80%,black)"
+        , Css.Media.withMediaQuery [ "(hover:hover)" ]
+            [ Css.pseudoClass "hover"
+                [ Css.property "color" "color-mix(in oklab,var(--fallback-su,oklch(var(--su)/1)) 80%,black)"
+                ]
             ]
         ]
 
@@ -15745,8 +15757,10 @@ link_warning =
     Css.batch
         [ Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-wa,oklch(var(--wa)/var(--tw-text-opacity)))"
-        , Css.pseudoClass "hover"
-            [ Css.property "color" "color-mix(in oklab,var(--fallback-wa,oklch(var(--wa)/1)) 80%,black)"
+        , Css.Media.withMediaQuery [ "(hover:hover)" ]
+            [ Css.pseudoClass "hover"
+                [ Css.property "color" "color-mix(in oklab,var(--fallback-wa,oklch(var(--wa)/1)) 80%,black)"
+                ]
             ]
         ]
 

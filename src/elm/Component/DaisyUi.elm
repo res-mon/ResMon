@@ -1,4 +1,4 @@
-module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DrawerModifier(..), DropdownModifier(..), ExtendedStyle, InputModifier(..), MenuItemModifier(..), MenuModifier(..), SwapModifier(..), ToastModifier(..), alert, alertStyle, attribute, attributes, btn, btnStyle, class, classes, countdown, countdownStyle, drawer, drawerStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, modifier, modifiers, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, style, styleElement, styles, swap, swapStyle, toast, toastStyle)
+module Component.DaisyUi exposing (AlertModifier(..), BtnModifier(..), DrawerModifier(..), DropdownModifier(..), ExtendedStyle, InputModifier(..), MenuItemModifier(..), MenuModifier(..), SwapModifier(..), TableModifier(..), ToastModifier(..), alert, alertStyle, attribute, attributes, btn, btnStyle, class, classes, countdown, countdownStyle, drawer, drawerStyle, dropdown, dropdownContent, dropdownStyle, menu, menuItem, menuItemStyle, menuStyle, menuTitle, menuTitleStyle, mergeStyles, modifier, modifiers, navbar, navbarCenter, navbarCenterStyle, navbarEnd, navbarEndStyle, navbarStart, navbarStartStyle, navbarStyle, stack, stackStyle, style, styleElement, styles, swap, swapStyle, table, tableStyle, toast, toastStyle)
 
 import Css exposing (Style, before, important)
 import Html.Styled as Dom
@@ -1105,3 +1105,132 @@ drawer toggleId styling pageStyling pageContent sidebarContent =
                 :: sidebarContent
             )
         ]
+
+
+
+-- TABLE
+
+
+type TableModifier
+    = TableZebra -- For <table> to show zebra stripe rows.
+    | TablePinRows -- For <table> to make all the rows inside <thead> and <tfoot> sticky.
+    | TablePinCols -- For <table> to make all the <th> columns sticky.
+    | TableXs -- Extra small size.
+    | TableSm -- Small size.
+    | TableMd -- Normal size.
+    | TableLg -- Large size.
+
+
+tableModifier : TableModifier -> ( List Style, List String )
+tableModifier mod =
+    case mod of
+        TableZebra ->
+            Cls.table_zebra
+
+        TablePinRows ->
+            ( [], [ "table-pin-rows" ] )
+
+        TablePinCols ->
+            ( [], [ "table-pin-cols" ] )
+
+        TableXs ->
+            Cls.table_xs
+
+        TableSm ->
+            Cls.table_sm
+
+        TableMd ->
+            Cls.table_md
+
+        TableLg ->
+            Cls.table_lg
+
+
+{-| Table can be used to show a list of data in a table format.
+
+<https://daisyui.com/components/table/>
+
+-}
+tableStyle :
+    List TableModifier
+    -> ( List Style, List String )
+tableStyle =
+    mergeModifiedStyles tableModifier [ Cls.table ]
+
+
+{-| Table can be used to show a list of data in a table format.
+
+<https://daisyui.com/components/table/>
+
+-}
+table :
+    List (ExtendedStyle msg TableModifier)
+    -> List (Dom.Html msg)
+    -> List (List (Dom.Html msg))
+    -> List (Dom.Html msg)
+    -> Dom.Html msg
+table styling header body footer =
+    let
+        tableBody : List (Dom.Html msg)
+        tableBody =
+            case body of
+                [] ->
+                    []
+
+                _ ->
+                    [ Dom.tbody
+                        []
+                        (List.map
+                            (\row ->
+                                Dom.tr []
+                                    (List.map
+                                        (\element -> Dom.td [] [ element ])
+                                        row
+                                    )
+                            )
+                            body
+                        )
+                    ]
+
+        tableFooter : List (Dom.Html msg)
+        tableFooter =
+            case footer of
+                [] ->
+                    []
+
+                _ ->
+                    [ Dom.tfoot
+                        []
+                        [ Dom.tr []
+                            (List.map
+                                (\element -> Dom.td [] [ element ])
+                                footer
+                            )
+                        ]
+                    ]
+
+        tableHead : List (Dom.Html msg)
+        tableHead =
+            case header of
+                [] ->
+                    []
+
+                _ ->
+                    [ Dom.thead []
+                        [ Dom.tr []
+                            (List.map
+                                (\element -> Dom.th [] [ element ])
+                                header
+                            )
+                        ]
+                    ]
+    in
+    mergeElement tableStyle
+        Dom.table
+        styling
+        (List.concat
+            [ tableHead
+            , tableBody
+            , tableFooter
+            ]
+        )
