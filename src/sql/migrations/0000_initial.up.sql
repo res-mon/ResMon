@@ -1,10 +1,11 @@
 -- TABLES
 CREATE TABLE IF NOT EXISTS
     "migration_script" (
-        "version" INTEGER PRIMARY KEY,
-        "identifier" TEXT NOT NULL   ,
-        "up" TEXT NOT NULL           ,
-        "down" TEXT NOT NULL
+        "version" INTEGER NOT NULL,
+        "identifier" TEXT NOT NULL,
+        "up" TEXT NOT NULL        ,
+        "down" TEXT NOT NULL      ,
+        PRIMARY KEY ("version")
     );
 
 
