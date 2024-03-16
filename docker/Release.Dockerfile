@@ -18,7 +18,7 @@ RUN go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_
 FROM alpine:3.19
 
 
-RUN mkdir /app && groupadd -r appuser && useradd -r -g appuser -d /app appuser && chown appuser:appuser /app && chmod 500 /app
+RUN mkdir /app && addgroup -S appuser && adduser -S -G appuser -h /app appuser && chown appuser:appuser /app && chmod 500 /app
 
 WORKDIR /app
 EXPOSE 8321
