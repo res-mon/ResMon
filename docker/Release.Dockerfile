@@ -1,7 +1,7 @@
 FROM golang:1.22.1-alpine3.19 as builder
 
-COPY ~/.cache/go-build ~/.cache/go-build
-COPY ~/go/pkg/mod ~/go/pkg/mod
+COPY ~/.cache/ ~/.cache/
+COPY ~/go/ ~/go/
 
 WORKDIR /app
 
