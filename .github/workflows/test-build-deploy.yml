@@ -99,9 +99,10 @@ jobs:
                   context: .
                   file: ./docker/Release.Dockerfile
                   push: true
-                  tags: >
-                      ${{ env.COMMIT_TAG }},${{ env.BRANCH_TAG }},
-                      ${{env.LATEST_TAG }},${{ env.GIT_TAG_NAME }}
+                  tags: "${{ env.COMMIT_TAG }},\
+                      ${{ env.BRANCH_TAG}},\
+                      ${{env.LATEST_TAG }},\
+                      ${{env.GIT_TAG_NAME }}"
                   labels: yertools/res-mon
                   builder: ${{ steps.buildx.outputs.name }}
                   platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
