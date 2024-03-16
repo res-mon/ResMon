@@ -4,15 +4,16 @@ on:
     push:
         branches: []
 
-env:
-    GOPATH: ${{ 'echo $GITHUB_WORKSPACE' }}/.go-path
-    GOCACHE: ${{ 'echo $GITHUB_WORKSPACE' }}/.go-cache
-
 jobs:
     build:
         runs-on: ubuntu-latest
 
         steps:
+            - name: Set env variables
+              run: |
+                  echo "GOPATH=$GITHUB_WORKSPACE/.go-path" >> $GITHUB_ENV
+                  echo "GOCACHE=$GITHUB_WORKSPACE/.go-cache" >> $GITHUB_ENV
+
             - name: Checkout code
               uses: actions/checkout@v4
 
