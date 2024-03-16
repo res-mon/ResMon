@@ -15,7 +15,9 @@ jobs:
             - name: Cache go dependencies
               uses: actions/cache@v4
               with:
-                  path: ~/go/pkg/mod
+                  path: |
+                      ~/.cache/go-build
+                      ~/go/pkg/mod
                   key: go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
                   restore-keys: |
                       go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
