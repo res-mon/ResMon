@@ -1,22 +1,14 @@
-name: Build ResMon
+name: Test, Build and Deploy ResMon
 
 on:
     push:
         branches: []
 
 jobs:
-    build:
+    setup:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
-
-            - name: Log in to Docker Hub
-              uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20
-              with:
-                  username: ${{ secrets.DOCKER_USERNAME }}
-                  password: ${{ secrets.DOCKER_PASSWORD }}
-
             - name: Set up Go
               uses: actions/setup-go@v5
               with:
@@ -27,6 +19,20 @@ jobs:
               with:
                   node-version: 20.x
                   cache: "npm"
+
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+    build:
+        needs: setup
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Log in to Docker Hub
+              uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
 
             - name: Create empty file in webroot
               run: mkdir -p webroot && touch webroot/empty
@@ -79,7 +85,9 @@ jobs:
                   context: .
                   file: ./docker/Release.Dockerfile
                   push: true
-                  tags: ${{ env.COMMIT_TAG }},${{ env.BRANCH_TAG }},${{ env.LATEST_TAG }},${{ env.GIT_TAG_NAME }}
+                  tags:
+                      ${{ env.COMMIT_TAG }},${{ env.BRANCH_TAG }},
+                      ${{env.LATEST_TAG }},${{ env.GIT_TAG_NAME }}
                   labels: yertools/res-mon
                   builder: ${{ steps.buildx.outputs.name }}
                   platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
