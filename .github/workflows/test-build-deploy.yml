@@ -12,6 +12,20 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
+            - name: Cache go dependencies
+              uses: actions/cache@v4
+              with:
+                  path: ~/go/pkg/mod
+                  key: go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
+                  restore-keys: go_dependencies-
+
+            - name: Cache node modules
+              uses: actions/cache@v4
+              with:
+                  path: node_modules
+                  key: node_modules-${{hashFiles('package-lock.json')}}
+                  restore-keys: node_modules-
+
             - name: Set up Go
               uses: actions/setup-go@v5
               with:
@@ -26,22 +40,8 @@ jobs:
             - name: Create empty file in webroot
               run: mkdir -p webroot && touch webroot/empty
 
-            - name: Cache go dependencies
-              uses: actions/cache@v4
-              with:
-                  path: ~/go/pkg/mod
-                  key: go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
-                  restore-keys: go_dependencies-
-
             - name: Install go dependencies
               run: go install
-
-            - name: Cache node modules
-              uses: actions/cache@v4
-              with:
-                  path: node_modules
-                  key: node_modules-${{hashFiles('package-lock.json')}}
-                  restore-keys: node_modules-
 
             - name: Install npm dependencies
               run: npm ci
@@ -68,8 +68,8 @@ jobs:
               uses: actions/cache@v4
               with:
                   path: /tmp/.buildx-cache
-                  key: ${{ runner.os }}-buildx-${{hashFiles('ResMon')}}
-                  restore-keys: ${{ runner.os }}-buildx-
+                  key: buildx-${{hashFiles('ResMon')}}
+                  restore-keys: buildx-
 
             - name: Prepare docker tags
               run: |
