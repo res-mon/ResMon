@@ -17,14 +17,18 @@ jobs:
               with:
                   path: ~/go/pkg/mod
                   key: go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
-                  restore-keys: go_dependencies-
+                  restore-keys: |
+                      go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
+                      go_dependencies-
 
             - name: Cache node modules
               uses: actions/cache@v4
               with:
                   path: node_modules
                   key: node_modules-${{hashFiles('package-lock.json')}}
-                  restore-keys: node_modules-
+                  restore-keys: |
+                      node_modules-${{hashFiles('package-lock.json')}}
+                      node_modules-
 
             - name: Set up Go
               uses: actions/setup-go@v5
@@ -69,7 +73,9 @@ jobs:
               with:
                   path: /tmp/.buildx-cache
                   key: buildx-${{hashFiles('ResMon')}}
-                  restore-keys: buildx-
+                  restore-keys: |
+                      buildx-${{hashFiles('ResMon')}}
+                      buildx-
 
             - name: Prepare docker tags
               run: |
