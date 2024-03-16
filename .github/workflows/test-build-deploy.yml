@@ -5,8 +5,8 @@ on:
         branches: []
 
 env:
-    GOPATH: .go-path
-    GOCACHE: .go-cache
+    GOPATH: ${GITHUB_WORKSPACE}/.go-path
+    GOCACHE: ${GITHUB_WORKSPACE}/.go-cache
 
 jobs:
     build:
