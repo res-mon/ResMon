@@ -1,10 +1,10 @@
 FROM golang:1.22.1-alpine3.19 as builder
 
-RUN go env GOPATH
-RUN go env GOCACHE
+ENV GOPATH=/go
+ENV GOCACHE=/root/.cache/go-build
 
-COPY ~/.cache/go-build/ ~/.cache/go-build/
-COPY ~/go/pkg/ ~/go/pkg/
+COPY .go-path/pkg/ /go/pkg/
+COPY .go-cache/ /root/.cache/go-build/
 
 WORKDIR /app
 

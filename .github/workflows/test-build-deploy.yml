@@ -4,6 +4,10 @@ on:
     push:
         branches: []
 
+env:
+    GOPATH: .go-path
+    GOCACHE: .go-cache
+
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -16,8 +20,8 @@ jobs:
               uses: actions/cache@v4
               with:
                   path: |
-                      ~/.cache/go-build
-                      ~/go
+                      .go-path
+                      .go-cache
                   key: go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
                   restore-keys: |
                       go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
