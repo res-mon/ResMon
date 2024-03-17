@@ -1,22 +1,15 @@
-FROM golang:1.22.1-alpine3.19 as builder
+FROM --platform=$BUILDPLATFORM alpine:3.19 as builder
 
 WORKDIR /app
 
-COPY main.go go.mod go.sum /app/
-COPY webroot/ /app/webroot/
-COPY src/sql/ /app/src/sql/
-COPY src/go/ /app/src/go/
-COPY generated/go/ /app/generated/go/
+COPY res-mon-linux-amd64 res-mon-linux-arm64 /app/
+COPY res-mon-linux-armv7 /app/res-mon-linux-arm
 
-RUN apk add --no-cache gcc musl-dev sqlite-dev build-base
-
-ENV CGO_ENABLED=1
-RUN go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -ldflags '-extldflags "-static"' -o res-mon
-
+ARG TARGETARCH
+RUN mv res-mon-linux-${TARGETARCH} res-mon
 
 
 FROM alpine:3.19
-
 
 RUN mkdir /app && addgroup -S appuser && adduser -S -G appuser -h /app appuser && chown appuser:appuser /app && chmod 500 /app
 
