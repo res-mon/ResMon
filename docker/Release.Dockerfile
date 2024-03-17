@@ -2,7 +2,8 @@ FROM --platform=$BUILDPLATFORM alpine:3.19 as builder
 
 WORKDIR /app
 
-COPY res-mon-linux-amd64 res-mon-linux-arm64 res-mon-linux-armv7 /app/
+COPY res-mon-linux-amd64 res-mon-linux-arm64 /app/
+COPY res-mon-linux-armv7 /app/res-mon-linux-arm
 
 ARG TARGETARCH
 RUN mv res-mon-linux-${TARGETARCH} res-mon
