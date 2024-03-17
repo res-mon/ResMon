@@ -1,6 +1,6 @@
-FROM golang:1.22.1-alpine3.19 as builder
+FROM --platform=$BUILDPLATFORM golang:1.22.1-alpine3.19 as builder
 
-RUN apk add --no-cache gcc musl-dev sqlite-dev build-base
+RUN apk add --no-cache gcc musl-dev sqlite-dev build-base alpine-sdk
 
 ENV GOPATH=/go
 ENV GOCACHE=/root/.cache/go-build
@@ -16,8 +16,13 @@ COPY src/sql/ /app/src/sql/
 COPY src/go/ /app/src/go/
 COPY generated/go/ /app/generated/go/
 
+RUN go mod download
+
 ENV CGO_ENABLED=1
-RUN go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -ldflags '-extldflags "-static"' -o res-mon
+ARG TARGETOS TARGETARCH
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg \
+    GOOS=$TARGETOS GOARCH=$TARGETARCH go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -ldflags '-extldflags "-static"' -o res-mon
 
 
 
