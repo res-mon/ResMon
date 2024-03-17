@@ -1,23 +1,17 @@
-FROM golang:1.22.1 as builder
+FROM --platform=$BUILDPLATFORM alpine:3.19 as builder
 
 WORKDIR /app
 
-COPY main.go go.mod go.sum /app/
-COPY webroot/ /app/webroot/
-COPY src/sql/ /app/src/sql/
-COPY src/go/ /app/src/go/
-COPY generated/go/ /app/generated/go/
+COPY res-mon-linux-amd64 res-mon-linux-arm64 /app/
+COPY res-mon-linux-armv7 /app/res-mon-linux-arm
 
-RUN apt-get update && apt-get install -y gcc libc6-dev
-
-ENV CGO_ENABLED=1
-RUN go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -ldflags '-extldflags "-static"' -o res-mon
+ARG TARGETARCH
+RUN mv res-mon-linux-${TARGETARCH} res-mon
 
 
+FROM alpine:3.19
 
-FROM debian:bullseye-slim
-
-RUN mkdir /app && groupadd -r appuser && useradd -r -g appuser -d /app appuser && chown appuser:appuser /app && chmod 500 /app
+RUN mkdir /app && addgroup -S appuser && adduser -S -G appuser -h /app appuser && chown appuser:appuser /app && chmod 500 /app
 
 WORKDIR /app
 EXPOSE 8321
@@ -27,5 +21,5 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 HEALTHCHECK --interval=1m --timeout=15s --start-period=30s --retries=5 CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:8321/ || exit 1
 
 COPY docker/entrypoint.sh /app/entrypoint.sh
-RUN chown root:root entrypoint.sh && chmod 500 entrypoint.sh && apt-get update && apt-get install -y ca-certificates wget gosu && rm -rf /var/lib/apt/lists/*
+RUN chown root:root /app/entrypoint.sh && chmod 500 /app/entrypoint.sh && apk add --no-cache ca-certificates wget su-exec
 COPY --from=builder /app/res-mon .

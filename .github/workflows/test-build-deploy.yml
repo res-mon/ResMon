@@ -1,0 +1,150 @@
+name: Test, Build and Deploy ResMon
+
+on:
+    push:
+        branches: []
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Set environment variables
+              run: |
+                  echo "GOPATH=$GITHUB_WORKSPACE/.go-path" >> $GITHUB_ENV
+                  echo "GOCACHE=$GITHUB_WORKSPACE/.go-cache" >> $GITHUB_ENV
+
+            - name: Install C dependencies
+              uses: awalsh128/cache-apt-pkgs-action@v1
+              with:
+                  packages: >
+                      gcc libc6-dev gcc-arm-linux-gnueabihf
+                      gcc-aarch64-linux-gnu
+
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Cache go dependencies
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      .go-path
+                      .go-cache
+                  key: go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
+                  restore-keys: |
+                      go_dependencies-${{ hashFiles('go.sum', 'go.work.sum') }}
+                      go_dependencies-
+
+            - name: Cache node modules
+              uses: actions/cache@v4
+              with:
+                  path: node_modules
+                  key: node_modules-${{hashFiles('package-lock.json')}}
+                  restore-keys: |
+                      node_modules-${{hashFiles('package-lock.json')}}
+                      node_modules-
+
+            - name: Cache elm dependencies
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.elm
+                      elm-stuff
+                  key: "elm-dependencies-\
+                      ${{hashFiles('elm.json', 'review/elm.json')}}"
+                  restore-keys: |
+                      elm-dependencies-${{hashFiles('elm.json', 'review/elm.json')}}
+                      elm-dependencies-
+
+            - name: Set up Go
+              uses: actions/setup-go@v5
+              with:
+                  go-version: "1.22"
+                  cache: false
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 21.x
+                  cache: "npm"
+
+            - name: Create empty file in webroot
+              run: mkdir -p webroot && touch webroot/empty
+
+            - name: Install go dependencies
+              run: go install
+
+            - name: Install npm dependencies
+              run: npm ci
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
+
+            - name: Run tests
+              run: npm run test
+
+            - name: Build project
+              run: npm run build
+
+            - name: Build for multiple platforms
+              run: |
+                  GOOS=linux GOARCH=amd64 CGO_ENABLED=1 CC=gcc go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -ldflags '-extldflags "-static"' -o res-mon-linux-amd64
+                  GOOS=linux GOARCH=arm64 CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -ldflags '-extldflags "-static"' -o res-mon-linux-arm64
+                  GOOS=linux GOARCH=arm GOARM=7 CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc go build -tags 'netgo sqlite_stat4 sqlite_fts5 sqlite_math_functions sqlite_vtable' -ldflags '-extldflags "-static"' -o res-mon-linux-armv7
+
+            - name: Upload build results
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ResMon
+                  path: |
+                      res-mon-linux-amd64
+                      res-mon-linux-arm64
+                      res-mon-linux-armv7
+                  retention-days: 30
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Cache Docker layers
+              uses: actions/cache@v4
+              with:
+                  path: /tmp/.buildx-cache
+                  key: buildx-${{hashFiles('ResMon')}}
+                  restore-keys: |
+                      buildx-${{hashFiles('ResMon')}}
+                      buildx-
+
+            - name: Prepare docker tags
+              run: |
+                  BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | sed 's/[^a-zA-Z0-9]/-/g')
+                  SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+                  echo "BRANCH_TAG=yertools/res-mon:$BRANCH_NAME" >> $GITHUB_ENV
+                  echo "COMMIT_TAG=yertools/res-mon:$BRANCH_NAME-$SHORT_SHA" >> $GITHUB_ENV
+                  if [[ "$GITHUB_REF" == refs/heads/main ]]; then
+                    echo "LATEST_TAG=yertools/res-mon:latest" >> $GITHUB_ENV
+                  else
+                    echo "LATEST_TAG=" >> $GITHUB_ENV
+                  fi
+
+            - name: Extract git tag name
+              if: startsWith(github.ref, 'refs/tags/')
+              run: echo "GIT_TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  file: ./docker/Release.Dockerfile
+                  push: true
+                  tags: "${{ env.COMMIT_TAG }},\
+                      ${{ env.BRANCH_TAG }},\
+                      ${{ env.LATEST_TAG }},\
+                      ${{ env.GIT_TAG_NAME }}"
+                  labels: yertools/res-mon
+                  builder: ${{ steps.buildx.outputs.name }}
+                  platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
+                  cache-from: type=local,src=/tmp/.buildx-cache
+                  cache-to: type=local,dest=/tmp/.buildx-cache
