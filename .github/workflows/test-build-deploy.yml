@@ -146,8 +146,8 @@ jobs:
                   SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
                   echo "DOCKER_GIT_TAG_NAME=yertools/res-mon:${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
                   echo "PACKAGE_GIT_TAG_NAME=ghcr.io/res-mon/res-mon:${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-                  echo "DOCKER_GIT_TAG_NAME=yertools/res-mon:${GITHUB_REF#refs/tags/}-$SHORT_SHA" >> $GITHUB_ENV
-                  echo "PACKAGE_GIT_TAG_NAME=ghcr.io/res-mon/res-mon:${GITHUB_REF#refs/tags/}-$SHORT_SHA" >> $GITHUB_ENV
+                  echo "DOCKER_GIT_TAG_NAME_SHA=yertools/res-mon:${GITHUB_REF#refs/tags/}-$SHORT_SHA" >> $GITHUB_ENV
+                  echo "PACKAGE_GIT_TAG_NAME_SHA=ghcr.io/res-mon/res-mon:${GITHUB_REF#refs/tags/}-$SHORT_SHA" >> $GITHUB_ENV
 
             - name: Build and push Docker image
               uses: docker/build-push-action@v5
@@ -159,6 +159,8 @@ jobs:
                       ${{ env.BRANCH_DOCKER_TAG }},\
                       ${{ env.LATEST_DOCKER_TAG }},\
                       ${{ env.DOCKER_GIT_TAG_NAME }},\
+                      ${{ env.DOCKER_GIT_TAG_NAME_SHA }},\
+                      ${{ env.PACKAGE_GIT_TAG_NAME_SHA }},\
                       ${{ env.COMMIT_PACKAGE_TAG }},\
                       ${{ env.BRANCH_PACKAGE_TAG }},\
                       ${{ env.LATEST_PACKAGE_TAG }},\
