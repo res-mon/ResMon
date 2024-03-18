@@ -51,7 +51,7 @@
 		"daisyui": "^4.7.3",
 		"elm-format": "^0.8.7",
 		"elm-reloader": "^1.0.0",
-		"elm-review": "^2.10.3",
+		"elm-review": "^2.11.1",
 		"elm-tailwind-modules": "^0.5.0",
 		"elm-test": "^0.19.1-revision12",
 		"elm-verify-examples": "^6.0.3",
