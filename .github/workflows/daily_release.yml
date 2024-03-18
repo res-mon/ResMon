@@ -46,6 +46,13 @@ jobs:
                   username: ${{ secrets.DOCKER_USERNAME }}
                   password: ${{ secrets.DOCKER_PASSWORD }}
 
+            - name: Log in to GitHub Packages
+              uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20
+              with:
+                  username: ${{ secrets.GH_PACKAGES_USERNAME }}
+                  password: ${{ secrets.GH_PACKAGES_PASSWORD }}
+                  registry: ghcr.io
+
             - name: Set up Go
               if: env.CHANGES_EXIST == 'true'
               uses: actions/setup-go@v5
@@ -61,7 +68,9 @@ jobs:
 
             - name: Install C dependencies
               if: env.CHANGES_EXIST == 'true'
-              run: sudo apt-get update && sudo apt-get install -y gcc libc6-dev mingw-w64 gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
+              run: >
+                  sudo apt-get update && sudo apt-get install -y gcc libc6-dev
+                  mingw-w64 gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
 
             - name: Create empty file in webroot
               if: env.CHANGES_EXIST == 'true'
@@ -117,6 +126,7 @@ jobs:
                   NEW_TAG="v$YEAR.$MONTH.$COUNT"
                   echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
                   echo "DOCKER_TAG=yertools/res-mon:$NEW_TAG" >> $GITHUB_ENV
+                  echo "PACKAGE_TAG=ghcr.io/res-mon/res-mon:$NEW_TAG" >> $GITHUB_ENV
                   echo "New version: $NEW_TAG"
 
             - name: Build and push Docker image
@@ -126,8 +136,8 @@ jobs:
                   context: .
                   file: ./docker/Release.Dockerfile
                   push: true
-                  tags: ${{ env.DOCKER_TAG }}
-                  labels: yertools/res-mon
+                  tags: "${{ env.DOCKER_TAG }},\
+                      ${{ env.PACKAGE_TAG }}"
                   builder: ${{ steps.buildx.outputs.name }}
                   platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
                   cache-from: type=local,src=/tmp/.buildx-cache
@@ -141,6 +151,9 @@ jobs:
 
             - name: Create release
               if: env.CHANGES_EXIST == 'true'
-              run: gh release create $NEW_TAG res-mon-linux-amd64 res-mon-linux-arm64 res-mon-linux-armv7 res-mon-windows-amd64.exe --generate-notes
+              run: >
+                  gh release create $NEW_TAG res-mon-linux-amd64
+                  res-mon-linux-arm64 res-mon-linux-armv7
+                  res-mon-windows-amd64.exe --generate-notes
               env:
                   GH_TOKEN: ${{ secrets.DAILY_RELEASE_ACCESS_TOKEN }}
