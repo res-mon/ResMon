@@ -46,3 +46,9 @@ updates:
           interval: "daily"
           time: "03:33"
       open-pull-requests-limit: 25
+
+    - package-ecosystem: "devcontainers"
+      directory: "/"
+      schedule:
+          interval: "daily"
+          time: "03:33"
