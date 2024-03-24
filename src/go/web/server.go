@@ -135,7 +135,7 @@ func (s *server) Run(ctx, killCtx context.Context, shutdown func(), db *database
 		go (func() {
 			err := openURL("http://localhost:8321/")
 			if err != nil {
-				errChan <- err
+				fmt.Printf("could not open browser: %v\n", err)
 			}
 		})()
 	}
