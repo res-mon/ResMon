@@ -878,13 +878,13 @@ globalStyles =
         [ Css.property "overflow" "hidden"
         , Css.property "border-radius" "inherit"
         ]
-    , Css.Global.selector ".checkbox:checked,\n  .checkbox[checked=\"true\"],\n  .checkbox[aria-checked=\"true\"]"
+    , Css.Global.selector ".checkbox:checked,\n  .checkbox[aria-checked=\"true\"]"
         [ Css.property "background-repeat" "no-repeat"
         , Css.property "animation" "checkmark var(--animation-input, 0.2s) ease-out"
         , Css.property "background-color" "var(--chkbg)"
         , Css.property "background-image" "linear-gradient(-45deg, transparent 65%, var(--chkbg) 65.99%),\n      linear-gradient(45deg, transparent 75%, var(--chkbg) 75.99%),\n      linear-gradient(-45deg, var(--chkbg) 40%, transparent 40.99%),\n      linear-gradient(\n        45deg,\n        var(--chkbg) 30%,\n        var(--chkfg) 30.99%,\n        var(--chkfg) 40%,\n        transparent 40.99%\n      ),\n      linear-gradient(-45deg, var(--chkfg) 50%, var(--chkbg) 50.99%)"
         ]
-    , Css.Global.selector ".checkbox-primary:checked,\n    .checkbox-primary[checked=\"true\"],\n    .checkbox-primary[aria-checked=\"true\"]"
+    , Css.Global.selector ".checkbox-primary:checked,\n    .checkbox-primary[aria-checked=\"true\"]"
         [ Css.property "--tw-border-opacity" "1"
         , Css.property "border-color" "var(--fallback-p,oklch(var(--p)/var(--tw-border-opacity)))"
         , Css.property "--tw-bg-opacity" "1"
@@ -892,7 +892,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-pc,oklch(var(--pc)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".checkbox-secondary:checked,\n    .checkbox-secondary[checked=\"true\"],\n    .checkbox-secondary[aria-checked=\"true\"]"
+    , Css.Global.selector ".checkbox-secondary:checked,\n    .checkbox-secondary[aria-checked=\"true\"]"
         [ Css.property "--tw-border-opacity" "1"
         , Css.property "border-color" "var(--fallback-s,oklch(var(--s)/var(--tw-border-opacity)))"
         , Css.property "--tw-bg-opacity" "1"
@@ -900,7 +900,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".checkbox-accent:checked,\n    .checkbox-accent[checked=\"true\"],\n    .checkbox-accent[aria-checked=\"true\"]"
+    , Css.Global.selector ".checkbox-accent:checked,\n    .checkbox-accent[aria-checked=\"true\"]"
         [ Css.property "--tw-border-opacity" "1"
         , Css.property "border-color" "var(--fallback-a,oklch(var(--a)/var(--tw-border-opacity)))"
         , Css.property "--tw-bg-opacity" "1"
@@ -908,7 +908,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-ac,oklch(var(--ac)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".checkbox-success:checked,\n    .checkbox-success[checked=\"true\"],\n    .checkbox-success[aria-checked=\"true\"]"
+    , Css.Global.selector ".checkbox-success:checked,\n    .checkbox-success[aria-checked=\"true\"]"
         [ Css.property "--tw-border-opacity" "1"
         , Css.property "border-color" "var(--fallback-su,oklch(var(--su)/var(--tw-border-opacity)))"
         , Css.property "--tw-bg-opacity" "1"
@@ -916,7 +916,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-suc,oklch(var(--suc)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".checkbox-warning:checked,\n    .checkbox-warning[checked=\"true\"],\n    .checkbox-warning[aria-checked=\"true\"]"
+    , Css.Global.selector ".checkbox-warning:checked,\n    .checkbox-warning[aria-checked=\"true\"]"
         [ Css.property "--tw-border-opacity" "1"
         , Css.property "border-color" "var(--fallback-wa,oklch(var(--wa)/var(--tw-border-opacity)))"
         , Css.property "--tw-bg-opacity" "1"
@@ -924,7 +924,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-wac,oklch(var(--wac)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".checkbox-info:checked,\n    .checkbox-info[checked=\"true\"],\n    .checkbox-info[aria-checked=\"true\"]"
+    , Css.Global.selector ".checkbox-info:checked,\n    .checkbox-info[aria-checked=\"true\"]"
         [ Css.property "--tw-border-opacity" "1"
         , Css.property "border-color" "var(--fallback-in,oklch(var(--in)/var(--tw-border-opacity)))"
         , Css.property "--tw-bg-opacity" "1"
@@ -932,7 +932,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-inc,oklch(var(--inc)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".checkbox-error:checked,\n    .checkbox-error[checked=\"true\"],\n    .checkbox-error[aria-checked=\"true\"]"
+    , Css.Global.selector ".checkbox-error:checked,\n    .checkbox-error[aria-checked=\"true\"]"
         [ Css.property "--tw-border-opacity" "1"
         , Css.property "border-color" "var(--fallback-er,oklch(var(--er)/var(--tw-border-opacity)))"
         , Css.property "--tw-bg-opacity" "1"
@@ -1228,19 +1228,19 @@ globalStyles =
     , Css.Global.selector "[dir=\"rtl\"] .toggle"
         [ Css.property "--handleoffsetcalculator" "calc(var(--handleoffset) * 1)"
         ]
-    , Css.Global.selector ".toggle:checked,\n  .toggle[checked=\"true\"],\n  .toggle[aria-checked=\"true\"]"
+    , Css.Global.selector ".toggle:checked,\n  .toggle[aria-checked=\"true\"]"
         [ Css.property "background-image" "none"
         , Css.property "--handleoffsetcalculator" "var(--handleoffset)"
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector "[dir=\"rtl\"] .toggle:checked, [dir=\"rtl\"] .toggle[checked=\"true\"], [dir=\"rtl\"] .toggle[aria-checked=\"true\"]"
+    , Css.Global.selector "[dir=\"rtl\"] .toggle:checked, [dir=\"rtl\"] .toggle[aria-checked=\"true\"]"
         [ Css.property "--handleoffsetcalculator" "calc(var(--handleoffset) * -1)"
         ]
     , Css.Global.selector "[dir=\"rtl\"] .toggle:indeterminate"
         [ Css.property "box-shadow" "calc(var(--handleoffset) / 2) 0 0 2px var(--tglbg) inset,\n        calc(var(--handleoffset) / -2) 0 0 2px var(--tglbg) inset,\n        0 0 0 2px var(--tglbg) inset"
         ]
-    , Css.Global.selector ".toggle-primary:checked,\n    .toggle-primary[checked=\"true\"],\n    .toggle-primary[aria-checked=\"true\"]"
+    , Css.Global.selector ".toggle-primary:checked,\n    .toggle-primary[aria-checked=\"true\"]"
         [ Css.property "border-color" "var(--fallback-p,oklch(var(--p)/var(--tw-border-opacity)))"
         , Css.property "--tw-border-opacity" "0.1"
         , Css.property "--tw-bg-opacity" "1"
@@ -1248,7 +1248,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-pc,oklch(var(--pc)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".toggle-secondary:checked,\n    .toggle-secondary[checked=\"true\"],\n    .toggle-secondary[aria-checked=\"true\"]"
+    , Css.Global.selector ".toggle-secondary:checked,\n    .toggle-secondary[aria-checked=\"true\"]"
         [ Css.property "border-color" "var(--fallback-s,oklch(var(--s)/var(--tw-border-opacity)))"
         , Css.property "--tw-border-opacity" "0.1"
         , Css.property "--tw-bg-opacity" "1"
@@ -1256,7 +1256,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".toggle-accent:checked,\n    .toggle-accent[checked=\"true\"],\n    .toggle-accent[aria-checked=\"true\"]"
+    , Css.Global.selector ".toggle-accent:checked,\n    .toggle-accent[aria-checked=\"true\"]"
         [ Css.property "border-color" "var(--fallback-a,oklch(var(--a)/var(--tw-border-opacity)))"
         , Css.property "--tw-border-opacity" "0.1"
         , Css.property "--tw-bg-opacity" "1"
@@ -1264,7 +1264,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-ac,oklch(var(--ac)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".toggle-success:checked,\n    .toggle-success[checked=\"true\"],\n    .toggle-success[aria-checked=\"true\"]"
+    , Css.Global.selector ".toggle-success:checked,\n    .toggle-success[aria-checked=\"true\"]"
         [ Css.property "border-color" "var(--fallback-su,oklch(var(--su)/var(--tw-border-opacity)))"
         , Css.property "--tw-border-opacity" "0.1"
         , Css.property "--tw-bg-opacity" "1"
@@ -1272,7 +1272,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-suc,oklch(var(--suc)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".toggle-warning:checked,\n    .toggle-warning[checked=\"true\"],\n    .toggle-warning[aria-checked=\"true\"]"
+    , Css.Global.selector ".toggle-warning:checked,\n    .toggle-warning[aria-checked=\"true\"]"
         [ Css.property "border-color" "var(--fallback-wa,oklch(var(--wa)/var(--tw-border-opacity)))"
         , Css.property "--tw-border-opacity" "0.1"
         , Css.property "--tw-bg-opacity" "1"
@@ -1280,7 +1280,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-wac,oklch(var(--wac)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".toggle-info:checked,\n    .toggle-info[checked=\"true\"],\n    .toggle-info[aria-checked=\"true\"]"
+    , Css.Global.selector ".toggle-info:checked,\n    .toggle-info[aria-checked=\"true\"]"
         [ Css.property "border-color" "var(--fallback-in,oklch(var(--in)/var(--tw-border-opacity)))"
         , Css.property "--tw-border-opacity" "0.1"
         , Css.property "--tw-bg-opacity" "1"
@@ -1288,7 +1288,7 @@ globalStyles =
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-inc,oklch(var(--inc)/var(--tw-text-opacity)))"
         ]
-    , Css.Global.selector ".toggle-error:checked,\n    .toggle-error[checked=\"true\"],\n    .toggle-error[aria-checked=\"true\"]"
+    , Css.Global.selector ".toggle-error:checked,\n    .toggle-error[aria-checked=\"true\"]"
         [ Css.property "border-color" "var(--fallback-er,oklch(var(--er)/var(--tw-border-opacity)))"
         , Css.property "--tw-border-opacity" "0.1"
         , Css.property "--tw-bg-opacity" "1"
