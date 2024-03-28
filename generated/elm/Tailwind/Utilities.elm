@@ -29991,12 +29991,6 @@ prose =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(video):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "margin-top" "2em"
-                , Css.property "margin-bottom" "2em"
-                ]
-            ]
-        , Css.Global.descendants
             [ Css.Global.selector ":where(picture > img):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "0"
                 , Css.property "margin-bottom" "0"
@@ -30178,6 +30172,12 @@ prose =
                 , Css.property "padding-right" "0.375em"
                 , Css.property "padding-bottom" "0.1875em"
                 , Css.property "padding-left" "0.375em"
+                ]
+            ]
+        , Css.Global.descendants
+            [ Css.Global.selector ":where(video):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+                [ Css.property "margin-top" "2em"
+                , Css.property "margin-bottom" "2em"
                 ]
             ]
         , Css.Global.descendants
