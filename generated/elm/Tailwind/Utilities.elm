@@ -29884,30 +29884,30 @@ prose =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:last-child, tfoot td:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:first-child, tfoot td:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td, tfoot td):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "padding-top" "0.5714286em"
-                , Css.property "padding-right" "0.5714286em"
+                , Css.property "padding-inline-end" "0.5714286em"
                 , Css.property "padding-bottom" "0.5714286em"
-                , Css.property "padding-left" "0.5714286em"
+                , Css.property "padding-inline-start" "0.5714286em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
@@ -29933,7 +29933,7 @@ prose =
         , Css.Global.descendants
             [ Css.Global.selector ":where(dd):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "0.5em"
-                , Css.property "padding-left" "1.625em"
+                , Css.property "padding-inline-start" "1.625em"
                 ]
             ]
         , Css.Global.descendants
@@ -29976,12 +29976,12 @@ prose =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ul > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.375em"
+                [ Css.property "padding-inline-start" "0.375em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ol > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.375em"
+                [ Css.property "padding-inline-start" "0.375em"
                 ]
             ]
         , Css.Global.descendants
@@ -30042,9 +30042,9 @@ prose =
                 [ Css.property "color" "var(--tw-prose-headings)"
                 , Css.property "font-weight" "600"
                 , Css.property "vertical-align" "bottom"
-                , Css.property "padding-right" "0.5714286em"
+                , Css.property "padding-inline-end" "0.5714286em"
                 , Css.property "padding-bottom" "0.5714286em"
-                , Css.property "padding-left" "0.5714286em"
+                , Css.property "padding-inline-start" "0.5714286em"
                 ]
             ]
         , Css.Global.descendants
@@ -30057,7 +30057,7 @@ prose =
             [ Css.Global.selector ":where(table):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "width" "100%"
                 , Css.property "table-layout" "auto"
-                , Css.property "text-align" "left"
+                , Css.property "text-align" "start"
                 , Css.property "margin-top" "2em"
                 , Css.property "margin-bottom" "2em"
                 , Css.property "font-size" "0.875em"
@@ -30099,9 +30099,9 @@ prose =
                 , Css.property "margin-bottom" "1.7142857em"
                 , Css.property "border-radius" "0.375rem"
                 , Css.property "padding-top" "0.8571429em"
-                , Css.property "padding-right" "1.1428571em"
+                , Css.property "padding-inline-end" "1.1428571em"
                 , Css.property "padding-bottom" "0.8571429em"
-                , Css.property "padding-left" "1.1428571em"
+                , Css.property "padding-inline-start" "1.1428571em"
                 ]
             ]
         , Css.Global.descendants
@@ -30169,9 +30169,9 @@ prose =
                 , Css.property "font-size" "0.875em"
                 , Css.property "border-radius" "0.3125rem"
                 , Css.property "padding-top" "0.1875em"
-                , Css.property "padding-right" "0.375em"
+                , Css.property "padding-inline-end" "0.375em"
                 , Css.property "padding-bottom" "0.1875em"
-                , Css.property "padding-left" "0.375em"
+                , Css.property "padding-inline-start" "0.375em"
                 ]
             ]
         , Css.Global.descendants
@@ -30271,12 +30271,12 @@ prose =
                 [ Css.property "font-weight" "500"
                 , Css.property "font-style" "italic"
                 , Css.property "color" "var(--tw-prose-quotes)"
-                , Css.property "border-left-width" "0.25rem"
-                , Css.property "border-left-color" "var(--tw-prose-quote-borders)"
+                , Css.property "border-inline-start-width" "0.25rem"
+                , Css.property "border-inline-start-color" "var(--tw-prose-quote-borders)"
                 , Css.property "quotes" "\"\\201C\"\"\\201D\"\"\\2018\"\"\\2019\""
                 , Css.property "margin-top" "1.6em"
                 , Css.property "margin-bottom" "1.6em"
-                , Css.property "padding-left" "1em"
+                , Css.property "padding-inline-start" "1em"
                 ]
             ]
         , Css.Global.descendants
@@ -30310,7 +30310,7 @@ prose =
                 [ Css.property "list-style-type" "disc"
                 , Css.property "margin-top" "1.25em"
                 , Css.property "margin-bottom" "1.25em"
-                , Css.property "padding-left" "1.625em"
+                , Css.property "padding-inline-start" "1.625em"
                 ]
             ]
         , Css.Global.descendants
@@ -30363,7 +30363,7 @@ prose =
                 [ Css.property "list-style-type" "decimal"
                 , Css.property "margin-top" "1.25em"
                 , Css.property "margin-bottom" "1.25em"
-                , Css.property "padding-left" "1.625em"
+                , Css.property "padding-inline-start" "1.625em"
                 ]
             ]
         , Css.Global.descendants
@@ -30448,37 +30448,37 @@ prose_2xl =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:last-child, tfoot td:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:first-child, tfoot td:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td, tfoot td):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "padding-top" "0.8em"
-                , Css.property "padding-right" "0.6em"
+                , Css.property "padding-inline-end" "0.6em"
                 , Css.property "padding-bottom" "0.8em"
-                , Css.property "padding-left" "0.6em"
+                , Css.property "padding-inline-start" "0.6em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0.6em"
+                [ Css.property "padding-inline-end" "0.6em"
                 , Css.property "padding-bottom" "0.8em"
-                , Css.property "padding-left" "0.6em"
+                , Css.property "padding-inline-start" "0.6em"
                 ]
             ]
         , Css.Global.descendants
@@ -30516,7 +30516,7 @@ prose_2xl =
         , Css.Global.descendants
             [ Css.Global.selector ":where(dd):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "0.5em"
-                , Css.property "padding-left" "1.5833333em"
+                , Css.property "padding-inline-start" "1.5833333em"
                 ]
             ]
         , Css.Global.descendants
@@ -30564,12 +30564,12 @@ prose_2xl =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ul > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.4166667em"
+                [ Css.property "padding-inline-start" "0.4166667em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ol > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.4166667em"
+                [ Css.property "padding-inline-start" "0.4166667em"
                 ]
             ]
         , Css.Global.descendants
@@ -30582,14 +30582,14 @@ prose_2xl =
             [ Css.Global.selector ":where(ul):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.3333333em"
                 , Css.property "margin-bottom" "1.3333333em"
-                , Css.property "padding-left" "1.5833333em"
+                , Css.property "padding-inline-start" "1.5833333em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ol):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.3333333em"
                 , Css.property "margin-bottom" "1.3333333em"
-                , Css.property "padding-left" "1.5833333em"
+                , Css.property "padding-inline-start" "1.5833333em"
                 ]
             ]
         , Css.Global.descendants
@@ -30600,9 +30600,9 @@ prose_2xl =
                 , Css.property "margin-bottom" "2em"
                 , Css.property "border-radius" "0.5rem"
                 , Css.property "padding-top" "1.2em"
-                , Css.property "padding-right" "1.6em"
+                , Css.property "padding-inline-end" "1.6em"
                 , Css.property "padding-bottom" "1.2em"
-                , Css.property "padding-left" "1.6em"
+                , Css.property "padding-inline-start" "1.6em"
                 ]
             ]
         , Css.Global.descendants
@@ -30625,9 +30625,9 @@ prose_2xl =
                 [ Css.property "font-size" "0.8333333em"
                 , Css.property "border-radius" "0.375rem"
                 , Css.property "padding-top" "0.25em"
-                , Css.property "padding-right" "0.3333333em"
+                , Css.property "padding-inline-end" "0.3333333em"
                 , Css.property "padding-bottom" "0.25em"
-                , Css.property "padding-left" "0.3333333em"
+                , Css.property "padding-inline-start" "0.3333333em"
                 ]
             ]
         , Css.Global.descendants
@@ -30689,7 +30689,7 @@ prose_2xl =
             [ Css.Global.selector ":where(blockquote):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.7777778em"
                 , Css.property "margin-bottom" "1.7777778em"
-                , Css.property "padding-left" "1.1111111em"
+                , Css.property "padding-inline-start" "1.1111111em"
                 ]
             ]
         , Css.Global.descendants
@@ -30753,37 +30753,37 @@ prose_base =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:last-child, tfoot td:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:first-child, tfoot td:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td, tfoot td):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "padding-top" "0.5714286em"
-                , Css.property "padding-right" "0.5714286em"
+                , Css.property "padding-inline-end" "0.5714286em"
                 , Css.property "padding-bottom" "0.5714286em"
-                , Css.property "padding-left" "0.5714286em"
+                , Css.property "padding-inline-start" "0.5714286em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0.5714286em"
+                [ Css.property "padding-inline-end" "0.5714286em"
                 , Css.property "padding-bottom" "0.5714286em"
-                , Css.property "padding-left" "0.5714286em"
+                , Css.property "padding-inline-start" "0.5714286em"
                 ]
             ]
         , Css.Global.descendants
@@ -30821,7 +30821,7 @@ prose_base =
         , Css.Global.descendants
             [ Css.Global.selector ":where(dd):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "0.5em"
-                , Css.property "padding-left" "1.625em"
+                , Css.property "padding-inline-start" "1.625em"
                 ]
             ]
         , Css.Global.descendants
@@ -30869,12 +30869,12 @@ prose_base =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ul > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.375em"
+                [ Css.property "padding-inline-start" "0.375em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ol > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.375em"
+                [ Css.property "padding-inline-start" "0.375em"
                 ]
             ]
         , Css.Global.descendants
@@ -30887,14 +30887,14 @@ prose_base =
             [ Css.Global.selector ":where(ul):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.25em"
                 , Css.property "margin-bottom" "1.25em"
-                , Css.property "padding-left" "1.625em"
+                , Css.property "padding-inline-start" "1.625em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ol):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.25em"
                 , Css.property "margin-bottom" "1.25em"
-                , Css.property "padding-left" "1.625em"
+                , Css.property "padding-inline-start" "1.625em"
                 ]
             ]
         , Css.Global.descendants
@@ -30905,9 +30905,9 @@ prose_base =
                 , Css.property "margin-bottom" "1.7142857em"
                 , Css.property "border-radius" "0.375rem"
                 , Css.property "padding-top" "0.8571429em"
-                , Css.property "padding-right" "1.1428571em"
+                , Css.property "padding-inline-end" "1.1428571em"
                 , Css.property "padding-bottom" "0.8571429em"
-                , Css.property "padding-left" "1.1428571em"
+                , Css.property "padding-inline-start" "1.1428571em"
                 ]
             ]
         , Css.Global.descendants
@@ -30930,9 +30930,9 @@ prose_base =
                 [ Css.property "font-size" "0.875em"
                 , Css.property "border-radius" "0.3125rem"
                 , Css.property "padding-top" "0.1875em"
-                , Css.property "padding-right" "0.375em"
+                , Css.property "padding-inline-end" "0.375em"
                 , Css.property "padding-bottom" "0.1875em"
-                , Css.property "padding-left" "0.375em"
+                , Css.property "padding-inline-start" "0.375em"
                 ]
             ]
         , Css.Global.descendants
@@ -30994,7 +30994,7 @@ prose_base =
             [ Css.Global.selector ":where(blockquote):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.6em"
                 , Css.property "margin-bottom" "1.6em"
-                , Css.property "padding-left" "1em"
+                , Css.property "padding-inline-start" "1em"
                 ]
             ]
         , Css.Global.descendants
@@ -31164,37 +31164,37 @@ prose_lg =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:last-child, tfoot td:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:first-child, tfoot td:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td, tfoot td):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "padding-top" "0.75em"
-                , Css.property "padding-right" "0.75em"
+                , Css.property "padding-inline-end" "0.75em"
                 , Css.property "padding-bottom" "0.75em"
-                , Css.property "padding-left" "0.75em"
+                , Css.property "padding-inline-start" "0.75em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0.75em"
+                [ Css.property "padding-inline-end" "0.75em"
                 , Css.property "padding-bottom" "0.75em"
-                , Css.property "padding-left" "0.75em"
+                , Css.property "padding-inline-start" "0.75em"
                 ]
             ]
         , Css.Global.descendants
@@ -31232,7 +31232,7 @@ prose_lg =
         , Css.Global.descendants
             [ Css.Global.selector ":where(dd):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "0.6666667em"
-                , Css.property "padding-left" "1.5555556em"
+                , Css.property "padding-inline-start" "1.5555556em"
                 ]
             ]
         , Css.Global.descendants
@@ -31280,12 +31280,12 @@ prose_lg =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ul > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.4444444em"
+                [ Css.property "padding-inline-start" "0.4444444em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ol > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.4444444em"
+                [ Css.property "padding-inline-start" "0.4444444em"
                 ]
             ]
         , Css.Global.descendants
@@ -31298,14 +31298,14 @@ prose_lg =
             [ Css.Global.selector ":where(ul):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.3333333em"
                 , Css.property "margin-bottom" "1.3333333em"
-                , Css.property "padding-left" "1.5555556em"
+                , Css.property "padding-inline-start" "1.5555556em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ol):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.3333333em"
                 , Css.property "margin-bottom" "1.3333333em"
-                , Css.property "padding-left" "1.5555556em"
+                , Css.property "padding-inline-start" "1.5555556em"
                 ]
             ]
         , Css.Global.descendants
@@ -31316,9 +31316,9 @@ prose_lg =
                 , Css.property "margin-bottom" "2em"
                 , Css.property "border-radius" "0.375rem"
                 , Css.property "padding-top" "1em"
-                , Css.property "padding-right" "1.5em"
+                , Css.property "padding-inline-end" "1.5em"
                 , Css.property "padding-bottom" "1em"
-                , Css.property "padding-left" "1.5em"
+                , Css.property "padding-inline-start" "1.5em"
                 ]
             ]
         , Css.Global.descendants
@@ -31341,9 +31341,9 @@ prose_lg =
                 [ Css.property "font-size" "0.8888889em"
                 , Css.property "border-radius" "0.3125rem"
                 , Css.property "padding-top" "0.2222222em"
-                , Css.property "padding-right" "0.4444444em"
+                , Css.property "padding-inline-end" "0.4444444em"
                 , Css.property "padding-bottom" "0.2222222em"
-                , Css.property "padding-left" "0.4444444em"
+                , Css.property "padding-inline-start" "0.4444444em"
                 ]
             ]
         , Css.Global.descendants
@@ -31405,7 +31405,7 @@ prose_lg =
             [ Css.Global.selector ":where(blockquote):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.6666667em"
                 , Css.property "margin-bottom" "1.6666667em"
-                , Css.property "padding-left" "1em"
+                , Css.property "padding-inline-start" "1em"
                 ]
             ]
         , Css.Global.descendants
@@ -31601,37 +31601,37 @@ prose_sm =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:last-child, tfoot td:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:first-child, tfoot td:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td, tfoot td):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "padding-top" "0.6666667em"
-                , Css.property "padding-right" "1em"
+                , Css.property "padding-inline-end" "1em"
                 , Css.property "padding-bottom" "0.6666667em"
-                , Css.property "padding-left" "1em"
+                , Css.property "padding-inline-start" "1em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "1em"
+                [ Css.property "padding-inline-end" "1em"
                 , Css.property "padding-bottom" "0.6666667em"
-                , Css.property "padding-left" "1em"
+                , Css.property "padding-inline-start" "1em"
                 ]
             ]
         , Css.Global.descendants
@@ -31669,7 +31669,7 @@ prose_sm =
         , Css.Global.descendants
             [ Css.Global.selector ":where(dd):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "0.2857143em"
-                , Css.property "padding-left" "1.5714286em"
+                , Css.property "padding-inline-start" "1.5714286em"
                 ]
             ]
         , Css.Global.descendants
@@ -31717,12 +31717,12 @@ prose_sm =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ul > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.4285714em"
+                [ Css.property "padding-inline-start" "0.4285714em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ol > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.4285714em"
+                [ Css.property "padding-inline-start" "0.4285714em"
                 ]
             ]
         , Css.Global.descendants
@@ -31735,14 +31735,14 @@ prose_sm =
             [ Css.Global.selector ":where(ul):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.1428571em"
                 , Css.property "margin-bottom" "1.1428571em"
-                , Css.property "padding-left" "1.5714286em"
+                , Css.property "padding-inline-start" "1.5714286em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ol):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.1428571em"
                 , Css.property "margin-bottom" "1.1428571em"
-                , Css.property "padding-left" "1.5714286em"
+                , Css.property "padding-inline-start" "1.5714286em"
                 ]
             ]
         , Css.Global.descendants
@@ -31753,9 +31753,9 @@ prose_sm =
                 , Css.property "margin-bottom" "1.6666667em"
                 , Css.property "border-radius" "0.25rem"
                 , Css.property "padding-top" "0.6666667em"
-                , Css.property "padding-right" "1em"
+                , Css.property "padding-inline-end" "1em"
                 , Css.property "padding-bottom" "0.6666667em"
-                , Css.property "padding-left" "1em"
+                , Css.property "padding-inline-start" "1em"
                 ]
             ]
         , Css.Global.descendants
@@ -31778,9 +31778,9 @@ prose_sm =
                 [ Css.property "font-size" "0.8571429em"
                 , Css.property "border-radius" "0.3125rem"
                 , Css.property "padding-top" "0.1428571em"
-                , Css.property "padding-right" "0.3571429em"
+                , Css.property "padding-inline-end" "0.3571429em"
                 , Css.property "padding-bottom" "0.1428571em"
-                , Css.property "padding-left" "0.3571429em"
+                , Css.property "padding-inline-start" "0.3571429em"
                 ]
             ]
         , Css.Global.descendants
@@ -31842,7 +31842,7 @@ prose_sm =
             [ Css.Global.selector ":where(blockquote):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.3333333em"
                 , Css.property "margin-bottom" "1.3333333em"
-                , Css.property "padding-left" "1.1111111em"
+                , Css.property "padding-inline-start" "1.1111111em"
                 ]
             ]
         , Css.Global.descendants
@@ -31956,37 +31956,37 @@ prose_xl =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:last-child, tfoot td:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td:first-child, tfoot td:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(tbody td, tfoot td):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "padding-top" "0.8888889em"
-                , Css.property "padding-right" "0.6666667em"
+                , Css.property "padding-inline-end" "0.6666667em"
                 , Css.property "padding-bottom" "0.8888889em"
-                , Css.property "padding-left" "0.6666667em"
+                , Css.property "padding-inline-start" "0.6666667em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0"
+                [ Css.property "padding-inline-end" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0"
+                [ Css.property "padding-inline-start" "0"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(thead th):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-right" "0.6666667em"
+                [ Css.property "padding-inline-end" "0.6666667em"
                 , Css.property "padding-bottom" "0.8888889em"
-                , Css.property "padding-left" "0.6666667em"
+                , Css.property "padding-inline-start" "0.6666667em"
                 ]
             ]
         , Css.Global.descendants
@@ -32024,7 +32024,7 @@ prose_xl =
         , Css.Global.descendants
             [ Css.Global.selector ":where(dd):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "0.6em"
-                , Css.property "padding-left" "1.6em"
+                , Css.property "padding-inline-start" "1.6em"
                 ]
             ]
         , Css.Global.descendants
@@ -32072,12 +32072,12 @@ prose_xl =
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ul > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.4em"
+                [ Css.property "padding-inline-start" "0.4em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ol > li):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
-                [ Css.property "padding-left" "0.4em"
+                [ Css.property "padding-inline-start" "0.4em"
                 ]
             ]
         , Css.Global.descendants
@@ -32090,14 +32090,14 @@ prose_xl =
             [ Css.Global.selector ":where(ul):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.2em"
                 , Css.property "margin-bottom" "1.2em"
-                , Css.property "padding-left" "1.6em"
+                , Css.property "padding-inline-start" "1.6em"
                 ]
             ]
         , Css.Global.descendants
             [ Css.Global.selector ":where(ol):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.2em"
                 , Css.property "margin-bottom" "1.2em"
-                , Css.property "padding-left" "1.6em"
+                , Css.property "padding-inline-start" "1.6em"
                 ]
             ]
         , Css.Global.descendants
@@ -32108,9 +32108,9 @@ prose_xl =
                 , Css.property "margin-bottom" "2em"
                 , Css.property "border-radius" "0.5rem"
                 , Css.property "padding-top" "1.1111111em"
-                , Css.property "padding-right" "1.3333333em"
+                , Css.property "padding-inline-end" "1.3333333em"
                 , Css.property "padding-bottom" "1.1111111em"
-                , Css.property "padding-left" "1.3333333em"
+                , Css.property "padding-inline-start" "1.3333333em"
                 ]
             ]
         , Css.Global.descendants
@@ -32133,9 +32133,9 @@ prose_xl =
                 [ Css.property "font-size" "0.9em"
                 , Css.property "border-radius" "0.3125rem"
                 , Css.property "padding-top" "0.25em"
-                , Css.property "padding-right" "0.4em"
+                , Css.property "padding-inline-end" "0.4em"
                 , Css.property "padding-bottom" "0.25em"
-                , Css.property "padding-left" "0.4em"
+                , Css.property "padding-inline-start" "0.4em"
                 ]
             ]
         , Css.Global.descendants
@@ -32197,7 +32197,7 @@ prose_xl =
             [ Css.Global.selector ":where(blockquote):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.6em"
                 , Css.property "margin-bottom" "1.6em"
-                , Css.property "padding-left" "1.0666667em"
+                , Css.property "padding-inline-start" "1.0666667em"
                 ]
             ]
         , Css.Global.descendants
