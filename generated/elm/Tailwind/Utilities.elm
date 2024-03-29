@@ -85,6 +85,7 @@ globalStyles =
         , Css.property "font-size" "100%"
         , Css.property "font-weight" "inherit"
         , Css.property "line-height" "inherit"
+        , Css.property "letter-spacing" "inherit"
         , Css.property "color" "inherit"
         , Css.property "margin" "0"
         , Css.property "padding" "0"
@@ -92,7 +93,7 @@ globalStyles =
     , Css.Global.selector "button,\nselect"
         [ Css.property "text-transform" "none"
         ]
-    , Css.Global.selector "button,\n[type='button'],\n[type='reset'],\n[type='submit']"
+    , Css.Global.selector "button,\ninput:where([type='button']),\ninput:where([type='reset']),\ninput:where([type='submit'])"
         [ Css.property "-webkit-appearance" "button"
         , Css.property "background-color" "transparent"
         , Css.property "background-image" "none"
@@ -346,6 +347,10 @@ globalStyles =
         , Css.property "--tw-backdrop-opacity" " "
         , Css.property "--tw-backdrop-saturate" " "
         , Css.property "--tw-backdrop-sepia" " "
+        , Css.property "--tw-contain-size" " "
+        , Css.property "--tw-contain-layout" " "
+        , Css.property "--tw-contain-paint" " "
+        , Css.property "--tw-contain-style" " "
         ]
     , Css.Global.selector "::backdrop"
         [ Css.property "--tw-border-spacing-x" "0"
@@ -395,6 +400,10 @@ globalStyles =
         , Css.property "--tw-backdrop-opacity" " "
         , Css.property "--tw-backdrop-saturate" " "
         , Css.property "--tw-backdrop-sepia" " "
+        , Css.property "--tw-contain-size" " "
+        , Css.property "--tw-contain-layout" " "
+        , Css.property "--tw-contain-paint" " "
+        , Css.property "--tw-contain-style" " "
         ]
     , Css.Global.selector ".avatar.placeholder > div"
         [ Css.property "display" "flex"
@@ -9419,6 +9428,61 @@ columns_xs =
     Css.property "columns" "20rem"
 
 
+contain_content : Css.Style
+contain_content =
+    Css.property "contain" "content"
+
+
+contain_inline_size : Css.Style
+contain_inline_size =
+    Css.batch
+        [ Css.property "--tw-contain-size" "inline-size"
+        , Css.property "contain" "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+        ]
+
+
+contain_layout : Css.Style
+contain_layout =
+    Css.batch
+        [ Css.property "--tw-contain-layout" "layout"
+        , Css.property "contain" "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+        ]
+
+
+contain_none : Css.Style
+contain_none =
+    Css.property "contain" "none"
+
+
+contain_paint : Css.Style
+contain_paint =
+    Css.batch
+        [ Css.property "--tw-contain-paint" "paint"
+        , Css.property "contain" "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+        ]
+
+
+contain_size : Css.Style
+contain_size =
+    Css.batch
+        [ Css.property "--tw-contain-size" "size"
+        , Css.property "contain" "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+        ]
+
+
+contain_strict : Css.Style
+contain_strict =
+    Css.property "contain" "strict"
+
+
+contain_style : Css.Style
+contain_style =
+    Css.batch
+        [ Css.property "--tw-contain-style" "style"
+        , Css.property "contain" "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+        ]
+
+
 container : Css.Style
 container =
     Css.batch
@@ -17901,6 +17965,11 @@ mix_blend_normal =
 mix_blend_overlay : Css.Style
 mix_blend_overlay =
     Css.property "mix-blend-mode" "overlay"
+
+
+mix_blend_plus_darker : Css.Style
+mix_blend_plus_darker =
+    Css.property "mix-blend-mode" "plus-darker"
 
 
 mix_blend_plus_lighter : Css.Style
