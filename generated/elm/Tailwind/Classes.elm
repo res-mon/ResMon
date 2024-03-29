@@ -6724,6 +6724,62 @@ columns_xs =
     )
 
 
+contain_content : ( List Css.Style, List String )
+contain_content =
+    ( [ Tw.contain_content ]
+    , [ "contain-content" ]
+    )
+
+
+contain_inline_size : ( List Css.Style, List String )
+contain_inline_size =
+    ( [ Tw.contain_inline_size ]
+    , [ "contain-inline-size" ]
+    )
+
+
+contain_layout : ( List Css.Style, List String )
+contain_layout =
+    ( [ Tw.contain_layout ]
+    , [ "contain-layout" ]
+    )
+
+
+contain_none : ( List Css.Style, List String )
+contain_none =
+    ( [ Tw.contain_none ]
+    , [ "contain-none" ]
+    )
+
+
+contain_paint : ( List Css.Style, List String )
+contain_paint =
+    ( [ Tw.contain_paint ]
+    , [ "contain-paint" ]
+    )
+
+
+contain_size : ( List Css.Style, List String )
+contain_size =
+    ( [ Tw.contain_size ]
+    , [ "contain-size" ]
+    )
+
+
+contain_strict : ( List Css.Style, List String )
+contain_strict =
+    ( [ Tw.contain_strict ]
+    , [ "contain-strict" ]
+    )
+
+
+contain_style : ( List Css.Style, List String )
+contain_style =
+    ( [ Tw.contain_style ]
+    , [ "contain-style" ]
+    )
+
+
 container : ( List Css.Style, List String )
 container =
     ( [ Tw.container ]
@@ -15366,6 +15422,13 @@ mix_blend_overlay : ( List Css.Style, List String )
 mix_blend_overlay =
     ( [ Tw.mix_blend_overlay ]
     , [ "mix-blend-overlay" ]
+    )
+
+
+mix_blend_plus_darker : ( List Css.Style, List String )
+mix_blend_plus_darker =
+    ( [ Tw.mix_blend_plus_darker ]
+    , [ "mix-blend-plus-darker" ]
     )
 
 
