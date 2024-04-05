@@ -681,6 +681,7 @@ globalStyles =
         ]
     , Css.Global.selector ":root:has(:is(.modal-open, .modal:target, .modal-toggle:checked + .modal, .modal[open]))"
         [ Css.property "overflow" "hidden"
+        , Css.property "scrollbar-gutter" "stable"
         ]
     , Css.Global.selector ":where(.navbar > *:not(script, style))"
         [ Css.property "display" "inline-flex"
@@ -42764,6 +42765,13 @@ table =
         , Css.property "line-height" "1.25rem"
         , Css.property "display" "table"
         , Css.Global.descendants
+            [ Css.Global.selector ":where(tfoot)"
+                [ Css.property "border-top-width" "1px"
+                , Css.property "--tw-border-opacity" "1"
+                , Css.property "border-top-color" "var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity)))"
+                ]
+            ]
+        , Css.Global.descendants
             [ Css.Global.selector ":where(thead, tfoot)"
                 [ Css.property "white-space" "nowrap"
                 , Css.property "font-size" "0.75rem"
@@ -42773,14 +42781,7 @@ table =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(thead, tbody) :where(tr:first-child:last-child)"
-                [ Css.property "border-bottom-width" "1px"
-                , Css.property "--tw-border-opacity" "1"
-                , Css.property "border-bottom-color" "var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity)))"
-                ]
-            ]
-        , Css.Global.descendants
-            [ Css.Global.selector ":where(thead, tbody) :where(tr:not(:last-child))"
+            [ Css.Global.selector ":where(thead tr, tbody tr:not(:last-child), tbody tr:first-child:last-child)"
                 [ Css.property "border-bottom-width" "1px"
                 , Css.property "--tw-border-opacity" "1"
                 , Css.property "border-bottom-color" "var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity)))"
