@@ -30018,22 +30018,22 @@ prose =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose > ol > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose > ol > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.25em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose > ol > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose > ol > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.25em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose > ul > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose > ul > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.25em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose > ul > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose > ul > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.25em"
                 ]
             ]
@@ -30606,22 +30606,22 @@ prose_2xl =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-2xl > ol > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-2xl > ol > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.3333333em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-2xl > ol > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-2xl > ol > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.3333333em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-2xl > ul > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-2xl > ul > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.3333333em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-2xl > ul > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-2xl > ul > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.3333333em"
                 ]
             ]
@@ -30911,22 +30911,22 @@ prose_base =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-base > ol > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-base > ol > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.25em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-base > ol > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-base > ol > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.25em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-base > ul > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-base > ul > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.25em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-base > ul > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-base > ul > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.25em"
                 ]
             ]
@@ -31322,22 +31322,22 @@ prose_lg =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-lg > ol > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-lg > ol > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.3333333em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-lg > ol > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-lg > ol > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.3333333em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-lg > ul > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-lg > ul > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.3333333em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-lg > ul > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-lg > ul > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.3333333em"
                 ]
             ]
@@ -31759,22 +31759,22 @@ prose_sm =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-sm > ol > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-sm > ol > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.1428571em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-sm > ol > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-sm > ol > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.1428571em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-sm > ul > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-sm > ul > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.1428571em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-sm > ul > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-sm > ul > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.1428571em"
                 ]
             ]
@@ -32114,22 +32114,22 @@ prose_xl =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-xl > ol > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-xl > ol > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.2em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-xl > ol > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-xl > ol > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.2em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-xl > ul > li > *:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-xl > ul > li > p:last-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-bottom" "1.2em"
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ":where(.prose-xl > ul > li > *:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
+            [ Css.Global.selector ":where(.prose-xl > ul > li > p:first-child):not(:where([class~=\"not-prose\"], [class~=\"not-prose\"] *))"
                 [ Css.property "margin-top" "1.2em"
                 ]
             ]
