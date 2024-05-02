@@ -8743,13 +8743,6 @@ checkbox =
         , Css.property "border-width" "1px"
         , Css.property "border-color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-border-opacity)))"
         , Css.property "--tw-border-opacity" "0.2"
-        , Css.pseudoClass "disabled"
-            [ Css.property "cursor" "not-allowed"
-            , Css.property "border-color" "transparent"
-            , Css.property "--tw-bg-opacity" "1"
-            , Css.property "background-color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-bg-opacity)))"
-            , Css.property "opacity" "0.2"
-            ]
         , Css.pseudoClass "indeterminate"
             [ Css.property "--tw-bg-opacity" "1"
             , Css.property "background-color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-bg-opacity)))"
@@ -8772,6 +8765,14 @@ checkbox =
                     ]
                 )
             , Css.property "background-image" "linear-gradient(90deg, transparent 80%, var(--chkbg) 80%),\n      linear-gradient(-90deg, transparent 80%, var(--chkbg) 80%),\n      linear-gradient(0deg, var(--chkbg) 43%, var(--chkfg) 43%, var(--chkfg) 57%, var(--chkbg) 57%)"
+            ]
+        , Css.pseudoClass "disabled"
+            [ Css.property "border-width" "0px"
+            , Css.property "cursor" "not-allowed"
+            , Css.property "border-color" "transparent"
+            , Css.property "--tw-bg-opacity" "1"
+            , Css.property "background-color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-bg-opacity)))"
+            , Css.property "opacity" "0.2"
             ]
         , Css.pseudoClass "focus-visible"
             [ Css.property "outline-style" "solid"
