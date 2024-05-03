@@ -1025,7 +1025,7 @@ globalStyles =
     , Css.Global.selector ".input[list]::-webkit-calendar-picker-indicator"
         [ Css.property "line-height" "1em"
         ]
-    , Css.Global.selector ".input-disabled,\n  .input:disabled,\n  .input[disabled]"
+    , Css.Global.selector ".input:has(> input[disabled]),\n  .input-disabled,\n  .input:disabled,\n  .input[disabled]"
         [ Css.property "cursor" "not-allowed"
         , Css.property "--tw-border-opacity" "1"
         , Css.property "border-color" "var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity)))"
@@ -1033,9 +1033,12 @@ globalStyles =
         , Css.property "background-color" "var(--fallback-b2,oklch(var(--b2)/var(--tw-bg-opacity)))"
         , Css.property "color" "var(--fallback-bc,oklch(var(--bc)/0.4))"
         ]
-    , Css.Global.selector ".input-disabled::placeholder,\n  .input:disabled::placeholder,\n  .input[disabled]::placeholder"
+    , Css.Global.selector ".input:has(> input[disabled])::placeholder,\n  .input-disabled::placeholder,\n  .input:disabled::placeholder,\n  .input[disabled]::placeholder"
         [ Css.property "color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-placeholder-opacity)))"
         , Css.property "--tw-placeholder-opacity" "0.2"
+        ]
+    , Css.Global.selector ".input:has(> input[disabled]) > input[disabled]"
+        [ Css.property "cursor" "not-allowed"
         ]
     , Css.Global.selector ":where(.menu li:empty)"
         [ Css.property "--tw-bg-opacity" "1"
