@@ -694,13 +694,13 @@ globalStyles =
         [ Css.property "grid-auto-flow" "column"
         , Css.property "overflow-x" "auto"
         ]
-    , Css.Global.selector ".tabs-lifted:has(.tab-content[class^=\"rounded-\"]) .tab:first-child:not(.tab-active),\n  .tabs-lifted:has(.tab-content[class*=\" rounded-\"]) .tab:first-child:not(.tab-active)"
+    , Css.Global.selector ".tabs-lifted:has(.tab-content[class^=\"rounded-\"]) .tab:first-child:not(:is(.tab-active, [aria-selected=\"true\"])), .tabs-lifted:has(.tab-content[class*=\" rounded-\"]) .tab:first-child:not(:is(.tab-active, [aria-selected=\"true\"]))"
         [ Css.property "border-bottom-color" "transparent"
         ]
-    , Css.Global.selector ":checked + .tab-content:nth-child(2),\n  .tab-active + .tab-content:nth-child(2)"
+    , Css.Global.selector ":checked + .tab-content:nth-child(2),\n  :is(.tab-active, [aria-selected=\"true\"]) + .tab-content:nth-child(2)"
         [ Css.property "border-start-start-radius" "0px"
         ]
-    , Css.Global.selector "input.tab:checked + .tab-content,\n.tab-active + .tab-content"
+    , Css.Global.selector "input.tab:checked + .tab-content,\n:is(.tab-active, [aria-selected=\"true\"]) + .tab-content"
         [ Css.property "display" "block"
         ]
     , Css.Global.selector ":where(.timeline > li)"
@@ -1176,21 +1176,16 @@ globalStyles =
     , Css.Global.selector ".swap-flip input:checked ~ .swap-on,\n.swap-active:where(.swap-flip) .swap-on,\n.swap-flip input:indeterminate ~ .swap-indeterminate"
         [ Css.property "transform" "rotateY(0deg)"
         ]
-    , Css.Global.selector ".tab.tab-active:not(.tab-disabled):not([disabled]),\n  .tab:is(input:checked)"
-        [ Css.property "border-color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-border-opacity)))"
-        , Css.property "--tw-border-opacity" "1"
-        , Css.property "--tw-text-opacity" "1"
-        ]
     , Css.Global.selector ".tab-disabled,\n  .tab[disabled]"
         [ Css.property "cursor" "not-allowed"
         , Css.property "color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)))"
         , Css.property "--tw-text-opacity" "0.2"
         ]
-    , Css.Global.selector "[dir=\"rtl\"] .tabs-lifted > .tab.tab-active:not(.tab-disabled):not([disabled]):first-child:before, [dir=\"rtl\"] .tabs-lifted > .tab:is(input:checked):first-child:before"
+    , Css.Global.selector "[dir=\"rtl\"] .tabs-lifted > .tab:is(.tab-active, [aria-selected=\"true\"]):not(.tab-disabled):not([disabled]):first-child:before, [dir=\"rtl\"] .tabs-lifted > .tab:is(input:checked):first-child:before"
         [ Css.property "background-image" "var(--radius-start)"
         , Css.property "background-position" "top left"
         ]
-    , Css.Global.selector "[dir=\"rtl\"] .tabs-lifted > .tab.tab-active:not(.tab-disabled):not([disabled]):last-child:before, [dir=\"rtl\"] .tabs-lifted > .tab:is(input:checked):last-child:before"
+    , Css.Global.selector "[dir=\"rtl\"] .tabs-lifted > .tab:is(.tab-active, [aria-selected=\"true\"]):not(.tab-disabled):not([disabled]):last-child:before, [dir=\"rtl\"] .tabs-lifted > .tab:is(input:checked):last-child:before"
         [ Css.property "background-image" "var(--radius-end)"
         , Css.property "background-position" "top right"
         ]
@@ -7805,23 +7800,6 @@ btn =
         , Css.property "transition-duration" "200ms"
         , Css.property "transition-timing-function" "cubic-bezier(0, 0, 0.2, 1)"
         , Css.property "border-width" "var(--border-btn, 1px)"
-        , Css.property "animation" "var(--animation-btn, 0.25s) ease-out"
-        , Css.animationName
-            (Css.Animations.keyframes
-                [ ( 0
-                  , [ Css.Animations.property "transform" "scale(var(--btn-focus-scale, 0.98))"
-                    ]
-                  )
-                , ( 40
-                  , [ Css.Animations.property "transform" "scale(1.02)"
-                    ]
-                  )
-                , ( 100
-                  , [ Css.Animations.property "transform" "scale(1)"
-                    ]
-                  )
-                ]
-            )
         , Css.property "transition-property" "color, background-color, border-color, opacity, box-shadow, transform"
         , Css.property "--tw-text-opacity" "1"
         , Css.property "color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)))"
@@ -7900,6 +7878,25 @@ btn =
                     )
                 , Css.property "transform" "scale(var(--btn-focus-scale, 0.97))"
                 ]
+            ]
+        , Css.Media.withMediaQuery [ "(prefers-reduced-motion: no-preference)" ]
+            [ Css.property "animation" "var(--animation-btn, 0.25s) ease-out"
+            , Css.animationName
+                (Css.Animations.keyframes
+                    [ ( 0
+                      , [ Css.Animations.property "transform" "scale(var(--btn-focus-scale, 0.98))"
+                        ]
+                      )
+                    , ( 40
+                      , [ Css.Animations.property "transform" "scale(1.02)"
+                        ]
+                      )
+                    , ( 100
+                      , [ Css.Animations.property "transform" "scale(1)"
+                        ]
+                      )
+                    ]
+                )
             ]
         , Css.Media.withMediaQuery [ "(hover: hover)" ]
             [ Css.pseudoClass "is"
@@ -42689,6 +42686,15 @@ tab =
             [ Css.property "outline" "2px solid transparent"
             , Css.property "outline-offset" "2px"
             ]
+        , Css.pseudoClass "is"
+            [ Css.pseudoClass "not"
+                [ Css.pseudoClass "not"
+                    [ Css.property "border-color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-border-opacity)))"
+                    , Css.property "--tw-border-opacity" "1"
+                    , Css.property "--tw-text-opacity" "1"
+                    ]
+                ]
+            ]
         , Css.pseudoClass "not"
             [ Css.pseudoClass "empty"
                 [ Css.property "cursor" "default"
@@ -42705,6 +42711,9 @@ tab =
             [ Css.property "width" "auto"
             , Css.property "border-bottom-right-radius" "0px"
             , Css.property "border-bottom-left-radius" "0px"
+            , Css.property "border-color" "var(--fallback-bc,oklch(var(--bc)/var(--tw-border-opacity)))"
+            , Css.property "--tw-border-opacity" "1"
+            , Css.property "--tw-text-opacity" "1"
             ]
         , Css.Media.withMediaQuery [ "(hover:hover)" ]
             [ Css.pseudoClass "hover"
@@ -43079,7 +43088,7 @@ tabs_boxed =
                 ]
             ]
         , Css.Global.descendants
-            [ Css.Global.selector ".tab-active:not(.tab-disabled):not([disabled])"
+            [ Css.Global.selector ":is(.tab-active, [aria-selected=\"true\"]):not(.tab-disabled):not([disabled])"
                 [ Css.property "--tw-bg-opacity" "1"
                 , Css.property "background-color" "var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity)))"
                 , Css.property "--tw-text-opacity" "1"
@@ -43101,7 +43110,7 @@ tabs_boxed =
             ]
         , Css.Media.withMediaQuery [ "(hover:hover)" ]
             [ Css.Global.descendants
-                [ Css.Global.selector ".tab-active:not(.tab-disabled):not([disabled]):hover"
+                [ Css.Global.selector ":is(.tab-active, [aria-selected=\"true\"]):not(.tab-disabled):not([disabled]):hover"
                     [ Css.property "--tw-text-opacity" "1"
                     , Css.property "color" "var(--fallback-pc,oklch(var(--pc)/var(--tw-text-opacity)))"
                     ]
@@ -43133,7 +43142,7 @@ tabs_lifted =
                 ]
             ]
         , Css.Global.children
-            [ Css.Global.selector ".tab-active:not(.tab-disabled):not([disabled]) + .tabs-lifted .tab-active:not(.tab-disabled):not([disabled]):before"
+            [ Css.Global.selector ":is(.tab-active, [aria-selected=\"true\"]):not(.tab-disabled):not([disabled]) + .tabs-lifted :is(.tab-active, [aria-selected=\"true\"]):not(.tab-disabled):not([disabled]):before"
                 [ Css.property "background-image" "var(--radius-end)"
                 , Css.property "background-position" "top right"
                 ]
@@ -43145,7 +43154,7 @@ tabs_lifted =
                 ]
             ]
         , Css.Global.children
-            [ Css.Global.selector ".tab.tab-active:not(.tab-disabled):not([disabled]):last-child:before"
+            [ Css.Global.selector ".tab:is(.tab-active, [aria-selected=\"true\"]):not(.tab-disabled):not([disabled]):last-child:before"
                 [ Css.property "background-image" "var(--radius-start)"
                 , Css.property "background-position" "top left"
                 ]
@@ -43157,7 +43166,7 @@ tabs_lifted =
                 ]
             ]
         , Css.Global.children
-            [ Css.Global.selector ".tab.tab-active:not(.tab-disabled):not([disabled]):first-child:before"
+            [ Css.Global.selector ".tab:is(.tab-active, [aria-selected=\"true\"]):not(.tab-disabled):not([disabled]):first-child:before"
                 [ Css.property "background-image" "var(--radius-end)"
                 , Css.property "background-position" "top right"
                 ]
@@ -43181,7 +43190,7 @@ tabs_lifted =
                 ]
             ]
         , Css.Global.children
-            [ Css.Global.selector ".tab.tab-active:not(.tab-disabled):not([disabled]):before"
+            [ Css.Global.selector ".tab:is(.tab-active, [aria-selected=\"true\"]):not(.tab-disabled):not([disabled]):before"
                 [ Css.property "z-index" "1"
                 , Css.property "content" "\"\""
                 , Css.property "display" "block"
@@ -43212,7 +43221,7 @@ tabs_lifted =
                 ]
             ]
         , Css.Global.children
-            [ Css.Global.selector ".tab.tab-active:not(.tab-disabled):not([disabled])"
+            [ Css.Global.selector ".tab:is(.tab-active, [aria-selected=\"true\"]):not(.tab-disabled):not([disabled])"
                 [ Css.property "background-color" "var(--tab-bg)"
                 , Css.property "border-width" "var(--tab-border, 1px) var(--tab-border, 1px) 0 var(--tab-border, 1px)"
                 , Css.property "border-inline-start-color" "var(--tab-border-color)"
