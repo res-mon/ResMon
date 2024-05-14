@@ -1,8 +1,0 @@
-type WorkClockQuery {
-	activity: ActivityQuery!
-	history: HistoryQuery!
-}
-
-type WorkClockMutation {
-	activity: ActivityMutation!
-}

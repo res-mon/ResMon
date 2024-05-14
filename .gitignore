@@ -1,9 +1,4 @@
-/data/
-/elm-stuff/
-/node_modules/
-/review/elm-stuff/
-/tests/VerifyExamples/
-/webroot/
-
-/ResMon
-/ResMon.exe
+*.beam
+*.ez
+/build
+erl_crash.dump
