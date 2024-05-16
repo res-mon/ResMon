@@ -19,6 +19,7 @@ lustre = ">= 4.2.2 and < 5.0.0"
 lustre_http = ">= 0.5.2 and < 1.0.0"
 tardis = ">= 0.1.0 and < 1.0.0"
 lustre_ui = ">= 0.6.0 and < 1.0.0"
+lustre_websocket = ">= 0.7.6 and < 1.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
