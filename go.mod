@@ -5,7 +5,7 @@ go 1.22.0
 require (
 	github.com/gorilla/websocket v1.5.1
 	github.com/sqlc-dev/sqlc v1.26.0
-	github.com/vektah/gqlparser/v2 v2.5.11
+	github.com/vektah/gqlparser/v2 v2.5.12
 )
 
 require (
