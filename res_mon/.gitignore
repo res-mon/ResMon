@@ -1,0 +1,5 @@
+*.beam
+*.ez
+/build
+/data
+erl_crash.dump
