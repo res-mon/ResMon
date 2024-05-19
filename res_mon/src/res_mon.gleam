@@ -1,14 +1,14 @@
-import birl
 import database
 import dot_env
 import dot_env/env
-import gleam/erlang/process
-import gleam/io
 import mist
 import simplifile
 import web/router
 import web/web.{Context}
 import wisp
+
+@external(erlang, "signal_handler_ffi", "wait_for_shutdown")
+pub fn wait_for_shutdown() -> Nil
 
 pub fn main() {
   let assert Ok(_) = simplifile.create_directory_all("./data")
@@ -29,33 +29,10 @@ pub fn main() {
     |> mist.port(8321)
     |> mist.start_http
 
-  process.trap_exits(True)
 
-  // Create a selector to handle exit signals
-  let selector =
-    process.new_selector()
-    |> process.selecting_trapped_exits(handle_exit_signal(db))
+  wait_for_shutdown()
 
-  // Run your main application logic here
-  io.println("Application is running...")
-
-  // Wait for an exit signal
-  let _ = process.select_forever(selector)
-
-  io.println("Application is shutting down.")
-}
-
-fn handle_exit_signal(db: database.Database) -> fn(process.ExitMessage) -> Nil {
-  fn(signal: process.ExitMessage) -> Nil{
-    // Close the database connection here
-    io.println("Received exit signal:")
-    io.debug(signal)
-    io.println("Closing database connection...")
-    // Your code to close the database connection
-    
-    let assert Ok(_) = database.close(db)
-    Nil
-  }
+  let assert Ok(_) = database.close(db)
 }
 
 fn static_directory() {

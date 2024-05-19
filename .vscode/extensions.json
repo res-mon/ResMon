@@ -9,6 +9,7 @@
 		"supertsy5.line-length-checker-vscode",
     "gleam.gleam",
     "ms-vscode-remote.remote-containers",
-    "tyriar.sort-lines",
+	"tyriar.sort-lines",
+	"pgourlain.erlang",
 	]
 }
