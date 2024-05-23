@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM alpine:3.19 as builder
+FROM --platform=$BUILDPLATFORM alpine:3.20 as builder
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ ARG TARGETARCH
 RUN mv res-mon-linux-${TARGETARCH} res-mon
 
 
-FROM alpine:3.19
+FROM alpine:3.20
 
 RUN mkdir /app && addgroup -S appuser && adduser -S -G appuser -h /app appuser && chown appuser:appuser /app && chmod 500 /app
 
