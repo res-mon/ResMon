@@ -6,11 +6,13 @@ import simplifile
 import web/router
 import web/web.{Context}
 import wisp
+import gleam/io
+import extension
 
-@external(erlang, "signal_handler_ffi", "wait_for_shutdown")
-pub fn wait_for_shutdown() -> Nil
 
 pub fn main() {
+  io.println("Starting ResMon...")
+
   let assert Ok(_) = simplifile.create_directory_all("./data")
   let assert Ok(db) = database.open("./data/database.db")
 
@@ -30,9 +32,11 @@ pub fn main() {
     |> mist.start_http
 
 
-  wait_for_shutdown()
+  extension.wait_for_shutdown()
 
+  io.println("ResMon is shutting down...")
   let assert Ok(_) = database.close(db)
+  io.println("ResMon has shut down. Thanks for using it! <3")
 }
 
 fn static_directory() {

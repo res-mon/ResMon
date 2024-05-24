@@ -1,6 +1,5 @@
--module(signal_handler_ffi).
+-module(extension_ffi).
 -export([wait_for_shutdown/0]).
-
 
 wait_for_shutdown() ->
     erlang:unregister(erl_signal_server),
