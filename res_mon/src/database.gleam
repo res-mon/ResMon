@@ -105,8 +105,7 @@ fn combine_migrations(
     True -> {
       case a.up, a.down, b.up, b.down {
         option.Some(_), _, option.Some(_), _
-        | _, option.Some(_), _, option.Some(_)
-        ->
+        | _, option.Some(_), _, option.Some(_) ->
           Error(ErrorMessage(
             "Migrations from version "
             <> int.to_string(a.version)

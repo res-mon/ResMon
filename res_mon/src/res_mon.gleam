@@ -1,14 +1,13 @@
 import database
 import dot_env
 import dot_env/env
+import extension
+import gleam/io
 import mist
 import simplifile
 import web/router
 import web/web.{Context}
 import wisp
-import gleam/io
-import extension
-
 
 pub fn main() {
   io.println("Starting ResMon...")
@@ -30,7 +29,6 @@ pub fn main() {
     |> mist.new
     |> mist.port(8321)
     |> mist.start_http
-
 
   extension.wait_for_shutdown()
 

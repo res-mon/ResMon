@@ -29,12 +29,14 @@ pub fn default_responses(handle_request: fn() -> wisp.Response) -> wisp.Response
   use <- bool.guard(when: response.body != wisp.Empty, return: response)
 
   case response.status {
-    404 | 405 ->
+    404
+    | 405 ->
       "<h1>Not Found</h1>"
       |> string_builder.from_string
       |> wisp.html_body(response, _)
 
-    400 | 422 ->
+    400
+    | 422 ->
       "<h1>Bad request</h1>"
       |> string_builder.from_string
       |> wisp.html_body(response, _)
