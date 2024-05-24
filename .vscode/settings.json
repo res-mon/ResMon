@@ -51,5 +51,11 @@
 	"sortLines.filterBlankLines": true,
 	"[sql]": {
 		"editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
+	},
+	"[erlang]": {
+		"editor.defaultFormatter": "pgourlain.erlang"
+	},
+	"[gleam]": {
+		"editor.defaultFormatter": "gleam.gleam"
 	}
 }
