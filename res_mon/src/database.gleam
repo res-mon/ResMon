@@ -136,7 +136,7 @@ fn insert_migration(
   })
 
   let now = birl.utc_now()
-  let unix_micros = birl.to_unix(now) * 1_000_000
+  let unix_micros = birl.to_unix_micro(now)
 
   use _ <- result.try(query(
     insert_migration_query,
