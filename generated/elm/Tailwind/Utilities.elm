@@ -173,6 +173,9 @@ globalStyles =
     , Css.Global.selector "html"
         [ Css.property "-webkit-tap-highlight-color" "transparent"
         ]
+    , Css.Global.selector "*"
+        [ Css.property "scrollbar-color" "currentColor transparent"
+        ]
     , Css.Global.selector ":root"
         [ Css.property "--p" "60.5299% 0.131413 253.342306"
         , Css.property "--pc" "17.3895% 0.097507 291.48584"
