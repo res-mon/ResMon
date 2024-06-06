@@ -17427,6 +17427,188 @@ neg_bottom_px =
     )
 
 
+neg_col_end_1 : ( List Css.Style, List String )
+neg_col_end_1 =
+    ( [ Tw.neg_col_end_1 ]
+    , [ "-col-end-1" ]
+    )
+
+
+neg_col_end_10 : ( List Css.Style, List String )
+neg_col_end_10 =
+    ( [ Tw.neg_col_end_10 ]
+    , [ "-col-end-10" ]
+    )
+
+
+neg_col_end_11 : ( List Css.Style, List String )
+neg_col_end_11 =
+    ( [ Tw.neg_col_end_11 ]
+    , [ "-col-end-11" ]
+    )
+
+
+neg_col_end_12 : ( List Css.Style, List String )
+neg_col_end_12 =
+    ( [ Tw.neg_col_end_12 ]
+    , [ "-col-end-12" ]
+    )
+
+
+neg_col_end_13 : ( List Css.Style, List String )
+neg_col_end_13 =
+    ( [ Tw.neg_col_end_13 ]
+    , [ "-col-end-13" ]
+    )
+
+
+neg_col_end_2 : ( List Css.Style, List String )
+neg_col_end_2 =
+    ( [ Tw.neg_col_end_2 ]
+    , [ "-col-end-2" ]
+    )
+
+
+neg_col_end_3 : ( List Css.Style, List String )
+neg_col_end_3 =
+    ( [ Tw.neg_col_end_3 ]
+    , [ "-col-end-3" ]
+    )
+
+
+neg_col_end_4 : ( List Css.Style, List String )
+neg_col_end_4 =
+    ( [ Tw.neg_col_end_4 ]
+    , [ "-col-end-4" ]
+    )
+
+
+neg_col_end_5 : ( List Css.Style, List String )
+neg_col_end_5 =
+    ( [ Tw.neg_col_end_5 ]
+    , [ "-col-end-5" ]
+    )
+
+
+neg_col_end_6 : ( List Css.Style, List String )
+neg_col_end_6 =
+    ( [ Tw.neg_col_end_6 ]
+    , [ "-col-end-6" ]
+    )
+
+
+neg_col_end_7 : ( List Css.Style, List String )
+neg_col_end_7 =
+    ( [ Tw.neg_col_end_7 ]
+    , [ "-col-end-7" ]
+    )
+
+
+neg_col_end_8 : ( List Css.Style, List String )
+neg_col_end_8 =
+    ( [ Tw.neg_col_end_8 ]
+    , [ "-col-end-8" ]
+    )
+
+
+neg_col_end_9 : ( List Css.Style, List String )
+neg_col_end_9 =
+    ( [ Tw.neg_col_end_9 ]
+    , [ "-col-end-9" ]
+    )
+
+
+neg_col_start_1 : ( List Css.Style, List String )
+neg_col_start_1 =
+    ( [ Tw.neg_col_start_1 ]
+    , [ "-col-start-1" ]
+    )
+
+
+neg_col_start_10 : ( List Css.Style, List String )
+neg_col_start_10 =
+    ( [ Tw.neg_col_start_10 ]
+    , [ "-col-start-10" ]
+    )
+
+
+neg_col_start_11 : ( List Css.Style, List String )
+neg_col_start_11 =
+    ( [ Tw.neg_col_start_11 ]
+    , [ "-col-start-11" ]
+    )
+
+
+neg_col_start_12 : ( List Css.Style, List String )
+neg_col_start_12 =
+    ( [ Tw.neg_col_start_12 ]
+    , [ "-col-start-12" ]
+    )
+
+
+neg_col_start_13 : ( List Css.Style, List String )
+neg_col_start_13 =
+    ( [ Tw.neg_col_start_13 ]
+    , [ "-col-start-13" ]
+    )
+
+
+neg_col_start_2 : ( List Css.Style, List String )
+neg_col_start_2 =
+    ( [ Tw.neg_col_start_2 ]
+    , [ "-col-start-2" ]
+    )
+
+
+neg_col_start_3 : ( List Css.Style, List String )
+neg_col_start_3 =
+    ( [ Tw.neg_col_start_3 ]
+    , [ "-col-start-3" ]
+    )
+
+
+neg_col_start_4 : ( List Css.Style, List String )
+neg_col_start_4 =
+    ( [ Tw.neg_col_start_4 ]
+    , [ "-col-start-4" ]
+    )
+
+
+neg_col_start_5 : ( List Css.Style, List String )
+neg_col_start_5 =
+    ( [ Tw.neg_col_start_5 ]
+    , [ "-col-start-5" ]
+    )
+
+
+neg_col_start_6 : ( List Css.Style, List String )
+neg_col_start_6 =
+    ( [ Tw.neg_col_start_6 ]
+    , [ "-col-start-6" ]
+    )
+
+
+neg_col_start_7 : ( List Css.Style, List String )
+neg_col_start_7 =
+    ( [ Tw.neg_col_start_7 ]
+    , [ "-col-start-7" ]
+    )
+
+
+neg_col_start_8 : ( List Css.Style, List String )
+neg_col_start_8 =
+    ( [ Tw.neg_col_start_8 ]
+    , [ "-col-start-8" ]
+    )
+
+
+neg_col_start_9 : ( List Css.Style, List String )
+neg_col_start_9 =
+    ( [ Tw.neg_col_start_9 ]
+    , [ "-col-start-9" ]
+    )
+
+
 neg_end_0 : ( List Css.Style, List String )
 neg_end_0 =
     ( [ Tw.neg_end_0 ]
@@ -21883,6 +22065,188 @@ neg_rotate_90 : ( List Css.Style, List String )
 neg_rotate_90 =
     ( [ Tw.neg_rotate_90 ]
     , [ "-rotate-90" ]
+    )
+
+
+neg_row_end_1 : ( List Css.Style, List String )
+neg_row_end_1 =
+    ( [ Tw.neg_row_end_1 ]
+    , [ "-row-end-1" ]
+    )
+
+
+neg_row_end_10 : ( List Css.Style, List String )
+neg_row_end_10 =
+    ( [ Tw.neg_row_end_10 ]
+    , [ "-row-end-10" ]
+    )
+
+
+neg_row_end_11 : ( List Css.Style, List String )
+neg_row_end_11 =
+    ( [ Tw.neg_row_end_11 ]
+    , [ "-row-end-11" ]
+    )
+
+
+neg_row_end_12 : ( List Css.Style, List String )
+neg_row_end_12 =
+    ( [ Tw.neg_row_end_12 ]
+    , [ "-row-end-12" ]
+    )
+
+
+neg_row_end_13 : ( List Css.Style, List String )
+neg_row_end_13 =
+    ( [ Tw.neg_row_end_13 ]
+    , [ "-row-end-13" ]
+    )
+
+
+neg_row_end_2 : ( List Css.Style, List String )
+neg_row_end_2 =
+    ( [ Tw.neg_row_end_2 ]
+    , [ "-row-end-2" ]
+    )
+
+
+neg_row_end_3 : ( List Css.Style, List String )
+neg_row_end_3 =
+    ( [ Tw.neg_row_end_3 ]
+    , [ "-row-end-3" ]
+    )
+
+
+neg_row_end_4 : ( List Css.Style, List String )
+neg_row_end_4 =
+    ( [ Tw.neg_row_end_4 ]
+    , [ "-row-end-4" ]
+    )
+
+
+neg_row_end_5 : ( List Css.Style, List String )
+neg_row_end_5 =
+    ( [ Tw.neg_row_end_5 ]
+    , [ "-row-end-5" ]
+    )
+
+
+neg_row_end_6 : ( List Css.Style, List String )
+neg_row_end_6 =
+    ( [ Tw.neg_row_end_6 ]
+    , [ "-row-end-6" ]
+    )
+
+
+neg_row_end_7 : ( List Css.Style, List String )
+neg_row_end_7 =
+    ( [ Tw.neg_row_end_7 ]
+    , [ "-row-end-7" ]
+    )
+
+
+neg_row_end_8 : ( List Css.Style, List String )
+neg_row_end_8 =
+    ( [ Tw.neg_row_end_8 ]
+    , [ "-row-end-8" ]
+    )
+
+
+neg_row_end_9 : ( List Css.Style, List String )
+neg_row_end_9 =
+    ( [ Tw.neg_row_end_9 ]
+    , [ "-row-end-9" ]
+    )
+
+
+neg_row_start_1 : ( List Css.Style, List String )
+neg_row_start_1 =
+    ( [ Tw.neg_row_start_1 ]
+    , [ "-row-start-1" ]
+    )
+
+
+neg_row_start_10 : ( List Css.Style, List String )
+neg_row_start_10 =
+    ( [ Tw.neg_row_start_10 ]
+    , [ "-row-start-10" ]
+    )
+
+
+neg_row_start_11 : ( List Css.Style, List String )
+neg_row_start_11 =
+    ( [ Tw.neg_row_start_11 ]
+    , [ "-row-start-11" ]
+    )
+
+
+neg_row_start_12 : ( List Css.Style, List String )
+neg_row_start_12 =
+    ( [ Tw.neg_row_start_12 ]
+    , [ "-row-start-12" ]
+    )
+
+
+neg_row_start_13 : ( List Css.Style, List String )
+neg_row_start_13 =
+    ( [ Tw.neg_row_start_13 ]
+    , [ "-row-start-13" ]
+    )
+
+
+neg_row_start_2 : ( List Css.Style, List String )
+neg_row_start_2 =
+    ( [ Tw.neg_row_start_2 ]
+    , [ "-row-start-2" ]
+    )
+
+
+neg_row_start_3 : ( List Css.Style, List String )
+neg_row_start_3 =
+    ( [ Tw.neg_row_start_3 ]
+    , [ "-row-start-3" ]
+    )
+
+
+neg_row_start_4 : ( List Css.Style, List String )
+neg_row_start_4 =
+    ( [ Tw.neg_row_start_4 ]
+    , [ "-row-start-4" ]
+    )
+
+
+neg_row_start_5 : ( List Css.Style, List String )
+neg_row_start_5 =
+    ( [ Tw.neg_row_start_5 ]
+    , [ "-row-start-5" ]
+    )
+
+
+neg_row_start_6 : ( List Css.Style, List String )
+neg_row_start_6 =
+    ( [ Tw.neg_row_start_6 ]
+    , [ "-row-start-6" ]
+    )
+
+
+neg_row_start_7 : ( List Css.Style, List String )
+neg_row_start_7 =
+    ( [ Tw.neg_row_start_7 ]
+    , [ "-row-start-7" ]
+    )
+
+
+neg_row_start_8 : ( List Css.Style, List String )
+neg_row_start_8 =
+    ( [ Tw.neg_row_start_8 ]
+    , [ "-row-start-8" ]
+    )
+
+
+neg_row_start_9 : ( List Css.Style, List String )
+neg_row_start_9 =
+    ( [ Tw.neg_row_start_9 ]
+    , [ "-row-start-9" ]
     )
 
 

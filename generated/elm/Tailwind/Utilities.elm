@@ -19992,6 +19992,136 @@ neg_bottom_px =
     Css.property "bottom" "-1px"
 
 
+neg_col_end_1 : Css.Style
+neg_col_end_1 =
+    Css.property "grid-column-end" "-1"
+
+
+neg_col_end_10 : Css.Style
+neg_col_end_10 =
+    Css.property "grid-column-end" "-10"
+
+
+neg_col_end_11 : Css.Style
+neg_col_end_11 =
+    Css.property "grid-column-end" "-11"
+
+
+neg_col_end_12 : Css.Style
+neg_col_end_12 =
+    Css.property "grid-column-end" "-12"
+
+
+neg_col_end_13 : Css.Style
+neg_col_end_13 =
+    Css.property "grid-column-end" "-13"
+
+
+neg_col_end_2 : Css.Style
+neg_col_end_2 =
+    Css.property "grid-column-end" "-2"
+
+
+neg_col_end_3 : Css.Style
+neg_col_end_3 =
+    Css.property "grid-column-end" "-3"
+
+
+neg_col_end_4 : Css.Style
+neg_col_end_4 =
+    Css.property "grid-column-end" "-4"
+
+
+neg_col_end_5 : Css.Style
+neg_col_end_5 =
+    Css.property "grid-column-end" "-5"
+
+
+neg_col_end_6 : Css.Style
+neg_col_end_6 =
+    Css.property "grid-column-end" "-6"
+
+
+neg_col_end_7 : Css.Style
+neg_col_end_7 =
+    Css.property "grid-column-end" "-7"
+
+
+neg_col_end_8 : Css.Style
+neg_col_end_8 =
+    Css.property "grid-column-end" "-8"
+
+
+neg_col_end_9 : Css.Style
+neg_col_end_9 =
+    Css.property "grid-column-end" "-9"
+
+
+neg_col_start_1 : Css.Style
+neg_col_start_1 =
+    Css.property "grid-column-start" "-1"
+
+
+neg_col_start_10 : Css.Style
+neg_col_start_10 =
+    Css.property "grid-column-start" "-10"
+
+
+neg_col_start_11 : Css.Style
+neg_col_start_11 =
+    Css.property "grid-column-start" "-11"
+
+
+neg_col_start_12 : Css.Style
+neg_col_start_12 =
+    Css.property "grid-column-start" "-12"
+
+
+neg_col_start_13 : Css.Style
+neg_col_start_13 =
+    Css.property "grid-column-start" "-13"
+
+
+neg_col_start_2 : Css.Style
+neg_col_start_2 =
+    Css.property "grid-column-start" "-2"
+
+
+neg_col_start_3 : Css.Style
+neg_col_start_3 =
+    Css.property "grid-column-start" "-3"
+
+
+neg_col_start_4 : Css.Style
+neg_col_start_4 =
+    Css.property "grid-column-start" "-4"
+
+
+neg_col_start_5 : Css.Style
+neg_col_start_5 =
+    Css.property "grid-column-start" "-5"
+
+
+neg_col_start_6 : Css.Style
+neg_col_start_6 =
+    Css.property "grid-column-start" "-6"
+
+
+neg_col_start_7 : Css.Style
+neg_col_start_7 =
+    Css.property "grid-column-start" "-7"
+
+
+neg_col_start_8 : Css.Style
+neg_col_start_8 =
+    Css.property "grid-column-start" "-8"
+
+
+neg_col_start_9 : Css.Style
+neg_col_start_9 =
+    Css.property "grid-column-start" "-9"
+
+
 neg_end_0 : Css.Style
 neg_end_0 =
     Css.property "inset-inline-end" "-0px"
@@ -23682,6 +23812,136 @@ neg_rotate_90 =
         [ Css.property "--tw-rotate" "-90deg"
         , Css.property "transform" "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
         ]
+
+
+neg_row_end_1 : Css.Style
+neg_row_end_1 =
+    Css.property "grid-row-end" "-1"
+
+
+neg_row_end_10 : Css.Style
+neg_row_end_10 =
+    Css.property "grid-row-end" "-10"
+
+
+neg_row_end_11 : Css.Style
+neg_row_end_11 =
+    Css.property "grid-row-end" "-11"
+
+
+neg_row_end_12 : Css.Style
+neg_row_end_12 =
+    Css.property "grid-row-end" "-12"
+
+
+neg_row_end_13 : Css.Style
+neg_row_end_13 =
+    Css.property "grid-row-end" "-13"
+
+
+neg_row_end_2 : Css.Style
+neg_row_end_2 =
+    Css.property "grid-row-end" "-2"
+
+
+neg_row_end_3 : Css.Style
+neg_row_end_3 =
+    Css.property "grid-row-end" "-3"
+
+
+neg_row_end_4 : Css.Style
+neg_row_end_4 =
+    Css.property "grid-row-end" "-4"
+
+
+neg_row_end_5 : Css.Style
+neg_row_end_5 =
+    Css.property "grid-row-end" "-5"
+
+
+neg_row_end_6 : Css.Style
+neg_row_end_6 =
+    Css.property "grid-row-end" "-6"
+
+
+neg_row_end_7 : Css.Style
+neg_row_end_7 =
+    Css.property "grid-row-end" "-7"
+
+
+neg_row_end_8 : Css.Style
+neg_row_end_8 =
+    Css.property "grid-row-end" "-8"
+
+
+neg_row_end_9 : Css.Style
+neg_row_end_9 =
+    Css.property "grid-row-end" "-9"
+
+
+neg_row_start_1 : Css.Style
+neg_row_start_1 =
+    Css.property "grid-row-start" "-1"
+
+
+neg_row_start_10 : Css.Style
+neg_row_start_10 =
+    Css.property "grid-row-start" "-10"
+
+
+neg_row_start_11 : Css.Style
+neg_row_start_11 =
+    Css.property "grid-row-start" "-11"
+
+
+neg_row_start_12 : Css.Style
+neg_row_start_12 =
+    Css.property "grid-row-start" "-12"
+
+
+neg_row_start_13 : Css.Style
+neg_row_start_13 =
+    Css.property "grid-row-start" "-13"
+
+
+neg_row_start_2 : Css.Style
+neg_row_start_2 =
+    Css.property "grid-row-start" "-2"
+
+
+neg_row_start_3 : Css.Style
+neg_row_start_3 =
+    Css.property "grid-row-start" "-3"
+
+
+neg_row_start_4 : Css.Style
+neg_row_start_4 =
+    Css.property "grid-row-start" "-4"
+
+
+neg_row_start_5 : Css.Style
+neg_row_start_5 =
+    Css.property "grid-row-start" "-5"
+
+
+neg_row_start_6 : Css.Style
+neg_row_start_6 =
+    Css.property "grid-row-start" "-6"
+
+
+neg_row_start_7 : Css.Style
+neg_row_start_7 =
+    Css.property "grid-row-start" "-7"
+
+
+neg_row_start_8 : Css.Style
+neg_row_start_8 =
+    Css.property "grid-row-start" "-8"
+
+
+neg_row_start_9 : Css.Style
+neg_row_start_9 =
+    Css.property "grid-row-start" "-9"
 
 
 neg_scale_0 : Css.Style
