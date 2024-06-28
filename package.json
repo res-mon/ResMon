@@ -41,7 +41,7 @@
 		"@tailwindcss/typography": "^0.5.13",
 		"@types/color-name": "^1.1.4",
 		"@types/deep-equal": "^1.0.4",
-		"@types/lodash": "^4.17.1",
+		"@types/lodash": "^4.17.6",
 		"autoprefixer": "^10.4.19",
 		"clean-webpack-plugin": "^4.0.0",
 		"concurrently": "^8.2.2",
